@@ -33,6 +33,17 @@
 	width: 100%;
 }
 
+#pitch-container .pitch {
+	position: relative;
+	right: 0;
+	left: 0;
+	margin: auto auto; 
+	height: 380px;
+	width: 650px;
+	top: 50%;
+  	transform: translateY(-50%);
+}
+
 #actions-container {
 	height: 25%;
 	width: 100%;
