@@ -13,17 +13,69 @@ require(["userArea/PitchService", "userArea/ActionsService", "userArea/InfoServi
 
 });
 
-//TODO extract to separate file
+initialMockConfig = {
+	"config": {
+		"players":3,
+		"rows":3,
+		"columns":9
+	},
+	"state": {
+		"TwerkinPlayer1": {"x":0, "y":1},
+		"TwerkinPlayer2": {"x":1, "y":1},
+		"TwerkinPlayer3": {"x":0, "y":2},
+		"CuloGordoPlayer1": {"x":5, "y":0},
+		"CuloGordoPlayer2": {"x":5, "y":1},
+		"CuloGordoPlayer3": {"x":5, "y":2},
+		"ball": {"x":3,"y":3}
+	}
+}
 
+initialMockUsers = {
+	"alvarito": "A.D. Twerkin",
+	"alexito": "Culo Gordo F.C."
+}
+
+//TODO extract to separate file
 GameManager = (function() {
 	"use strict";
 
 	var GameManager = function(stateHandler) {
 		this.stateHandler = stateHandler;
+		this.state = {};
+		this.userTeams = {};
 	};
 
 	GameManager.prototype.start = function() {
+		//poll for players and initialConfig, websockets probably
+		//AJAXService.askForPlayers(onUserReady());
+		//AJAXService.askForInitialConfig(onConfigReady());
+		//AJAXService
 
+		onConfigReady.call(this);
+		onUserReady.call(this);
+
+	};
+
+	function onConfigReady(config) {
+		this.state = initialMockConfig;
+		tryGameStart.call(this);
+
+	};
+
+	function onUserReady(userName) {
+		this.userTeams = initialMockUsers;
+		tryGameStart.call(this);
+	};
+
+	function tryGameStart() {
+		if (!this.state || Object.keys(this.userTeams).length !== 2) {
+			return;
+		}
+
+		console.log("GAME START!!");
+		this.state.userTeams = this.userTeams;
+			
+		this.stateHandler.loadState(this.state, true);
 	};
 
 	return GameManager;
