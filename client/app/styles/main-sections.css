@@ -44,6 +44,20 @@
   	transform: translateY(-50%);
 }
 
+.pitch .player.mine {
+	font-size: 12px;
+	font-weight: bold;
+	border: 1px solid;
+	border-color: red;
+	color: red;
+}
+
+.pitch .player.rival {
+	font-size: 10px;
+	border-color: blue;
+	color: blue;
+}
+
 #actions-container {
 	height: 25%;
 	width: 100%;

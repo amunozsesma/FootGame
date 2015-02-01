@@ -17,15 +17,24 @@ initialMockConfig = {
 	"config": {
 		"players":3,
 		"rows":3,
-		"columns":9
+		"columns":6,
+		"user":"alvarito",
+		"team": "A.D. Twerkin",
+		"rival": "Culo Gordo F.C."
 	},
 	"state": {
-		"TwerkinPlayer1": {"x":0, "y":1},
-		"TwerkinPlayer2": {"x":1, "y":1},
-		"TwerkinPlayer3": {"x":0, "y":2},
-		"CuloGordoPlayer1": {"x":5, "y":0},
-		"CuloGordoPlayer2": {"x":5, "y":1},
-		"CuloGordoPlayer3": {"x":5, "y":2},
+		"teams": {
+			"A.D. Twerkin": {
+				"TwerkinPlayer1": {"x":0, "y":1},
+				"TwerkinPlayer2": {"x":1, "y":1},
+				"TwerkinPlayer3": {"x":0, "y":2}
+			},
+			"Culo Gordo F.C.": {
+				"CuloGordoPlayer1": {"x":5, "y":0},
+				"CuloGordoPlayer2": {"x":5, "y":1},
+				"CuloGordoPlayer3": {"x":5, "y":2}
+			}
+		},
 		"ball": {"x":3,"y":3}
 	}
 }
