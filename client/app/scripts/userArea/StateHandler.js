@@ -41,7 +41,12 @@ define(["Emitter"], function(Emitter) {
 		}
 	}	
 
-	//Methods to get state information or to modify state
+	//Methods that belong to UserAreaController
+	StateHandler.prototype.cellClicked = function(x, y) {
+		console.log("CEll {x: " + x + ", y: " + y + "} clicked");
+	};
+
+	//Methods to get state information or to modify state --> Extract to StateHandler, rename this class to UserAreaController
 	StateHandler.prototype.getUser = function() {
 		var user = this.initialState.config.user;
 
@@ -82,6 +87,8 @@ define(["Emitter"], function(Emitter) {
 	return StateHandler;
 
 });
+
+
 
 // initialMockConfig = {
 // 	"config": {

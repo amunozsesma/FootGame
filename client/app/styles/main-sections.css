@@ -44,7 +44,15 @@
   	transform: translateY(-50%);
 }
 
-.pitch .player.mine {
+.player {
+	cursor: pointer;
+}
+
+.player:hover {
+	background-color: #8AFF93;
+}
+
+.pitch .player .mine {
 	font-size: 12px;
 	font-weight: bold;
 	border: 1px solid;
@@ -52,7 +60,7 @@
 	color: red;
 }
 
-.pitch .player.rival {
+.pitch .player .rival {
 	font-size: 10px;
 	border-color: blue;
 	color: blue;

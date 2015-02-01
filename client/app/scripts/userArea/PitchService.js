@@ -11,11 +11,12 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	function init() {
-		var self = this;
-		
+		var own = this;
+
 		var pitchComponent = React.createClass({
   			getInitialState: function() {
     			return {
+            "stateHandler": own.stateHandler,
     				"dimensions": {"columns": 1, "rows": 1},
     				"userPlayers": {},
     				"rivalePlayers": {}
@@ -25,6 +26,9 @@ define(["Emitter"], function(Emitter) {
   				var rowElements = this.loadField();
   				return React.createElement("div", { className: 'pitch' }, rowElements);
   			},
+        cellClicked: function(x, y) {
+          this.state.stateHandler.cellClicked(x, y);
+        },
   			loadField: function() {
   				var rows = this.state.dimensions.rows;
   				var columns = this.state.dimensions.columns;
@@ -34,7 +38,9 @@ define(["Emitter"], function(Emitter) {
   					columnElements = [];
   					for (var j = 0; j < columns; j++) {
   						var player = this.createPlayerIfNeeded(j, i);
-  						columnElements.push(React.createElement("div", { className: 'pitchColumn skeleton green', style: {width: 100/columns + "%", height:"100%", float: "left"} }, player));
+              var className = "pitchColumn skeleton green";
+              className = (player) ? className + " player" : className;
+  						columnElements.push(React.createElement("div", { onClick:this.cellClicked.bind(this, j, i), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, player));
   					}	
   					rowElements.push(React.createElement("div", { className: 'pitchRow skeleton green', style: {width: "100%", height:100/rows + "%" } }, columnElements));
   				}
@@ -57,7 +63,7 @@ define(["Emitter"], function(Emitter) {
   				var player = null;
   				for (var playerName in playerMap) {
   					if (playerMap[playerName].x === x && playerMap[playerName].y === y) {
-  						return React.createElement("span", {className: "player " + className}, playerName);
+  						return React.createElement("span", {className: className}, playerName);
   					}
   				}
   			}
