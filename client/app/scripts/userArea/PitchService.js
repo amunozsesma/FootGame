@@ -6,7 +6,7 @@ define(["Emitter"], function(Emitter) {
 		this.stateHandler = stateHandler;
 
 		// createReactElements.call(this);
-		this.stateHandler.on("load-static-state", init, this);
+    init.call(this);
 		this.stateHandler.on("load-initial-state", loadState, this);
 	};
 

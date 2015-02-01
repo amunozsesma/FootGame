@@ -44,6 +44,32 @@ define(["Emitter"], function(Emitter) {
 	//Methods that belong to UserAreaController
 	StateHandler.prototype.cellClicked = function(x, y) {
 		console.log("CEll {x: " + x + ", y: " + y + "} clicked");
+
+		this.trigger("hide-actions-menu", this);
+
+		if (cellBelongsToUserPlayer.call(this, x, y) || cellBelongsToRivalPlayer.call(this, x, y)) {
+			this.trigger("show-actions-menu", this);
+		}
+	};
+
+	function cellBelongsToUserPlayer(x, y) {
+		return lookForCellInMap.call(this, x, y, this.getUserPlayerPositions());
+	};
+
+	function cellBelongsToRivalPlayer(x, y) {
+		return lookForCellInMap.call(this, x, y, this.getRivalPlayerPositions());	
+	};
+
+	function lookForCellInMap(x, y, map) {
+		var found = false;
+		for (var key in map) {
+			if (map[key].x === x && map[key].y === y) {
+				found = true;
+				break;
+			}
+		}
+
+		return found;
 	};
 
 	//Methods to get state information or to modify state --> Extract to StateHandler, rename this class to UserAreaController
