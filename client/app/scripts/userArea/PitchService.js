@@ -38,11 +38,11 @@ define(["Emitter"], function(Emitter) {
   					columnElements = [];
   					for (var j = 0; j < columns; j++) {
   						var player = this.createPlayerIfNeeded(j, i);
-              var className = "pitchColumn skeleton green";
+              var className = "pitchColumn skeleton";
               className = (player) ? className + " player" : className;
   						columnElements.push(React.createElement("div", { onClick:this.cellClicked.bind(this, j, i), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, player));
   					}	
-  					rowElements.push(React.createElement("div", { className: 'pitchRow skeleton green', style: {width: "100%", height:100/rows + "%" } }, columnElements));
+  					rowElements.push(React.createElement("div", { className: 'pitchRow skeleton', style: {width: "100%", height:100/rows + "%" } }, columnElements));
   				}
 
   				return rowElements;

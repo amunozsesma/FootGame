@@ -30,7 +30,7 @@ define(["Emitter"], function(Emitter) {
     			};
   			},
   			render: function() {
-  				var className = "actions skeleton blue" + ((this.state.below) ? " below" : "");
+  				var className = "actions skeleton" + ((this.state.below) ? " below" : "");
   				return React.createElement("div", { className: className});
   			}
 		});
