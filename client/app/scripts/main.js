@@ -1,14 +1,14 @@
-require(["userArea/PitchService", "userArea/ActionsService", "userArea/InfoService", "userArea/StateHandler"], function(PitchService, ActionsService, InfoService, StateHandler) {
+require(["userArea/PitchService", "userArea/ActionsService", "userArea/InfoService", "userArea/UserAreaController"], function(PitchService, ActionsService, InfoService, UserAreaController) {
 
-	var stateHandler = new StateHandler();
+	var userAreaController = new UserAreaController();
 	
-	var pitchService = new PitchService(document.getElementById("pitch-container"), stateHandler);
-	var infoService = new InfoService(document.getElementById("info-container"), stateHandler);
-	var actionshService = new ActionsService(document.getElementById("actions-container"), stateHandler);
+	var pitchService = new PitchService(document.getElementById("pitch-container"), userAreaController);
+	var infoService = new InfoService(document.getElementById("info-container"), userAreaController);
+	var actionshService = new ActionsService(document.getElementById("actions-container"), userAreaController);
 
-	var gameManager = new GameManager(stateHandler);
+	var gameManager = new GameManager(userAreaController);
 
-	stateHandler.loadStaticContext();
+	userAreaController.loadStaticContext();
 	gameManager.start();
 
 });
@@ -114,8 +114,8 @@ initialMockUsers = {
 GameManager = (function() {
 	"use strict";
 
-	var GameManager = function(stateHandler) {
-		this.stateHandler = stateHandler;
+	var GameManager = function(userAreaController) {
+		this.userAreaController = userAreaController;
 		this.state = {};
 		this.userTeams = {};
 	};
@@ -150,7 +150,7 @@ GameManager = (function() {
 		console.log("GAME START!!");
 		this.state.userTeams = this.userTeams;
 			
-		this.stateHandler.loadState(this.state, true);
+		this.userAreaController.loadState(this.state, true);
 	};
 
 	return GameManager;

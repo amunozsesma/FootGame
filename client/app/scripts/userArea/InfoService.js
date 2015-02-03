@@ -1,12 +1,12 @@
 define(function() {
 	"use strict";
 
-	var InfoService = function(infoElement, stateHandler) {
+	var InfoService = function(infoElement, userAreaController) {
 		this.infoElement = infoElement;
-		this.stateHandler = stateHandler;
+		this.userAreaController = userAreaController;
 
 		init.call(this);
-		this.stateHandler.on("load-initial-state", loadState, this);
+		this.userAreaController.on("load-initial-state", loadState, this);
 	};
 
 	function init() {
@@ -15,7 +15,7 @@ define(function() {
 		var infoComponent = React.createClass({
   			getInitialState: function() {
     			return {
-    				"stateHandler": own.stateHandler,
+    				"userAreaController": own.userAreaController,
     				"teamScores": {},
     			};
   			},
@@ -49,9 +49,9 @@ define(function() {
 		this.reactComponent = React.render(infoElement, this.infoElement);
 	};
 
-	function loadState(stateHandler) {
+	function loadState(userAreaController) {
 		this.reactComponent.setState({
-			"teamScores": stateHandler.getTeamScores()
+			"teamScores": userAreaController.getTeamScores()
 		});
 	};
 

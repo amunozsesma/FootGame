@@ -1,13 +1,13 @@
 define(function() {
 	"use strict";
 
-	var PitchService = function(pitchElement, stateHandler) {
+	var PitchService = function(pitchElement, userAreaController) {
 		this.pitchElement = pitchElement;
-		this.stateHandler = stateHandler;
+		this.userAreaController = userAreaController;
 
 		// createReactElements.call(this);
     init.call(this);
-		this.stateHandler.on("load-initial-state", loadState, this);
+		this.userAreaController.on("load-initial-state", loadState, this);
 	};
 
 	function init() {
@@ -16,7 +16,7 @@ define(function() {
 		var pitchComponent = React.createClass({
   			getInitialState: function() {
     			return {
-            "stateHandler": own.stateHandler,
+            "userAreaController": own.userAreaController,
     				"dimensions": {"columns": 1, "rows": 1},
     				"userPlayers": {},
     				"rivalePlayers": {}
@@ -27,7 +27,7 @@ define(function() {
   				return React.createElement("div", { className: 'pitch' }, rowElements);
   			},
         cellClicked: function(x, y) {
-          this.state.stateHandler.cellClicked(x, y);
+          this.state.userAreaController.cellClicked(x, y);
         },
   			loadField: function() {
   				var rows = this.state.dimensions.rows;
@@ -75,11 +75,11 @@ define(function() {
 		this.reactComponent = React.render(pitchElement, this.pitchElement);
 	};
 
-	function loadState(stateHandler) {
+	function loadState(userAreaController) {
 		this.reactComponent.setState({
-			"dimensions": stateHandler.getDimensions(),
-			"userPlayers": stateHandler.getUserPlayerPositions(),
-			"rivalPlayers": stateHandler.getRivalPlayerPositions()
+			"dimensions": userAreaController.getDimensions(),
+			"userPlayers": userAreaController.getUserPlayerPositions(),
+			"rivalPlayers": userAreaController.getRivalPlayerPositions()
 		});	
 	};
 	

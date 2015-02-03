@@ -1,7 +1,7 @@
 define(["Emitter"], function(Emitter) {
 	"use strict";
 
-	var StateHandler = function() {
+	var UserAreaController = function() {
 		this.initialState = {};
 		this.modifiedState = {};
 
@@ -11,13 +11,13 @@ define(["Emitter"], function(Emitter) {
 		this.seletecActions = {}
 	};
 
-	Emitter.mixInto(StateHandler);
+	Emitter.mixInto(UserAreaController);
 
-	StateHandler.prototype.loadStaticContext = function() {
+	UserAreaController.prototype.loadStaticContext = function() {
 		this.trigger("load-static-state");
 	};
 
-	StateHandler.prototype.loadState = function(state, isInitial) {
+	UserAreaController.prototype.loadState = function(state, isInitial) {
 		//TODO var state = new StateHelper(state);
 		this.initialState = state;
 		processState.call(this);
@@ -47,7 +47,7 @@ define(["Emitter"], function(Emitter) {
 	}	
 
 	//Methods that belong to UserAreaController
-	StateHandler.prototype.cellClicked = function(x, y) {
+	UserAreaController.prototype.cellClicked = function(x, y) {
 		console.log("CEll {x: " + x + ", y: " + y + "} clicked");
 
 		this.trigger("hide-actions-menu", this);
@@ -60,7 +60,7 @@ define(["Emitter"], function(Emitter) {
 		}
 	};
 
-	StateHandler.prototype.actionClicked = function(action) {
+	UserAreaController.prototype.actionClicked = function(action) {
 		console.log(this.playerInMenu + " selected " + action);
 
 		//TODO This goes into modified state
@@ -97,8 +97,8 @@ define(["Emitter"], function(Emitter) {
 	};
 
 
-	//Methods to get state information or to modify state --> TODO Extract to StateHandler, rename this class to UserAreaController
-	StateHandler.prototype.getUser = function() {
+	//Methods to get state information or to modify state --> TODO Extract to UserAreaController, rename this class to UserAreaController
+	UserAreaController.prototype.getUser = function() {
 		var user = this.initialState.config.user;
 
 		if (!user) throw new Error("A ver, subnormal, el puto usuario");
@@ -106,7 +106,7 @@ define(["Emitter"], function(Emitter) {
 		return user;
 	};
 
-	StateHandler.prototype.getDimensions = function() {
+	UserAreaController.prototype.getDimensions = function() {
 		var columns = this.initialState.config.columns;
 		var rows = this.initialState.config.rows;
 
@@ -115,7 +115,7 @@ define(["Emitter"], function(Emitter) {
 		return {"columns": columns, "rows": rows};
 	};
 
-	StateHandler.prototype.getUserPlayerPositions = function() {
+	UserAreaController.prototype.getUserPlayerPositions = function() {
 		var userTeam = this.initialState.config.team;
 		if(!userTeam) throw new Error("El puto usuario no tiene equipo");
 
@@ -125,7 +125,7 @@ define(["Emitter"], function(Emitter) {
 		return userPlayers;
 	};
 
-	StateHandler.prototype.getRivalPlayerPositions = function() {
+	UserAreaController.prototype.getRivalPlayerPositions = function() {
 		var rivalTeam = this.initialState.config.rival;
 		if(!rivalTeam) throw new Error("Sin rival o q?");
 
@@ -135,11 +135,11 @@ define(["Emitter"], function(Emitter) {
 		return rivalPlayers;
 	};
 
-	StateHandler.prototype.getPlayerInMenu = function() {
+	UserAreaController.prototype.getPlayerInMenu = function() {
 		return this.playerInMenu;
 	};
 
-	StateHandler.prototype.getPlayerImage = function() {
+	UserAreaController.prototype.getPlayerImage = function() {
 		var players = getAllPlayers.call(this);
 
 		if (!players) {
@@ -149,7 +149,7 @@ define(["Emitter"], function(Emitter) {
 
 	};
 
-	StateHandler.prototype.getPlayerStats = function() {
+	UserAreaController.prototype.getPlayerStats = function() {
 		var stats = {}
 		if (this.playerInMenu) {
 			var players = getAllPlayers.call(this);
@@ -159,7 +159,7 @@ define(["Emitter"], function(Emitter) {
 		return stats;
 	};
 
-	StateHandler.prototype.getPlayerActions = function() {
+	UserAreaController.prototype.getPlayerActions = function() {
 		if (this.playerInMenu) {
 			var players = getAllPlayers.call(this);
 			var actions = players[this.playerInMenu].actions;
@@ -167,11 +167,11 @@ define(["Emitter"], function(Emitter) {
 		return (actions) ? actions : [];
 	};
 
-	StateHandler.prototype.getSelectedAction = function() {
+	UserAreaController.prototype.getSelectedAction = function() {
 		return (this.seletecActions[this.playerInMenu]) ? this.seletecActions[this.playerInMenu] : "";
 	};
 
-	StateHandler.prototype.getTeamScores = function() {
+	UserAreaController.prototype.getTeamScores = function() {
 		return this.initialState.state.scores;
 	};
 
@@ -194,6 +194,6 @@ define(["Emitter"], function(Emitter) {
 		return players;
 	};
 
-	return StateHandler;
+	return UserAreaController;
 
 });

@@ -10,13 +10,13 @@
 define(function() {
 	"use strict";
 
-	var ActionService = function(actionsElement, stateHandler) {
+	var ActionService = function(actionsElement, userAreaController) {
 		this.actionsElement = actionsElement;
-		this.stateHandler = stateHandler;
+		this.userAreaController = userAreaController;
 
 		init.call(this);
-		this.stateHandler.on("show-actions-menu", showMenu, this);
-		this.stateHandler.on("hide-actions-menu", hideMenu, this);
+		this.userAreaController.on("show-actions-menu", showMenu, this);
+		this.userAreaController.on("hide-actions-menu", hideMenu, this);
 	};
 
 	function init() {
@@ -33,7 +33,7 @@ define(function() {
 		var actionsComponent = React.createClass({
   			getInitialState: function() {
     			return {
-            		"stateHandler": own.stateHandler,
+            		"userAreaController": own.userAreaController,
             		"isHidden": true,
             		"actions": [],
             		"playerStats": {},
@@ -48,7 +48,7 @@ define(function() {
   				return React.createElement("div", { className: className}, [descriptionContainer, statsContainer, buttonsContainer]);
   			},
   			createDescriptionContainer: function() {
-  				var name = React.createElement("div", { className: "name"}, this.state.stateHandler.getPlayerInMenu());
+  				var name = React.createElement("div", { className: "name"}, this.state.userAreaController.getPlayerInMenu());
   				var photoConainer = this.createPhotContainer();
   				return React.createElement("div", { className: "description-container"}, [name, photoConainer]);	
   			},
@@ -56,7 +56,7 @@ define(function() {
   				var props = {
   					className: "skeleton photo-container"
   				};
-  				var image = this.state.stateHandler.getPlayerImage();
+  				var image = this.state.userAreaController.getPlayerImage();
   				if (image) {
   					props["style"] = {
   						"background-image": "url(" + image + ")"
@@ -86,7 +86,7 @@ define(function() {
   				return React.createElement("div", {className: "buttons-container"}, actionButtons);
   			},
   			actionClicked: function(action) {
-  				this.state.stateHandler.actionClicked(action);
+  				this.state.userAreaController.actionClicked(action);
   				this.setState({"selectedAction":action});
   			}
 
@@ -96,12 +96,12 @@ define(function() {
 		this.reactComponent = React.render(actionsElement, this.actionsElement);
 	};
 
-	function showMenu(stateHandler) {
+	function showMenu(userAreaController) {
 		this.reactComponent.setState({
 			"isHidden": false,
-			"playerStats": stateHandler.getPlayerStats(),
-			"actions": stateHandler.getPlayerActions(),
-			"selectedAction": stateHandler.getSelectedAction()
+			"playerStats": userAreaController.getPlayerStats(),
+			"actions": userAreaController.getPlayerActions(),
+			"selectedAction": userAreaController.getSelectedAction()
 		});
 	};
 
@@ -111,7 +111,7 @@ define(function() {
 		});
 	};
 
-	function loadState(stateHandler) {
+	function loadState(userAreaController) {
 		this.reactComponent.setState({
 
 		});	
