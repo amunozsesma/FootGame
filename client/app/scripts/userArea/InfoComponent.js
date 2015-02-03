@@ -1,7 +1,7 @@
 define(function() {
 	"use strict";
 
-	var InfoService = function(infoElement, userAreaController) {
+	var InfoComponent = function(infoElement, userAreaController) {
 		this.infoElement = infoElement;
 		this.userAreaController = userAreaController;
 
@@ -55,6 +55,6 @@ define(function() {
 		});
 	};
 
-	return InfoService;
+	return InfoComponent;
 
 });

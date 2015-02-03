@@ -1,4 +1,4 @@
-// ActionService(actionsContainerElement)
+// ActionsComponent(actionsContainerElement)
 // showActions(actions);
 // hideActions();
 
@@ -10,7 +10,7 @@
 define(function() {
 	"use strict";
 
-	var ActionService = function(actionsElement, userAreaController) {
+	var ActionsComponent = function(actionsElement, userAreaController) {
 		this.actionsElement = actionsElement;
 		this.userAreaController = userAreaController;
 
@@ -118,7 +118,7 @@ define(function() {
 	};
 	
 
-	return ActionService;
+	return ActionsComponent;
 
 });
 

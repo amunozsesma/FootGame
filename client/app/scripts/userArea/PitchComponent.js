@@ -1,7 +1,7 @@
 define(function() {
 	"use strict";
 
-	var PitchService = function(pitchElement, userAreaController) {
+	var PitchComponent = function(pitchElement, userAreaController) {
 		this.pitchElement = pitchElement;
 		this.userAreaController = userAreaController;
 
@@ -83,5 +83,5 @@ define(function() {
 		});	
 	};
 	
-	return PitchService; 
+	return PitchComponent; 
 });

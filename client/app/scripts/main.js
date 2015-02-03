@@ -1,10 +1,10 @@
-require(["userArea/PitchService", "userArea/ActionsService", "userArea/InfoService", "userArea/UserAreaController"], function(PitchService, ActionsService, InfoService, UserAreaController) {
+require(["userArea/PitchComponent", "userArea/ActionsComponent", "userArea/InfoComponent", "userArea/UserAreaController"], function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController) {
 
 	var userAreaController = new UserAreaController();
 	
-	var pitchService = new PitchService(document.getElementById("pitch-container"), userAreaController);
-	var infoService = new InfoService(document.getElementById("info-container"), userAreaController);
-	var actionshService = new ActionsService(document.getElementById("actions-container"), userAreaController);
+	var pitchService = new PitchComponent(document.getElementById("pitch-container"), userAreaController);
+	var infoService = new InfoComponent(document.getElementById("info-container"), userAreaController);
+	var actionshService = new ActionsComponent(document.getElementById("actions-container"), userAreaController);
 
 	var gameManager = new GameManager(userAreaController);
 
