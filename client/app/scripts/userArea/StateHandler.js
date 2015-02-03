@@ -6,6 +6,9 @@ define(["Emitter"], function(Emitter) {
 		this.modifiedState = {};
 
 		this.playerInMenu = "";
+
+		//TODO remove once everythin is on modified state
+		this.seletecActions = {}
 	};
 
 	Emitter.mixInto(StateHandler);
@@ -15,7 +18,7 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	StateHandler.prototype.loadState = function(state, isInitial) {
-		// Maybe stract to helper function -> var state = new StateHelper(state);
+		//TODO var state = new StateHelper(state);
 		this.initialState = state;
 		processState.call(this);
 
@@ -31,7 +34,7 @@ define(["Emitter"], function(Emitter) {
 		deepClone.call(this, this.initialState, this.modifiedState); 
 	};
 
-	//Extract to utility
+	//TODO Extract to utility
 	function deepClone(from, into) {
 		for (var key in from) {
 			if (typeof from[key] === "object") {
@@ -55,6 +58,13 @@ define(["Emitter"], function(Emitter) {
 
 			this.trigger("show-actions-menu", this);
 		}
+	};
+
+	StateHandler.prototype.actionClicked = function(action) {
+		console.log(this.playerInMenu + " selected " + action);
+
+		//TODO This goes into modified state
+		this.seletecActions[this.playerInMenu] = action;
 	};
 
 	function cellBelongsToUserPlayer(x, y) {
@@ -87,7 +97,7 @@ define(["Emitter"], function(Emitter) {
 	};
 
 
-	//Methods to get state information or to modify state --> Extract to StateHandler, rename this class to UserAreaController
+	//Methods to get state information or to modify state --> TODO Extract to StateHandler, rename this class to UserAreaController
 	StateHandler.prototype.getUser = function() {
 		var user = this.initialState.config.user;
 
@@ -129,15 +139,37 @@ define(["Emitter"], function(Emitter) {
 		return this.playerInMenu;
 	};
 
-	// StateHandler.prototype.getPlayerImage = function() {
-	// 	var players = getAllPlayers.call(this);
+	StateHandler.prototype.getPlayerImage = function() {
+		var players = getAllPlayers.call(this);
 
-	// 	if (!players) {
-	// 		return null;
-	// 	}
-	// 	return players[this.playerInMenu].img;
+		if (!players) {
+			return null;
+		}
+		return players[this.playerInMenu].img;
 
-	// };
+	};
+
+	StateHandler.prototype.getPlayerStats = function() {
+		var stats = {}
+		if (this.playerInMenu) {
+			var players = getAllPlayers.call(this);
+			stats = players[this.playerInMenu].stats;
+		}
+
+		return stats;
+	};
+
+	StateHandler.prototype.getPlayerActions = function() {
+		if (this.playerInMenu) {
+			var players = getAllPlayers.call(this);
+			var actions = players[this.playerInMenu].actions;
+		}
+		return (actions) ? actions : [];
+	};
+
+	StateHandler.prototype.getSelectedAction = function() {
+		return (this.seletecActions[this.playerInMenu]) ? this.seletecActions[this.playerInMenu] : "";
+	};
 
 	function getAllPlayers() {
 		var players = {};
@@ -161,30 +193,3 @@ define(["Emitter"], function(Emitter) {
 	return StateHandler;
 
 });
-
-
-
-// initialMockConfig = {
-// 	"config": {
-// 		"players":3,
-// 		"rows":3,
-// 		"columns":9,
-// 		"user":"alvarito",
-// 		"team": "A.D. Twerkin"
-// 	},
-// 	"state": {
-// 		"teams": {
-// 			"A.D. Twerkin": {
-// 				"TwerkinPlayer1": {"x":0, "y":1},
-// 				"TwerkinPlayer2": {"x":1, "y":1},
-// 				"TwerkinPlayer3": {"x":0, "y":2}
-// 			},
-// 			"Culo Gordo F.C.": {
-// 				"CuloGordoPlayer1": {"x":5, "y":0},
-// 				"CuloGordoPlayer2": {"x":5, "y":1},
-// 				"CuloGordoPlayer3": {"x":5, "y":2}
-// 			}
-// 		},
-// 		"ball": {"x":3,"y":3}
-// 	}
-// }

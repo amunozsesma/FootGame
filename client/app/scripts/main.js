@@ -51,14 +51,50 @@ initialMockConfig = {
 	"state": {
 		"teams": {
 			"A.D. Twerkin": {
-				"TwerkinPlayer1": {"x":0, "y":1},
-				"TwerkinPlayer2": {"x":1, "y":1},
-				"TwerkinPlayer3": {"x":0, "y":2}
+				"TwerkinPlayer1": {"x":0, "y":1, "stats": {
+					"ATTACK": 2,
+					"DEFENCE": 3,
+					"SPEED": 1,
+					"STAMINNA": 5
+				}, "actions": ["MOVE", "PASS", "SHOOT"],
+					"img":"images/twerking1.jpg"},
+				"TwerkinPlayer2": {"x":1, "y":1, "stats": {
+					"ATTACK": 4,
+					"DEFENCE": 1,
+					"SPEED": 1,
+					"STAMINNA": 2
+				}, "actions": ["MOVE", "PASS", "SHOOT"],
+					"img":"images/twerking2.jpg"},
+				"TwerkinPlayer3": {"x":0, "y":2, "stats": {
+					"ATTACK": 7,
+					"DEFENCE": 1,
+					"SPEED": 1,
+					"STAMINNA": 7
+				}, "actions": ["MOVE", "PASS", "SHOOT"],
+					"img":"images/twerking3.jpg"}
 			},
 			"Culo Gordo F.C.": {
-				"CuloGordoPlayer1": {"x":5, "y":0},
-				"CuloGordoPlayer2": {"x":5, "y":1},
-				"CuloGordoPlayer3": {"x":5, "y":2}
+				"CuloGordoPlayer1": {"x":5, "y":0, "stats": {
+					"ATTACK": 3,
+					"DEFENCE": 3,
+					"SPEED": 1,
+					"STAMINNA": 8
+				},
+					"img":"images/culogordo1.jpg"},
+				"CuloGordoPlayer2": {"x":5, "y":1, "stats": {
+					"ATTACK": 2,
+					"DEFENCE": 8,
+					"SPEED": 1,
+					"STAMINNA": 4
+				},
+					"img":"images/culogordo2.jpg"},
+				"CuloGordoPlayer3": {"x":5, "y":2, "stats": {
+					"ATTACK": 7,
+					"DEFENCE": 7,
+					"SPEED": 2,
+					"STAMINNA": 9
+				},
+					"img":"images/culogordo3.jpg"}
 			}
 		},
 		"ball": {"x":3,"y":3}
