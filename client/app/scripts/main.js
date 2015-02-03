@@ -97,7 +97,11 @@ initialMockConfig = {
 					"img":"images/culogordo3.jpg"}
 			}
 		},
-		"ball": {"x":3,"y":3}
+		"ball": {"x":3,"y":3},
+		"scores": {
+			"A.D. Twerkin": 0,
+			"Culo Gordo F.C.": 1
+		}
 	}
 }
 

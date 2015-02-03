@@ -171,6 +171,10 @@ define(["Emitter"], function(Emitter) {
 		return (this.seletecActions[this.playerInMenu]) ? this.seletecActions[this.playerInMenu] : "";
 	};
 
+	StateHandler.prototype.getTeamScores = function() {
+		return this.initialState.state.scores;
+	};
+
 	function getAllPlayers() {
 		var players = {};
 		if (Object.keys(this.initialState).length === 0) {

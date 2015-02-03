@@ -155,3 +155,39 @@
 .action-button.selected {
 	border-color: blue;
 }
+
+#info-container .info {
+	position: relative;
+	right: 0;
+	left: 0;
+	margin: 0 auto; 
+	height: 100%;
+	width: 690px;
+}
+
+.score-container {
+	position: relative;
+	width: 319px;
+	height: 100%;
+	float: left;
+	padding: 10px;
+
+	font-size: 18px;
+}
+
+.info .separator {
+	position: relative;
+	width: 50px;
+	float: left;
+	height: 100%;
+	padding-top: 20px;
+}
+
+.score-container .team-name,
+.score-container .team-score {
+	position: relative;
+	width: 140px;
+	height: 100%;
+	float: left;
+	padding-top: 15px;
+}

@@ -76,7 +76,6 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	function loadState(stateHandler) {
-		//get needed from stateHandler
 		this.reactComponent.setState({
 			"dimensions": stateHandler.getDimensions(),
 			"userPlayers": stateHandler.getUserPlayerPositions(),
