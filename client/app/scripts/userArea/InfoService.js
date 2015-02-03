@@ -1,4 +1,4 @@
-define(["Emitter"], function(Emitter) {
+define(function() {
 	"use strict";
 
 	var InfoService = function(infoElement, stateHandler) {

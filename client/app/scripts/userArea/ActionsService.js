@@ -7,7 +7,7 @@
 
 // })
 
-define(["Emitter"], function(Emitter) {
+define(function() {
 	"use strict";
 
 	var ActionService = function(actionsElement, stateHandler) {

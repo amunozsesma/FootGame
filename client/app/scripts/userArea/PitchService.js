@@ -1,4 +1,4 @@
-define(["Emitter"], function(Emitter) {
+define(function() {
 	"use strict";
 
 	var PitchService = function(pitchElement, stateHandler) {
@@ -83,8 +83,5 @@ define(["Emitter"], function(Emitter) {
 		});	
 	};
 	
-
-	Emitter.mixInto(PitchService);
-
 	return PitchService; 
 });
