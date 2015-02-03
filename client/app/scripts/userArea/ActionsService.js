@@ -26,13 +26,32 @@ define(["Emitter"], function(Emitter) {
   			getInitialState: function() {
     			return {
             		"stateHandler": own.stateHandler,
-            		"below": true
+            		"isHidden": true
     			};
   			},
   			render: function() {
-  				var className = "actions skeleton" + ((this.state.below) ? " below" : "");
-  				return React.createElement("div", { className: className});
+  				var descriptionContainer = this.createDescriptionContainer();
+  				var className = "actions skeleton" + ((this.state.isHidden) ? " isHidden" : "");
+  				return React.createElement("div", { className: className}, [descriptionContainer]);
+  			},
+  			createDescriptionContainer: function() {
+  				var name = React.createElement("div", { className: "name"}, this.state.stateHandler.getPlayerInMenu());
+  				var photoConainer = this.createPhotContainer();
+  				return React.createElement("div", { className: "description-container"}, [name, photoConainer]);	
+  			},
+  			createPhotContainer: function() {
+  				var image = this.state.stateHandler.getPlayerImage();
+  				var props = {
+  					className: "skeleton photo-container"
+  				};
+  				// if (image) {
+  				// 	props["style"] = {
+  				// 		"background-image": "url(" + image + ")"
+  				// 	}
+  				// }
+  				return React.createElement("div", props);
   			}
+
 		});
 
 		var actionsElement = React.createElement(actionsComponent);
@@ -41,13 +60,14 @@ define(["Emitter"], function(Emitter) {
 
 	function showMenu() {
 		this.reactComponent.setState({
-			"below": false
+			"isHidden": false
 		});
+
 	};
 
 	function hideMenu() {
 		this.reactComponent.setState({
-			"below": true
+			"isHidden": true
 		});
 	};
 

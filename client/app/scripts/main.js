@@ -13,6 +13,32 @@ require(["userArea/PitchService", "userArea/ActionsService", "userArea/InfoServi
 
 });
 
+// initialMockConfig = {
+// 	"config": {
+// 		"players":3,
+// 		"rows":3,
+// 		"columns":6,
+// 		"user":"alvarito",
+// 		"team": "A.D. Twerkin",
+// 		"rival": "Culo Gordo F.C."
+// 	},
+// 	"state": {
+// 		"teams": {
+// 			"A.D. Twerkin": {
+// 				"TwerkinPlayer1": {"x":0, "y":1, "img":"images/twerking1.jpg"},
+// 				"TwerkinPlayer2": {"x":1, "y":1, "img":"images/twerking2.jpg"},
+// 				"TwerkinPlayer3": {"x":0, "y":2, "img":"images/twerking3.jpg"}
+// 			},
+// 			"Culo Gordo F.C.": {
+// 				"CuloGordoPlayer1": {"x":5, "y":0, "img":"images/culogordo1.jpg"},
+// 				"CuloGordoPlayer2": {"x":5, "y":1, "img":"images/culogordo2.jpg"},
+// 				"CuloGordoPlayer3": {"x":5, "y":2, "img":"images/culogordo3.jpg"}
+// 			}
+// 		},
+// 		"ball": {"x":3,"y":3}
+// 	}
+// }
+
 initialMockConfig = {
 	"config": {
 		"players":3,

@@ -4,6 +4,8 @@ define(["Emitter"], function(Emitter) {
 	var StateHandler = function() {
 		this.initialState = {};
 		this.modifiedState = {};
+
+		this.playerInMenu = "";
 	};
 
 	Emitter.mixInto(StateHandler);
@@ -25,7 +27,7 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	function processState() {
-		//deep clone
+		//TODO performance: make the state map plain: {player: {1: 2}}
 		deepClone.call(this, this.initialState, this.modifiedState); 
 	};
 
@@ -48,6 +50,9 @@ define(["Emitter"], function(Emitter) {
 		this.trigger("hide-actions-menu", this);
 
 		if (cellBelongsToUserPlayer.call(this, x, y) || cellBelongsToRivalPlayer.call(this, x, y)) {
+			//This is redundant but reads better
+			this.playerInMenu = playerIn.call(this,x, y);
+
 			this.trigger("show-actions-menu", this);
 		}
 	};
@@ -64,13 +69,23 @@ define(["Emitter"], function(Emitter) {
 		var found = false;
 		for (var key in map) {
 			if (map[key].x === x && map[key].y === y) {
-				found = true;
+				found = key;
 				break;
 			}
 		}
 
 		return found;
 	};
+
+	function playerIn(x, y) {
+		var playerName = cellBelongsToUserPlayer.call(this, x, y);
+		if (!playerName) {
+			playerName = cellBelongsToRivalPlayer.call(this, x, y);
+		}
+
+		return playerName;
+	};
+
 
 	//Methods to get state information or to modify state --> Extract to StateHandler, rename this class to UserAreaController
 	StateHandler.prototype.getUser = function() {
@@ -108,6 +123,39 @@ define(["Emitter"], function(Emitter) {
 		if(!rivalPlayers) throw new Error("Guay el equipo rival, " + rivalTeam + " no tiene jugadores, tu eres subnormal.");
 
 		return rivalPlayers;
+	};
+
+	StateHandler.prototype.getPlayerInMenu = function() {
+		return this.playerInMenu;
+	};
+
+	// StateHandler.prototype.getPlayerImage = function() {
+	// 	var players = getAllPlayers.call(this);
+
+	// 	if (!players) {
+	// 		return null;
+	// 	}
+	// 	return players[this.playerInMenu].img;
+
+	// };
+
+	function getAllPlayers() {
+		var players = {};
+		if (Object.keys(this.initialState).length === 0) {
+			return null;
+		}
+
+		var userTeam = this.initialState.state.teams[this.initialState.config.team];
+		var rivalTeam = this.initialState.state.teams[this.initialState.config.rival];
+
+		for (var player in userTeam) {
+			players[player] = userTeam[player];
+		}
+		for (var player in rivalTeam) {
+			players[player] = rivalTeam[player];
+		}
+
+		return players;
 	};
 
 	return StateHandler;
