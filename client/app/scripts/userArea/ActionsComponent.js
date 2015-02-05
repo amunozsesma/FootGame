@@ -48,7 +48,7 @@ define(function() {
   				return React.createElement("div", { className: className}, [descriptionContainer, statsContainer, buttonsContainer]);
   			},
   			createDescriptionContainer: function() {
-  				var name = React.createElement("div", { className: "name"}, this.state.userAreaController.getPlayerInMenu());
+  				var name = React.createElement("div", { className: "name"}, this.state.userAreaController.getSelectedPlayer());
   				var photoConainer = this.createPhotContainer();
   				return React.createElement("div", { className: "description-container"}, [name, photoConainer]);	
   			},

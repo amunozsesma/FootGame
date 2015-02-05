@@ -1,4 +1,4 @@
-require(["userArea/PitchComponent", "userArea/ActionsComponent", "userArea/InfoComponent", "userArea/UserAreaController"], function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController) {
+require(["userArea/PitchComponent", "userArea/ActionsComponent", "userArea/InfoComponent", "userArea/UserAreaController", "userArea/StateHelper"], function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, StateHelper) {
 
 	var userAreaController = new UserAreaController();
 	
@@ -6,106 +6,76 @@ require(["userArea/PitchComponent", "userArea/ActionsComponent", "userArea/InfoC
 	var infoService = new InfoComponent(document.getElementById("info-container"), userAreaController);
 	var actionshService = new ActionsComponent(document.getElementById("actions-container"), userAreaController);
 
-	var gameManager = new GameManager(userAreaController);
+	//TODO GM will need to require the StateHelper
+	var gameManager = new GameManager(userAreaController, StateHelper);
 
 	userAreaController.loadStaticContext();
 	gameManager.start();
 
 });
 
-// initialMockConfig = {
-// 	"config": {
-// 		"players":3,
-// 		"rows":3,
-// 		"columns":6,
-// 		"user":"alvarito",
-// 		"team": "A.D. Twerkin",
-// 		"rival": "Culo Gordo F.C."
-// 	},
-// 	"state": {
-// 		"teams": {
-// 			"A.D. Twerkin": {
-// 				"TwerkinPlayer1": {"x":0, "y":1, "img":"images/twerking1.jpg"},
-// 				"TwerkinPlayer2": {"x":1, "y":1, "img":"images/twerking2.jpg"},
-// 				"TwerkinPlayer3": {"x":0, "y":2, "img":"images/twerking3.jpg"}
-// 			},
-// 			"Culo Gordo F.C.": {
-// 				"CuloGordoPlayer1": {"x":5, "y":0, "img":"images/culogordo1.jpg"},
-// 				"CuloGordoPlayer2": {"x":5, "y":1, "img":"images/culogordo2.jpg"},
-// 				"CuloGordoPlayer3": {"x":5, "y":2, "img":"images/culogordo3.jpg"}
-// 			}
-// 		},
-// 		"ball": {"x":3,"y":3}
-// 	}
-// }
-
-initialMockConfig = {
+mockInitialMessage = {
 	"config": {
 		"players":3,
 		"rows":3,
 		"columns":6,
 		"user":"alvarito",
-		"team": "A.D. Twerkin",
-		"rival": "Culo Gordo F.C."
-	},
-	"state": {
+		"userTeam": "A.D. Twerkin",
+		"rivalTeam": "Culo Gordo F.C.",
 		"teams": {
 			"A.D. Twerkin": {
-				"TwerkinPlayer1": {"x":0, "y":1, "stats": {
-					"ATTACK": 2,
-					"DEFENCE": 3,
-					"SPEED": 1,
-					"STAMINNA": 5
-				}, "actions": ["MOVE", "PASS", "SHOOT"],
-					"img":"images/twerking1.jpg"},
-				"TwerkinPlayer2": {"x":1, "y":1, "stats": {
-					"ATTACK": 4,
-					"DEFENCE": 1,
-					"SPEED": 1,
-					"STAMINNA": 2
-				}, "actions": ["MOVE", "PASS", "SHOOT"],
-					"img":"images/twerking2.jpg"},
-				"TwerkinPlayer3": {"x":0, "y":2, "stats": {
-					"ATTACK": 7,
-					"DEFENCE": 1,
-					"SPEED": 1,
-					"STAMINNA": 7
-				}, "actions": ["MOVE", "PASS", "SHOOT"],
-					"img":"images/twerking3.jpg"}
+				"TwerkinPlayer1": {
+					"stats": {"ATTACK": 2, "DEFENCE": 3, "SPEED": 1, "STAMINNA": 5},
+					"img":"images/twerking1.jpg"
+				},
+				"TwerkinPlayer2": {
+					"stats": {"ATTACK": 4, "DEFENCE": 1, "SPEED": 1, "STAMINNA": 2}, 
+					"img":"images/twerking2.jpg"
+				},
+				"TwerkinPlayer3": {
+					"stats": {"ATTACK": 7, "DEFENCE": 1, "SPEED": 1, "STAMINNA": 7}, 
+					"img":"images/twerking3.jpg"
+				}
 			},
 			"Culo Gordo F.C.": {
-				"CuloGordoPlayer1": {"x":5, "y":0, "stats": {
-					"ATTACK": 3,
-					"DEFENCE": 3,
-					"SPEED": 1,
-					"STAMINNA": 8
+				"CuloGordoPlayer1": {
+					"stats": {"ATTACK": 3, "DEFENCE": 3, "SPEED": 1, "STAMINNA": 8},
+					"img":"images/culogordo1.jpg"
 				},
-					"img":"images/culogordo1.jpg"},
-				"CuloGordoPlayer2": {"x":5, "y":1, "stats": {
-					"ATTACK": 2,
-					"DEFENCE": 8,
-					"SPEED": 1,
-					"STAMINNA": 4
+				"CuloGordoPlayer2": {
+					"stats": {"ATTACK": 2, "DEFENCE": 8, "SPEED": 1, "STAMINNA": 4},
+					"img":"images/culogordo2.jpg"
 				},
-					"img":"images/culogordo2.jpg"},
-				"CuloGordoPlayer3": {"x":5, "y":2, "stats": {
-					"ATTACK": 7,
-					"DEFENCE": 7,
-					"SPEED": 2,
-					"STAMINNA": 9
-				},
-					"img":"images/culogordo3.jpg"}
+				"CuloGordoPlayer3": {
+					"stats": {"ATTACK": 7, "DEFENCE": 7, "SPEED": 2, "STAMINNA": 9},
+					"img":"images/culogordo3.jpg"
+				}
 			}
 		},
+		"actions": {
+			"attacking": ["MOVE", "PASS", "SHOOT", "CARD"],
+			"defending": ["MOVE", "PRESS", "CARD"]
+		}
+	},
+	"state": {
+		"players": {
+			"TwerkinPlayer1": {"x":0, "y":1, "action":""},
+			"TwerkinPlayer2": {"x":1, "y":1, "action":""},
+			"TwerkinPlayer3": {"x":0, "y":2, "action":""},
+			"CuloGordoPlayer1": {"x":5, "y":0, "action":""},
+			"CuloGordoPlayer2": {"x":5, "y":1, "action":""},
+			"CuloGordoPlayer3": {"x":5, "y":2, "action":""}
+		},
+		"side":"attacking",
 		"ball": {"x":3,"y":3},
 		"scores": {
 			"A.D. Twerkin": 0,
 			"Culo Gordo F.C.": 1
 		}
 	}
-}
+};
 
-initialMockUsers = {
+mockUsersMessage = {
 	"alvarito": "A.D. Twerkin",
 	"alexito": "Culo Gordo F.C."
 }
@@ -114,10 +84,13 @@ initialMockUsers = {
 GameManager = (function() {
 	"use strict";
 
-	var GameManager = function(userAreaController) {
+	var GameManager = function(userAreaController, StateHelperContructor) {
 		this.userAreaController = userAreaController;
 		this.state = {};
 		this.userTeams = {};
+		
+		//TODO get rid once we require
+		this.StateHelperContructor = StateHelperContructor;
 	};
 
 	GameManager.prototype.start = function() {
@@ -132,13 +105,13 @@ GameManager = (function() {
 	};
 
 	function onConfigReady(config) {
-		this.state = initialMockConfig;
+		this.state = mockInitialMessage;
 		tryGameStart.call(this);
 
 	};
 
 	function onUserReady(userName) {
-		this.userTeams = initialMockUsers;
+		this.userTeams = mockUsersMessage;
 		tryGameStart.call(this);
 	};
 
@@ -150,7 +123,7 @@ GameManager = (function() {
 		console.log("GAME START!!");
 		this.state.userTeams = this.userTeams;
 			
-		this.userAreaController.loadState(this.state, true);
+		this.userAreaController.loadState(new this.StateHelperContructor(this.state), true);
 	};
 
 	return GameManager;
