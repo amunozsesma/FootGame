@@ -59,6 +59,16 @@ define(function() {
 		}
 	};
 
+	StateHelper.prototype.getPlayerPosition = function(playerName) {
+		var playerPosition = {};
+		var playerState = this.inputState.players[playerName];
+
+		playerPosition.x = playerState.x;
+		playerPosition.y = playerState.y;
+
+		return playerPosition;
+	};
+
 	StateHelper.prototype.getSelectedAction = function(playerName) {
 		return (playerName) ? this.outputState.players[playerName].action : "";
 	};
@@ -77,6 +87,18 @@ define(function() {
 		}
 
 		return player;
+	};
+
+	StateHelper.prototype.getPassPosibilities = function(playerName) {
+		var posibilities = {};
+	};
+
+	StateHelper.prototype.getPressPosibilities = function(playerName) {
+		var posibilities = {};
+	};
+
+	StateHelper.prototype.getMovePosibilities = function(playerName) {
+		var posibilities = {};
 	};
 
 	function getPlayersConfig() {

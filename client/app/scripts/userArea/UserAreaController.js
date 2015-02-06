@@ -18,31 +18,26 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	UserAreaController.prototype.loadState = function(stateHelper, isInitial) {
-		//TODO var state = new StateHelper(state);
 		this.stateHelper = stateHelper;
 
-		if (isInitial) {
-			this.trigger("load-initial-state", this);
-		} else {
-			this.trigger("load-state", this);
-		}
+		this.trigger("load-state", this);
 	};
 
 	UserAreaController.prototype.cellClicked = function(x, y) {
 		console.log("CEll {x: " + x + ", y: " + y + "} clicked");
 
-		this.trigger("hide-actions-menu", this);
+		this.trigger("player-unselected", this);
 
 		this.selectedPlayer = this.stateHelper.getPlayerIn(x, y);
 		if (this.selectedPlayer) {
-			this.trigger("show-actions-menu", this);
+			this.trigger("player-selected", this);
 		}
 	};
 
 	UserAreaController.prototype.actionClicked = function(action) {
 		console.log(this.selectedPlayer + " selected " + action);
 
-		//TODO This goes into modified state
+		//TODO while selected player has an action on this map, selected player cannot change and he has to select within posibilities
 		this.seletecActions[this.selectedPlayer] = action;
 	};
 
@@ -81,6 +76,10 @@ define(["Emitter"], function(Emitter) {
 	UserAreaController.prototype.getTeamScores = function() {
 		return this.stateHelper.getTeamScores();
 	};
+
+	UserAreaController.prototype.getSelectedPlayerPosition = function() {
+		return this.stateHelper.getPlayerPosition(this.selectedPlayer);
+	}
 
 	return UserAreaController;
 

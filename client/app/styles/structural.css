@@ -46,6 +46,10 @@
   	transform: translateY(-50%);
 }
 
+.pitch .selected {
+	border: 2px solid blue;
+}
+
 .player {
 	cursor: pointer;
 }

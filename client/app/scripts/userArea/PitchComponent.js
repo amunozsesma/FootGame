@@ -1,5 +1,5 @@
 define(function() {
-	"use strict";
+  "use strict";
 
 	var PitchComponent = function(pitchElement, userAreaController) {
 		this.pitchElement = pitchElement;
@@ -7,7 +7,9 @@ define(function() {
 
 		// createReactElements.call(this);
     init.call(this);
-		this.userAreaController.on("load-initial-state", loadState, this);
+		this.userAreaController.on("load-state", loadState, this);
+    this.userAreaController.on("player-selected", selectPlayer, this);
+    this.userAreaController.on("player-unselected", unselectPlayer, this);
 	};
 
 	function init() {
@@ -18,8 +20,9 @@ define(function() {
     			return {
             "userAreaController": own.userAreaController,
     				"dimensions": {"columns": 1, "rows": 1},
-    				"userPlayers": {},
-    				"rivalePlayers": {}
+            "userPlayers": {},
+    				"rivalePlayers": {},
+            "selectedPlayerPosition": null
     			};
   			},
   			render: function() {
@@ -38,11 +41,12 @@ define(function() {
   					columnElements = [];
   					for (var j = 0; j < columns; j++) {
   						var player = this.createPlayerIfNeeded(j, i);
-              var className = "pitchColumn skeleton";
-              className = (player) ? className + " player" : className;
+              var className = "cell skeleton";
+              className += (player) ? " player" : "";
+              className += (this.state.selectedPlayerPosition && this.state.selectedPlayerPosition.x === j && this.state.selectedPlayerPosition.y === i) ? " selected" : "";
   						columnElements.push(React.createElement("div", { onClick:this.cellClicked.bind(this, j, i), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, player));
   					}	
-  					rowElements.push(React.createElement("div", { className: 'pitchRow skeleton', style: {width: "100%", height:100/rows + "%" } }, columnElements));
+  					rowElements.push(React.createElement("div", { className: 'row', style: {width: "100%", height:100/rows + "%" } }, columnElements));
   				}
 
   				return rowElements;
@@ -82,6 +86,18 @@ define(function() {
 			"rivalPlayers": userAreaController.getRivalPlayerPositions()
 		});	
 	};
+
+  function selectPlayer(userAreaController) {
+    this.reactComponent.setState({
+      "selectedPlayerPosition": userAreaController.getSelectedPlayerPosition()
+    });
+  }
+
+  function unselectPlayer(userAreaController) {
+    this.reactComponent.setState({
+      "selectedPlayerPosition": null
+    });
+  }
 	
 	return PitchComponent; 
 });

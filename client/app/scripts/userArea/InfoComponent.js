@@ -6,7 +6,7 @@ define(function() {
 		this.userAreaController = userAreaController;
 
 		init.call(this);
-		this.userAreaController.on("load-initial-state", loadState, this);
+		this.userAreaController.on("load-state", loadState, this);
 	};
 
 	function init() {

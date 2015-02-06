@@ -59,10 +59,10 @@ mockInitialMessage = {
 	},
 	"state": {
 		"players": {
-			"TwerkinPlayer1": {"x":0, "y":1, "action":""},
-			"TwerkinPlayer2": {"x":1, "y":1, "action":""},
+			"TwerkinPlayer1": {"x":2, "y":0, "action":""},
+			"TwerkinPlayer2": {"x":2, "y":2, "action":""},
 			"TwerkinPlayer3": {"x":0, "y":2, "action":""},
-			"CuloGordoPlayer1": {"x":5, "y":0, "action":""},
+			"CuloGordoPlayer1": {"x":3, "y":1, "action":""},
 			"CuloGordoPlayer2": {"x":5, "y":1, "action":""},
 			"CuloGordoPlayer3": {"x":5, "y":2, "action":""}
 		},

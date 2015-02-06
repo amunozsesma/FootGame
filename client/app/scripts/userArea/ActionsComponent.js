@@ -15,8 +15,8 @@ define(function() {
 		this.userAreaController = userAreaController;
 
 		init.call(this);
-		this.userAreaController.on("show-actions-menu", showMenu, this);
-		this.userAreaController.on("hide-actions-menu", hideMenu, this);
+		this.userAreaController.on("player-selected", showMenu, this);
+		this.userAreaController.on("player-unselected", hideMenu, this);
 	};
 
 	function init() {
@@ -86,8 +86,9 @@ define(function() {
   				return React.createElement("div", {className: "buttons-container"}, actionButtons);
   			},
   			actionClicked: function(action) {
-  				this.state.userAreaController.actionClicked(action);
-  				this.setState({"selectedAction":action});
+  				var selectedAction = (action !== this.state.selectedAction) ? action : "";
+          this.state.userAreaController.actionClicked(selectedAction);
+  				this.setState({"selectedAction": selectedAction});
   			}
 
 		});
