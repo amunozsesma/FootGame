@@ -1,7 +1,8 @@
 define(["Emitter"], function(Emitter) {
 	"use strict";
 
-	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility}
+	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility},
+	// Proper pitch model
 
 	var UserAreaController = function() {
 		this.stateHelper = null;
@@ -68,6 +69,10 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.getSelectedPlayer = function() {
 		return this.selectedPlayer;
+	};
+
+	UserAreaController.prototype.getBallPosition = function() {
+		return this.stateHelper.getBallPosition();
 	};
 
 	UserAreaController.prototype.getPlayerImage = function() {

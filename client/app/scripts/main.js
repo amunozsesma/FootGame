@@ -67,7 +67,7 @@ mockInitialMessage = {
 			"CuloGordoPlayer3": {"x":5, "y":2, "action":""}
 		},
 		"side":"attacking",
-		"ball": {"x":3,"y":3},
+		"ball": {"x":2,"y":1},
 		"scores": {
 			"A.D. Twerkin": 0,
 			"Culo Gordo F.C.": 1

@@ -78,6 +78,13 @@
 	border: 2px solid blue;
 }
 
+.pitch .ball {
+	top: 50%;
+	position: relative;
+	font-size: 12px;
+	color: red;
+}
+
 .player {
 	cursor: pointer;
 }

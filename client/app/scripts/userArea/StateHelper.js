@@ -41,6 +41,10 @@ define(function() {
 		return getPlayersState.call(this, rivalTeam, true);
 	};
 
+	StateHelper.prototype.getBallPosition = function() {
+		return this.inputState.ball;
+	};
+
 	StateHelper.prototype.getPlayerImage = function(playerName) {
 		return (playerName) ? this.playersConfig[playerName].img : "";
 	};

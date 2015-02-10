@@ -27,7 +27,8 @@ define(function() {
             "rivalPlayers": {},                           //pitch
             "selectedPlayerPosition": null,
             "posibleActions": [],
-            "selectedActionPosition": null
+            "selectedActionPosition": null,
+            "ballPosition": {"x": 2, "y": 1}
           };
         },
         render: function() {
@@ -65,7 +66,11 @@ define(function() {
           className += (this.state.selectActionState && this.isPosibilityCell(x, y)) ? " action-posibility" : "";
           className += (this.state.selectedActionPosition && this.state.selectedActionPosition.x === x && this.state.selectedActionPosition.y === y) ? " action-selected" : "";
 
-          return React.createElement("div", { onClick:this.cellClicked.bind(this, x, y), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, player);
+          var sons = [player];
+          if (this.state.ballPosition.x === x && this.state.ballPosition.y === y) {
+            sons.push(React.createElement("div", {className: "ball"}, "BALL"));
+          }
+          return React.createElement("div", { onClick:this.cellClicked.bind(this, x, y), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, sons);
         },
   			createPlayerIfNeeded: function(x, y) {
   				var player = null;
@@ -103,11 +108,13 @@ define(function() {
 		this.reactComponent = React.render(pitchElement, this.pitchElement);
 	};
 
+  //TODO REFACTOR have only a single call that updates full state
 	function loadState(userAreaController) {
 		this.reactComponent.setState({
 			"dimensions": userAreaController.getDimensions(),
 			"userPlayers": userAreaController.getUserPlayerPositions(),
-			"rivalPlayers": userAreaController.getRivalPlayerPositions()
+			"rivalPlayers": userAreaController.getRivalPlayerPositions(),
+      "ballPosition": userAreaController.getBallPosition()
 		});	
 	};
 
