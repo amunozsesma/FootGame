@@ -77,9 +77,15 @@ define(function() {
   			createButtonsContainer: function() {
   				var actionButtons = [];
   				this.state.actions.forEach(function(action) {
-  					var className = "action-button";
-  					className += (this.state.selectedAction === action) ? " selected" : "";
-  					var actionButton = React.createElement("button", {className: className, onClick: this.actionClicked.bind(this, action)}, action);
+  					var className = "action-button" + ((this.state.selectedAction === action) ? " selected" : "");
+  					var props = {
+              className: className,
+              onClick: this.actionClicked.bind(this, action)
+            }
+            if (!this.state.userAreaController.canPerform(action)) {
+              props.disabled = true;
+            }
+            var actionButton = React.createElement("button", props, action);
   					actionButtons.push(actionButton);
   				}.bind(this));
 

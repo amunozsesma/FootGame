@@ -138,6 +138,13 @@ define(function() {
 
 	};
 
+	StateHelper.prototype.playerHasBall = function(playerName) {
+		var playerPosition = this.getPlayerPosition(playerName);
+		var ballPosition = this.getBallPosition();
+
+		return (playerPosition.x === ballPosition.x && playerPosition.y === ballPosition.y);
+	};
+
 	function getPlayersConfig() {
 		var players = {};
 		if (Object.keys(this.inputState).length === 0) {

@@ -113,6 +113,15 @@ define(["Emitter"], function(Emitter) {
 		return (this.cellChosen[this.selectedPlayer]) ? this.cellChosen[this.selectedPlayer] : null; 
 	};
 
+	UserAreaController.prototype.canPerform = function(action) {
+		var result = true;
+		if (action === "Pass" || action === "Shoot") {
+			result = this.stateHelper.playerHasBall(this.selectedPlayer);
+		}
+
+		return result;
+	};
+
 	function setChosenCell(x, y) {
 		for (var i = 0, len = this.actionPosibilities.length; i < len; i++) {
 			if (this.actionPosibilities[i].x === x && this.actionPosibilities[i].y === y) {
