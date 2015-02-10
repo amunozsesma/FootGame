@@ -62,6 +62,10 @@
 	cursor: pointer;
 }
 
+#pitch-container .pitch.slected-action-state .cell.action-posibility:hover {
+	background-color: #FFC4C4;
+}
+
 #pitch-container .pitch.player-selected .action-selected {
 	background-color: #FFC4C4;
 }
