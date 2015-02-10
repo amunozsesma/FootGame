@@ -42,10 +42,10 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.actionClicked = function(action) {
 		console.log(this.selectedPlayer + " selected " + action);
+		this.seletecActions[this.selectedPlayer] = action;
 
 		if (action !== "" && action !== "Card" && action !== "Shoot") {
 			this.isPlayerInSelectActionState = true;
-			this.seletecActions[this.selectedPlayer] = action;
 			this.trigger("action-clicked", this);
 		} else {
 			delete this.cellChosen[this.selectedPlayer];
