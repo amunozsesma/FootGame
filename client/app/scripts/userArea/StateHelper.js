@@ -90,15 +90,48 @@ define(function() {
 	};
 
 	StateHelper.prototype.getPassPosibilities = function(playerName) {
-		var posibilities = {};
+		var posibilities = [];
+		var players = this.getUserPlayerPositions();
+		Object.keys(players).forEach(function(player) {
+			if (player !== playerName) {
+				posibilities.push(players[player]);
+			}
+		});	
+
+		return posibilities;
 	};
 
 	StateHelper.prototype.getPressPosibilities = function(playerName) {
-		var posibilities = {};
+		var posibilities = [];
+		var players = this.getRivalPlayerPositions();
+		Object.keys(players).forEach(function(player) {
+			if (player !== playerName) {
+				posibilities.push(players[player]);
+			}
+		});	
+
+		return posibilities;
 	};
 
 	StateHelper.prototype.getMovePosibilities = function(playerName) {
-		var posibilities = {};
+		var posibilities = [];
+		var playerPosition = this.getPlayerPosition(playerName);
+		var dimensions = this.getDimensions();
+
+		//TODO get movement from stats, assuming 1 at the moment // REFACTOR
+		for (var i = -1; i <= 1 ; i++) {
+			if (i !== 0) {
+				posibilities.push({"x": playerPosition.x + i, "y": playerPosition.y}); 
+			}
+		}
+		for (var j = -1; j <= 1; j++) {
+			if (j !== 0) {
+				posibilities.push({"x": playerPosition.x, "y": playerPosition.y + j}); 
+			}
+		}
+
+		return posibilities;
+
 	};
 
 	function getPlayersConfig() {

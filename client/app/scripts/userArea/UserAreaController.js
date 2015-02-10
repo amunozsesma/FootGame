@@ -1,14 +1,17 @@
 define(["Emitter"], function(Emitter) {
 	"use strict";
 
+	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility}
+
 	var UserAreaController = function() {
 		this.stateHelper = null;
 		this.modifiedState = {};
 
 		this.selectedPlayer = "";
+		this.isPlayerInSelectActionState = false;
 
-		//TODO remove once everythin is on modified state
-		this.seletecActions = {}
+		this.seletecActions = {};
+		this.cellChosen = {};
 	};
 
 	Emitter.mixInto(UserAreaController);
@@ -26,19 +29,29 @@ define(["Emitter"], function(Emitter) {
 	UserAreaController.prototype.cellClicked = function(x, y) {
 		console.log("CEll {x: " + x + ", y: " + y + "} clicked");
 
-		this.trigger("player-unselected", this);
-
-		this.selectedPlayer = this.stateHelper.getPlayerIn(x, y);
-		if (this.selectedPlayer) {
-			this.trigger("player-selected", this);
+		if (this.isPlayerInSelectActionState) {
+			setChosenCell.call(this, x, y);
+		} else {
+			this.trigger("player-unselected", this);
+			this.selectedPlayer = this.stateHelper.getPlayerIn(x, y);
+			if (this.selectedPlayer) {
+				this.trigger("player-selected", this);
+			}
 		}
 	};
 
 	UserAreaController.prototype.actionClicked = function(action) {
 		console.log(this.selectedPlayer + " selected " + action);
 
-		//TODO while selected player has an action on this map, selected player cannot change and he has to select within posibilities
-		this.seletecActions[this.selectedPlayer] = action;
+		if (action !== "" && action !== "Card" && action !== "Shoot") {
+			this.isPlayerInSelectActionState = true;
+			this.seletecActions[this.selectedPlayer] = action;
+			this.trigger("action-clicked", this);
+		} else {
+			delete this.cellChosen[this.selectedPlayer];
+			this.isPlayerInSelectActionState = false;
+		}
+		this.trigger("action-state-changed", this);
 	};
 
 	UserAreaController.prototype.getDimensions = function() {
@@ -79,7 +92,34 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.getSelectedPlayerPosition = function() {
 		return this.stateHelper.getPlayerPosition(this.selectedPlayer);
-	}
+	};
+
+	UserAreaController.prototype.getActionPosibilities = function() {
+		var action = this.seletecActions[this.selectedPlayer];
+		this.actionPosibilities = this.stateHelper["get" + action + "Posibilities"](this.selectedPlayer);
+		return this.actionPosibilities;
+	};
+
+	UserAreaController.prototype.getSelectActionState = function() {
+		return this.isPlayerInSelectActionState; 
+	};
+
+	UserAreaController.prototype.getSelectedActionPosition = function() {
+		return (this.cellChosen[this.selectedPlayer]) ? this.cellChosen[this.selectedPlayer] : null; 
+	};
+
+	function setChosenCell(x, y) {
+		for (var i = 0, len = this.actionPosibilities.length; i < len; i++) {
+			if (this.actionPosibilities[i].x === x && this.actionPosibilities[i].y === y) {
+				this.cellChosen[this.selectedPlayer] = {"x": x, "y": y};
+				this.isPlayerInSelectActionState = false;
+				this.trigger("action-state-changed", this);
+				break;
+			}
+		}
+	};
+
+
 
 	return UserAreaController;
 

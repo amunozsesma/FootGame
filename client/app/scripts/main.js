@@ -53,8 +53,8 @@ mockInitialMessage = {
 			}
 		},
 		"actions": {
-			"attacking": ["MOVE", "PASS", "SHOOT", "CARD"],
-			"defending": ["MOVE", "PRESS", "CARD"]
+			"attacking": ["Move", "Pass", "Shoot", "Card"],
+			"defending": ["Move", "Press", "Card"]
 		}
 	},
 	"state": {

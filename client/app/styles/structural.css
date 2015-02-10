@@ -1,3 +1,5 @@
+/* TODO REFACTOR, per component state*/
+
 #game-area {
 	position: absolute;
 	margin: 5px 5px 5px 5px;
@@ -44,6 +46,28 @@
 	width: 650px;
 	top: 50%;
   	transform: translateY(-50%);
+}
+
+#pitch-container .pitch.slected-action-state,
+#pitch-container .pitch.slected-action-state .player:hover {
+	background-color: #E3E3E3;
+}
+
+#pitch-container .pitch.slected-action-state .player {
+	cursor: default;
+}
+
+#pitch-container .pitch.slected-action-state .cell.action-posibility {
+	border: 2px solid red;
+	cursor: pointer;
+}
+
+#pitch-container .pitch.player-selected .action-selected {
+	background-color: #FFC4C4;
+}
+
+.pitch .row {
+	margin-left: 0;
 }
 
 .pitch .selected {
