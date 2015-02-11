@@ -28,7 +28,7 @@ define(function() {
             "selectedPlayerPosition": null,
             "posibleActions": [],
             "selectedActionPosition": null,
-            "ballPosition": {"x": 2, "y": 1}
+            "ballPosition": {"x": 0, "y": 0}
           };
         },
         render: function() {
@@ -114,7 +114,11 @@ define(function() {
 			"dimensions": userAreaController.getDimensions(),
 			"userPlayers": userAreaController.getUserPlayerPositions(),
 			"rivalPlayers": userAreaController.getRivalPlayerPositions(),
-      "ballPosition": userAreaController.getBallPosition()
+      "ballPosition": userAreaController.getBallPosition(),
+      "selectedPlayerPosition": null,
+      "posibleActions": [],
+      "selectedActionPosition": null,
+      "selectActionState": false
 		});	
 	};
 

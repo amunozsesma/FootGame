@@ -23,7 +23,6 @@ define(function() {
 		var userTeam = this.config.userTeam;
 		var userPlayerState = getPlayersState.call(this, userTeam, true);
 
-		outputState.ball = this.getBallPosition();
 		Object.keys(userPlayerState).forEach(function(playerName) {
 			outputState[playerName] = {};
 			outputState[playerName].action = (playerActions[playerName]) ? playerActions[playerName] : ""; 

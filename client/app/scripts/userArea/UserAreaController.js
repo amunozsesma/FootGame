@@ -6,7 +6,6 @@ define(["Emitter"], function(Emitter) {
 
 	var UserAreaController = function() {
 		this.stateHelper = null;
-		this.modifiedState = {};
 
 		this.selectedPlayer = "";
 		this.isPlayerInSelectActionState = false;
@@ -22,12 +21,18 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	UserAreaController.prototype.loadState = function(stateHelper, isInitial) {
+		this.selectedPlayer = "";
+		this.isPlayerInSelectActionState = false;
+		this.seletecActions = {};
+		this.cellChosen = {};
+
 		this.stateHelper = stateHelper;
 		if (!isInitial) {
 			console.log("-- Initial turn");
 			//TODO RESOLVE -> graphics and shit / maybe set resolve mode and then set state
 		}
 
+		this.trigger("player-unselected", this);
 		this.trigger("load-state", this);
 	};
 

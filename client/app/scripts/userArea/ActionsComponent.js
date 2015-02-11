@@ -114,7 +114,10 @@ define(function() {
 
 	function hideMenu() {
 		this.reactComponent.setState({
-			"isHidden": true
+			"isHidden": true,
+      "actions": [],
+      "playerStats": {},
+      "selectedAction": ""
 		});
 	};
 
