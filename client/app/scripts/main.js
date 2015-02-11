@@ -12,6 +12,8 @@ require(["userArea/PitchComponent", "userArea/ActionsComponent", "userArea/InfoC
 	userAreaController.loadStaticContext();
 	gameManager.start();
 
+	//TODO remove
+	window.gm = gameManager;
 });
 
 mockInitialMessage = {
@@ -80,6 +82,11 @@ mockUsersMessage = {
 	"alexito": "Culo Gordo F.C."
 }
 
+mockTurnResolution = function(previousState, finalState, turnResolutionCallback) {
+	console.log("--- Starting turn resolution ---");
+};
+
+
 //TODO extract to separate file
 GameManager = (function() {
 	"use strict";
@@ -120,38 +127,27 @@ GameManager = (function() {
 			return;
 		}
 
-		console.log("GAME START!!");
+		console.log("- GAME START!!");
 		this.state.userTeams = this.userTeams;
 			
 		this.userAreaController.loadState(new this.StateHelperContructor(this.state), true);
 	};
 
+	//This will come from the server
+	GameManager.prototype.endTurn = function() {
+		var outputState = this.userAreaController.getTurnEndResult();
+
+
+		//TODO send output to server, wait for callbacks to start nexturn
+		var turnResolver = mockTurnResolution(this.state, outputState, this.nextTurn.bind(this));
+	};
+
+	GameManager.prototype.nextTurn = function(state) {
+		this.state = state;
+		this.userAreaController.loadState(new this.StateHelperContructor(this.state), true);
+	};	
+
 	return GameManager;
 
 })();
 
-
-// maint() {
-
-// }
-
-// paintEverything() {
-// 	UserManager.start();
-// 	GameManager.start();
-// 	CardsManager.start();
-// }
-
-// GameManager.start = function() {
-// 	ConfigService.loadConfig(startGameIfEverythingUp());
-// 	onUserREady(startGameIfEverythingUp());
-// }
-
-// startGameIfEverythingUp{
-// 	if (user1 = true && user2 == true && props = true) {
-// 		startGame()
-// 	}
-// }
-
-// startGame() {
-	
-// }

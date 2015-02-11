@@ -23,12 +23,20 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.loadState = function(stateHelper, isInitial) {
 		this.stateHelper = stateHelper;
+		if (!isInitial) {
+			console.log("-- Initial turn");
+			//TODO RESOLVE -> graphics and shit / maybe set resolve mode and then set state
+		}
 
 		this.trigger("load-state", this);
 	};
 
+	UserAreaController.prototype.getTurnEndResult = function() {
+		var outputState = this.stateHelper.generateOutputState(this.seletecActions, this.cellChosen);
+		return outputState;
+	};
+
 	UserAreaController.prototype.cellClicked = function(x, y) {
-		console.log("CEll {x: " + x + ", y: " + y + "} clicked");
 
 		if (this.isPlayerInSelectActionState) {
 			setChosenCell.call(this, x, y);
@@ -42,7 +50,6 @@ define(["Emitter"], function(Emitter) {
 	};
 
 	UserAreaController.prototype.actionClicked = function(action) {
-		console.log(this.selectedPlayer + " selected " + action);
 		this.seletecActions[this.selectedPlayer] = action;
 
 		if (action !== "" && action !== "Card" && action !== "Shoot") {
@@ -115,6 +122,10 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.canPerform = function(action) {
 		var result = true;
+		if (!this.selectedPlayer) {
+			return false;
+		}
+
 		if (action === "Pass" || action === "Shoot") {
 			result = this.stateHelper.playerHasBall(this.selectedPlayer);
 		}

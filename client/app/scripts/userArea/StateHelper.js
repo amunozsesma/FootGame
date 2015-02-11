@@ -8,8 +8,6 @@ define(function() {
 
 		this.playersConfig = {};
 		processState.call(this);
-		//TODO remove once everythin is on modified state
-		this.seletecActions = {}
 	};
 
 	function processState() {
@@ -18,6 +16,23 @@ define(function() {
 
 		var userTeam = this.config.userTeam;
 		this.outputState = getPlayersState.call(this, userTeam)
+	};
+
+	StateHelper.prototype.generateOutputState = function(playerActions, playerSelectedCells) {
+		var outputState = {};
+		var userTeam = this.config.userTeam;
+		var userPlayerState = getPlayersState.call(this, userTeam, true);
+
+		outputState.ball = this.getBallPosition();
+		Object.keys(userPlayerState).forEach(function(playerName) {
+			outputState[playerName] = {};
+			outputState[playerName].action = (playerActions[playerName]) ? playerActions[playerName] : ""; 
+			outputState[playerName].x = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].x : userPlayerState[playerName].x;
+			outputState[playerName].y = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].y : userPlayerState[playerName].y;
+		}.bind(this));
+
+		console.log(outputState);
+		return outputState;
 	};
 
 	StateHelper.prototype.getUser = function() {
