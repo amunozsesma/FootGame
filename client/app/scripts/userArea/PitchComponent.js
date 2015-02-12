@@ -68,7 +68,7 @@ define(function() {
 
           var sons = [player];
           if (this.state.ballPosition.x === x && this.state.ballPosition.y === y) {
-            sons.push(React.createElement("div", {className: "ball"}, "BALL"));
+            sons.push(React.createElement("div", {className: "ball"}));
           }
           return React.createElement("div", { onClick:this.cellClicked.bind(this, x, y), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, sons);
         },
@@ -88,7 +88,7 @@ define(function() {
   				var player = null;
   				for (var playerName in playerMap) {
   					if (playerMap[playerName].x === x && playerMap[playerName].y === y) {
-  						return React.createElement("span", {className: className}, playerName);
+  						return React.createElement("div", {className: className});
   					}
   				}
   			},

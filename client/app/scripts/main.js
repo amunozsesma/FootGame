@@ -19,8 +19,8 @@ require(["userArea/PitchComponent", "userArea/ActionsComponent", "userArea/InfoC
 mockInitialMessage = {
 	"config": {
 		"players":3,
-		"rows":3,
-		"columns":6,
+		"rows":5,
+		"columns": 10,
 		"user":"alvarito",
 		"userTeam": "A.D. Twerkin",
 		"rivalTeam": "Culo Gordo F.C.",
@@ -62,14 +62,14 @@ mockInitialMessage = {
 	"state": {
 		"players": {
 			"TwerkinPlayer1": {"x":0, "y":0, "action":""},
-			"TwerkinPlayer2": {"x":0, "y":1, "action":""},
-			"TwerkinPlayer3": {"x":0, "y":2, "action":""},
-			"CuloGordoPlayer1": {"x":5, "y":0, "action":""},
-			"CuloGordoPlayer2": {"x":5, "y":1, "action":""},
-			"CuloGordoPlayer3": {"x":5, "y":2, "action":""}
+			"TwerkinPlayer2": {"x":0, "y":2, "action":""},
+			"TwerkinPlayer3": {"x":0, "y":4, "action":""},
+			"CuloGordoPlayer1": {"x":9, "y":0, "action":""},
+			"CuloGordoPlayer2": {"x":9, "y":2, "action":""},
+			"CuloGordoPlayer3": {"x":9, "y":4, "action":""}
 		},
 		"side":"attacking",
-		"ball": {"x":0,"y":1},
+		"ball": {"x":0,"y":2},
 		"scores": {
 			"A.D. Twerkin": 0,
 			"Culo Gordo F.C.": 1

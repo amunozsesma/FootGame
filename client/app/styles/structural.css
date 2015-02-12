@@ -46,15 +46,14 @@
 	width: 650px;
 	top: 50%;
   	transform: translateY(-50%);
-}
 
-#pitch-container .pitch.slected-action-state,
-#pitch-container .pitch.slected-action-state .player:hover {
-	background-color: #E3E3E3;
+	background-image: url('/images/football_field.png');
+	background-size: 100% 100%;
 }
 
 #pitch-container .pitch.slected-action-state .player {
 	cursor: default;
+	border: 1px solid #9C9C9C;
 }
 
 #pitch-container .pitch.slected-action-state .cell.action-posibility {
@@ -64,10 +63,12 @@
 
 #pitch-container .pitch.slected-action-state .cell.action-posibility:hover {
 	background-color: #FFC4C4;
+	opacity: 0.5;
 }
 
 #pitch-container .pitch.player-selected .action-selected {
 	background-color: #FFC4C4;
+	opacity: 0.5;
 }
 
 .pitch .row {
@@ -79,10 +80,15 @@
 }
 
 .pitch .ball {
-	top: 50%;
 	position: relative;
-	font-size: 12px;
-	color: red;
+	/*font-size: 12px;*/
+	/*color: red;*/
+	width: 20px;
+	height: 20px;
+	margin: 0 auto;
+
+	background-image: url('/images/soccer_ball.png');
+	background-size: 100% 100%;
 }
 
 .player {
@@ -90,17 +96,23 @@
 }
 
 .player:hover {
-	background-color: #B3B3B3;
+	border: 2px solid blue;
 }
 
 .pitch .player .mine {
-	font-size: 12px;
-	font-weight: bold;
 	border: 1px solid;
+	width: 20px;
+	height: 20px;
+	margin: 12px auto;
+	background-color: #855400;
 }
 
 .pitch .player .rival {
-	font-size: 10px;
+	border: 1px solid;
+	width: 20px;
+	height: 20px;
+	margin: 12px auto;
+	background-color: #00A186;
 }
 
 #actions-container {
