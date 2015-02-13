@@ -161,11 +161,11 @@ MockTurnResolver = (function(){
 			
 			// console.log("----- Posibilities for: " + playerName + ":");
 			// for (var i = 0; i < posibilities.length; i++) {
-				// console.log("----- x: " + posibilities[i].x + ", y: " + posibilities[i].y);
+			// 	console.log("----- x: " + posibilities[i].x + ", y: " + posibilities[i].y);
 			// }
 			// console.log("----- -----");
 
-			var i = Math.floor(Math.random() * (posibilities.length - 1));
+			var i = Math.floor(Math.random() * (posibilities.length));
 			this.outputState.state.players[playerName] = {};
 			this.outputState.state.players[playerName].x = posibilities[i].x;
 			this.outputState.state.players[playerName].y = posibilities[i].y;
@@ -174,20 +174,34 @@ MockTurnResolver = (function(){
 
 	};
 
-	function generatePosibilities(playerPosition, dimensions, players) {
+	function generatePosibilities(playerPosition, dimensions, players, canHaveConflicts) {
 		var allPosibilities = [];
 		for (var i = -1; i <= 1; i++) {
 			var x = playerPosition.x + i;
 			var y = playerPosition.y;
-			if (x < dimensions.columns && x >= 0 && y >= 0 && y < dimensions.rows && !isPlayerPosition(x, y, players) && !isIn(x, y, allPosibilities)) {
-				allPosibilities.push({"x": x, "y": y});	
+			if (x < dimensions.columns && x >= 0 && y >= 0 && y < dimensions.rows && !isIn(x, y, allPosibilities)) {
+				if (!canHaveConflicts) {
+					if (!isPlayerPosition(x, y, players)) {
+						allPosibilities.push({"x": x, "y": y});
+					}
+					continue;	
+				} else {
+					allPosibilities.push({"x": x, "y": y});
+				}
 			}
 		}
 		for (var i = -1; i <= 1; i++) {
 			var x = playerPosition.x;
 			var y = playerPosition.y + i;
-			if (x < dimensions.columns && x >= 0 && y >= 0 && y < dimensions.rows && !isPlayerPosition(x, y, players) && !isIn(x, y, allPosibilities)) {
-				allPosibilities.push({"x": x, "y": y});	
+			if (x < dimensions.columns && x >= 0 && y >= 0 && y < dimensions.rows && !isIn(x, y, allPosibilities)) {
+				if (!canHaveConflicts) {
+					if (!isPlayerPosition(x, y, players)) {
+						allPosibilities.push({"x": x, "y": y});
+					}
+					continue;	
+				} else {
+					allPosibilities.push({"x": x, "y": y});
+				}	
 			}
 		}
 
