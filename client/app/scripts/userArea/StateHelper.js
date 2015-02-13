@@ -30,7 +30,7 @@ define(function() {
 			outputState[playerName].y = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].y : userPlayerState[playerName].y;
 		}.bind(this));
 
-		console.log(outputState);
+		// console.log(outputState);
 		return outputState;
 	};
 
@@ -131,7 +131,7 @@ define(function() {
 		return posibilities;
 	};
 
-	StateHelper.prototype.getMovePosibilities = function(playerName) {
+	StateHelper.prototype.getMovePosibilities = function(playerName, selectedCells) {
 		var posibilities = [];
 		var playerPosition = this.getPlayerPosition(playerName);
 		var dimensions = this.getDimensions();

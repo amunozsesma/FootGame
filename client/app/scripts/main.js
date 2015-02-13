@@ -27,29 +27,29 @@ mockInitialMessage = {
 		"teams": {
 			"A.D. Twerkin": {
 				"TwerkinPlayer1": {
-					"stats": {"ATTACK": 2, "DEFENCE": 3, "SPEED": 1, "STAMINNA": 5},
+					"stats": {"ATTACK": 2, "DEFENCE": 3, "PASS": 3, "STRENGTH": 5},
 					"img":"images/twerking1.jpg"
 				},
 				"TwerkinPlayer2": {
-					"stats": {"ATTACK": 4, "DEFENCE": 1, "SPEED": 1, "STAMINNA": 2}, 
+					"stats": {"ATTACK": 4, "DEFENCE": 1, "PASS": 5, "STRENGTH": 2}, 
 					"img":"images/twerking2.jpg"
 				},
 				"TwerkinPlayer3": {
-					"stats": {"ATTACK": 7, "DEFENCE": 1, "SPEED": 1, "STAMINNA": 7}, 
+					"stats": {"ATTACK": 7, "DEFENCE": 1, "PASS": 9, "STRENGTH": 7}, 
 					"img":"images/twerking3.jpg"
 				}
 			},
 			"Culo Gordo F.C.": {
 				"CuloGordoPlayer1": {
-					"stats": {"ATTACK": 3, "DEFENCE": 3, "SPEED": 1, "STAMINNA": 8},
+					"stats": {"ATTACK": 3, "DEFENCE": 3, "PASS": 2, "STRENGTH": 8},
 					"img":"images/culogordo1.jpg"
 				},
 				"CuloGordoPlayer2": {
-					"stats": {"ATTACK": 2, "DEFENCE": 8, "SPEED": 1, "STAMINNA": 4},
+					"stats": {"ATTACK": 2, "DEFENCE": 8, "PASS": 3, "STRENGTH": 4},
 					"img":"images/culogordo2.jpg"
 				},
 				"CuloGordoPlayer3": {
-					"stats": {"ATTACK": 7, "DEFENCE": 7, "SPEED": 2, "STAMINNA": 9},
+					"stats": {"ATTACK": 7, "DEFENCE": 7, "PASS": 5, "STRENGTH": 9},
 					"img":"images/culogordo3.jpg"
 				}
 			}
@@ -61,15 +61,15 @@ mockInitialMessage = {
 	},
 	"state": {
 		"players": {
-			"TwerkinPlayer1": {"x":0, "y":0, "action":""},
-			"TwerkinPlayer2": {"x":0, "y":2, "action":""},
-			"TwerkinPlayer3": {"x":0, "y":4, "action":""},
-			"CuloGordoPlayer1": {"x":9, "y":0, "action":""},
-			"CuloGordoPlayer2": {"x":9, "y":2, "action":""},
-			"CuloGordoPlayer3": {"x":9, "y":4, "action":""}
+			"TwerkinPlayer1": {"x":3, "y":0, "action":""},
+			"TwerkinPlayer2": {"x":3, "y":2, "action":""},
+			"TwerkinPlayer3": {"x":3, "y":4, "action":""},
+			"CuloGordoPlayer1": {"x":4, "y":0, "action":""},
+			"CuloGordoPlayer2": {"x":4, "y":2, "action":""},
+			"CuloGordoPlayer3": {"x":4, "y":4, "action":""}
 		},
 		"side":"attacking",
-		"ball": {"x":0,"y":2},
+		"ball": {"x":3,"y":2},
 		"scores": {
 			"A.D. Twerkin": 0,
 			"Culo Gordo F.C.": 1
@@ -86,6 +86,7 @@ mockUsersMessage = {
 MockTurnResolver = (function(){
 	"use strict";
 
+	//TODO obviously, refactor this once it goes to server
 	var MockTurnResolver = function(previousState, finalState, turnResolutionCallback, StateHelper) {
 		this.previousState = previousState;
 		this.finalState = finalState;
@@ -93,7 +94,8 @@ MockTurnResolver = (function(){
 		this.StateHelper = StateHelper;
 
 		this.resolutionStrategies = {
-			"NO_CONFLICTS": resolveWithNoConflicts.bind(this)
+			"NO_CONFLICTS": generateRandomOutputTurn.bind(this),
+			"SIMPLE_CONFLICTS": resolveWithConflicts.bind(this)
 		};
 
 
@@ -111,10 +113,12 @@ MockTurnResolver = (function(){
 			this.resolutionStrategies["NO_CONFLICTS"]();
 		}
 
+		console.log(this.outputState);
 		this.callback(this.outputState);
+
 	};
 
-	function resolveWithNoConflicts() {
+	function generateRandomOutputTurn(canGenerateConflicts) {
 		console.log("---- NO CONFLICTS TURN RESOLUTION");
 		var stateHelper = new this.StateHelper(this.previousState);
 		var userPlayers = stateHelper.getUserPlayerPositions();
@@ -157,7 +161,7 @@ MockTurnResolver = (function(){
 		
 		//Rival players
 		Object.keys(rivalPlayers).forEach(function(playerName) {
-			var posibilities = generatePosibilities.call(this, rivalPlayers[playerName], dimensions, this.outputState.state.players);
+			var posibilities = generatePosibilities.call(this, rivalPlayers[playerName], dimensions, this.outputState.state.players, canGenerateConflicts);
 			
 			// console.log("----- Posibilities for: " + playerName + ":");
 			// for (var i = 0; i < posibilities.length; i++) {
@@ -170,8 +174,100 @@ MockTurnResolver = (function(){
 			this.outputState.state.players[playerName].x = posibilities[i].x;
 			this.outputState.state.players[playerName].y = posibilities[i].y;
 			this.outputState.state.players[playerName].action = "";
+
+			if (stateHelper.playerHasBall(playerName)) {
+				this.outputState.state.ball.x = this.outputState.state.players[playerName].x;
+				this.outputState.state.ball.y = this.outputState.state.players[playerName].y;
+			}
 		}.bind(this));
 
+	};
+
+	function resolveWithConflicts() {
+		generateRandomOutputTurn.call(this, true);
+		console.log("----- SIMPLE CONFLICTS TURN RESOLUTION");
+
+		var generatedState = new this.StateHelper(this.outputState);
+		var inputState =  new this.StateHelper(this.previousState);
+		var userPlayers = generatedState.getUserPlayerPositions();
+		var rivalPlayers = generatedState.getRivalPlayerPositions();
+		var players = this.previousState.state.players;
+		var playerWithBall = null;
+
+
+
+		for (var player in players) {
+			for (var playerAgainst in players) {
+				if (player !== playerAgainst && isThereConflict(players[player], players[playerAgainst])) {
+					console.log ("------ CONFLICT between: " + player + " and " + playerAgainst + " won by: ");
+					debugger;
+					if (inputState.playerHasBall(player) && this.finalState[player] && this.finalState[player].action === "Pass") {
+						//pass from
+						var result = generateResolution(inputState.getPlayerStats(player).PASS, inputState.getPlayerStats(playerAgainst).DEFENCE);
+						if (!result) {
+							var playerWithBall = playerAgainst;
+							this.outputState.state.players[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
+							this.outputState.state.players[playerAgainst].y = this.previousState.state.players[playerAgainst].y;
+							console.log("------- " + playerAgainst);
+						} else {
+							console.log("------- " + player);
+						}
+
+					} else if (generatedState.playerHasBall(player)) {
+						//pass to or move
+						var result = generateResolution(inputState.getPlayerStats(player).ATTACK, inputState.getPlayerStats(playerAgainst).DEFENCE);
+						if (!result) {
+							var playerWithBall = playerAgainst;
+							this.outputState.state.players[player].x = this.previousState.state.players[player].x;
+							this.outputState.state.players[player].y = this.previousState.state.players[player].y;
+							console.log("------- " + playerAgainst);
+						} else {
+							this.outputState.state.players[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
+							this.outputState.state.players[playerAgainst].y = this.previousState.state.players[playerAgainst].y;	
+							console.log("------- " + player);
+						}
+					} else {
+						//rest of the conflicts
+						var result = generateResolution(inputState.getPlayerStats(player).STRENGTH, inputState.getPlayerStats(playerAgainst).STRENGTH);
+						if (!result) {
+							this.outputState.state.players[player].x = this.previousState.state.players[player].x;
+							this.outputState.state.players[player].y = this.previousState.state.players[player].y;
+							console.log("------- " + playerAgainst);
+						} else {
+							this.outputState.state.players[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
+							this.outputState.state.players[playerAgainst].y = this.previousState.state.players[playerAgainst].y;
+							console.log("------- " + player);
+						}
+					}
+				}
+				
+			}
+		}
+
+		if (playerWithBall) {
+			console.log("------ SWAPING SIDES!!!");
+			this.outputState.state.ball.x = this.outputState.state.players[playerWithBall].x;
+			this.outputState.state.ball.y = this.outputState.state.players[playerWithBall].y;
+			this.outputState.state.side = (this.outputState.state.side === "attacking") ? "defending" : "attacking";
+		}
+
+	};
+
+	function generateResolution(stat1, stat2) {
+		var result = false;
+		if ((Math.floor(Math.random() * 10) + stat1) > (Math.floor(Math.random() * 10) + stat2))  {
+			result = true;
+		}
+
+		return result;
+	};
+
+	function isThereConflict (player1, player2) {
+		var result = false;
+		if (player1.x === player2.x && player1.y === player2.y) {
+			result = true;
+		}
+		return result;
 	};
 
 	function generatePosibilities(playerPosition, dimensions, players, canHaveConflicts) {
@@ -288,7 +384,7 @@ GameManager = (function() {
 
 		//TODO send output to server, wait for callbacks to start nexturn
 		var turnResolver = new MockTurnResolver(this.state, outputState, this.nextTurn.bind(this), this.StateHelperContructor); 
-		turnResolver.resolveTurn();
+		turnResolver.resolveTurn("SIMPLE_CONFLICTS");
 	};
 
 	GameManager.prototype.nextTurn = function(state) {

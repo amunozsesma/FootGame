@@ -113,7 +113,7 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.getActionPosibilities = function() {
 		var action = this.seletecActions[this.selectedPlayer];
-		this.actionPosibilities = this.stateHelper["get" + action + "Posibilities"](this.selectedPlayer);
+		this.actionPosibilities = this.stateHelper["get" + action + "Posibilities"](this.selectedPlayer, this.cellChosen);
 		return this.actionPosibilities;
 	};
 
