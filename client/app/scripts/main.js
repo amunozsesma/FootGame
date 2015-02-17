@@ -161,7 +161,8 @@ MockTurnResolver = (function(){
 		
 		//Rival players
 		Object.keys(rivalPlayers).forEach(function(playerName) {
-			var posibilities = generatePosibilities.call(this, rivalPlayers[playerName], dimensions, this.outputState.state.players, canGenerateConflicts);
+			var playersResolved = {};
+			var posibilities = generatePosibilities.call(this, rivalPlayers[playerName], dimensions, this.outputState.state.players, canGenerateConflicts, playersResolved);
 			
 			// console.log("----- Posibilities for: " + playerName + ":");
 			// for (var i = 0; i < posibilities.length; i++) {
@@ -170,14 +171,21 @@ MockTurnResolver = (function(){
 			// console.log("----- -----");
 
 			var i = Math.floor(Math.random() * (posibilities.length));
+			playersResolved[playerName] = {};
 			this.outputState.state.players[playerName] = {};
 			this.outputState.state.players[playerName].x = posibilities[i].x;
 			this.outputState.state.players[playerName].y = posibilities[i].y;
+			playersResolved[playerName].x = posibilities[i].x;
+			playersResolved[playerName].y = posibilities[i].y;
 			this.outputState.state.players[playerName].action = "";
+
 
 			if (stateHelper.playerHasBall(playerName)) {
 				this.outputState.state.ball.x = this.outputState.state.players[playerName].x;
 				this.outputState.state.ball.y = this.outputState.state.players[playerName].y;
+			} else {
+				this.outputState.state.ball.x = this.previousState.state.ball.x;
+				this.outputState.state.ball.y = this.previousState.state.ball.y;
 			}
 		}.bind(this));
 
@@ -192,22 +200,23 @@ MockTurnResolver = (function(){
 		var userPlayers = generatedState.getUserPlayerPositions();
 		var rivalPlayers = generatedState.getRivalPlayerPositions();
 		var players = this.previousState.state.players;
+		var dimensions = inputState.getDimensions();
 		var playerWithBall = null;
-
-
+		var movesAfterConflicts = {};
+		var playerConflictsResolved = [];
 
 		for (var player in players) {
 			for (var playerAgainst in players) {
-				if (player !== playerAgainst && isThereConflict(players[player], players[playerAgainst])) {
+				if (player !== playerAgainst && isThereConflict(players[player], this.outputState.state.players[playerAgainst]) && !movesAfterConflicts[player] && !movesAfterConflicts[playerAgainst]) {
 					console.log ("------ CONFLICT between: " + player + " and " + playerAgainst + " won by: ");
-					debugger;
 					if (inputState.playerHasBall(player) && this.finalState[player] && this.finalState[player].action === "Pass") {
 						//pass from
 						var result = generateResolution(inputState.getPlayerStats(player).PASS, inputState.getPlayerStats(playerAgainst).DEFENCE);
 						if (!result) {
 							var playerWithBall = playerAgainst;
-							this.outputState.state.players[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
-							this.outputState.state.players[playerAgainst].y = this.previousState.state.players[playerAgainst].y;
+							movesAfterConflicts[playerAgainst] = {};
+							movesAfterConflicts[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
+							movesAfterConflicts[playerAgainst].y = this.previousState.state.players[playerAgainst].y;
 							console.log("------- " + playerAgainst);
 						} else {
 							console.log("------- " + player);
@@ -217,25 +226,37 @@ MockTurnResolver = (function(){
 						//pass to or move
 						var result = generateResolution(inputState.getPlayerStats(player).ATTACK, inputState.getPlayerStats(playerAgainst).DEFENCE);
 						if (!result) {
+							movesAfterConflicts[player] = {};
 							var playerWithBall = playerAgainst;
-							this.outputState.state.players[player].x = this.previousState.state.players[player].x;
-							this.outputState.state.players[player].y = this.previousState.state.players[player].y;
+							if (this.outputState.state.players[player].x === this.previousState.state.players[player].x && this.outputState.state.players[player].y === this.previousState.state.players[player].y) {
+								movePlayerBack.call(this, this.outputState.state.side, movesAfterConflicts[player], this.previousState.state.players[player], dimensions);
+							} else {
+								movesAfterConflicts[player].x = this.previousState.state.players[player].x;
+								movesAfterConflicts[player].y = this.previousState.state.players[player].y;
+							}
 							console.log("------- " + playerAgainst);
 						} else {
-							this.outputState.state.players[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
-							this.outputState.state.players[playerAgainst].y = this.previousState.state.players[playerAgainst].y;	
+							movesAfterConflicts[playerAgainst] = {};
+							movesAfterConflicts[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
+							movesAfterConflicts[playerAgainst].y = this.previousState.state.players[playerAgainst].y;	
 							console.log("------- " + player);
 						}
 					} else {
 						//rest of the conflicts
 						var result = generateResolution(inputState.getPlayerStats(player).STRENGTH, inputState.getPlayerStats(playerAgainst).STRENGTH);
 						if (!result) {
-							this.outputState.state.players[player].x = this.previousState.state.players[player].x;
-							this.outputState.state.players[player].y = this.previousState.state.players[player].y;
+							movesAfterConflicts[player] = {};
+							if (this.outputState.state.players[player].x === this.previousState.state.players[player].x && this.outputState.state.players[player].y === this.previousState.state.players[player].y) {
+								movePlayerBack.call(this, this.outputState.state.side, movesAfterConflicts[player], this.previousState.state.players[player], dimensions);
+							} else {
+								movesAfterConflicts[player].x = this.previousState.state.players[player].x;
+								movesAfterConflicts[player].y = this.previousState.state.players[player].y;
+							}
 							console.log("------- " + playerAgainst);
 						} else {
-							this.outputState.state.players[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
-							this.outputState.state.players[playerAgainst].y = this.previousState.state.players[playerAgainst].y;
+							movesAfterConflicts[playerAgainst] = {};
+							movesAfterConflicts[playerAgainst].x = this.previousState.state.players[playerAgainst].x;
+							movesAfterConflicts[playerAgainst].y = this.previousState.state.players[playerAgainst].y;
 							console.log("------- " + player);
 						}
 					}
@@ -251,7 +272,21 @@ MockTurnResolver = (function(){
 			this.outputState.state.side = (this.outputState.state.side === "attacking") ? "defending" : "attacking";
 		}
 
+		Object.keys(movesAfterConflicts).forEach(function(player) {
+			this.outputState.state.players[player].x = movesAfterConflicts[player].x;
+			this.outputState.state.players[player].y = movesAfterConflicts[player].y;
+		}.bind(this));
 	};
+
+	function movePlayerBack(side, newPosition, oldPosition, dimensions) {
+		newPosition.x = oldPosition.x;
+		newPosition.y = oldPosition.y;
+		if (side === "attacking") {
+			newPosition.x += (oldPosition.x - 1 >= 0) ? -1 : 1;
+		} else {
+			newPosition.x += (oldPosition.x + 1 < dimensions.columns) ? 1 : -1;
+		}
+	}
 
 	function generateResolution(stat1, stat2) {
 		var result = false;
@@ -270,7 +305,7 @@ MockTurnResolver = (function(){
 		return result;
 	};
 
-	function generatePosibilities(playerPosition, dimensions, players, canHaveConflicts) {
+	function generatePosibilities(playerPosition, dimensions, players, canHaveConflicts, playersToAvoidCollisionsWith) {
 		var allPosibilities = [];
 		for (var i = -1; i <= 1; i++) {
 			var x = playerPosition.x + i;
@@ -282,7 +317,9 @@ MockTurnResolver = (function(){
 					}
 					continue;	
 				} else {
-					allPosibilities.push({"x": x, "y": y});
+					if (!isPlayerPosition(x, y, playersToAvoidCollisionsWith)) {
+						allPosibilities.push({"x": x, "y": y});
+					}
 				}
 			}
 		}
@@ -296,7 +333,9 @@ MockTurnResolver = (function(){
 					}
 					continue;	
 				} else {
-					allPosibilities.push({"x": x, "y": y});
+					if (!isPlayerPosition(x, y, playersToAvoidCollisionsWith)) {
+						allPosibilities.push({"x": x, "y": y});
+					}
 				}	
 			}
 		}
