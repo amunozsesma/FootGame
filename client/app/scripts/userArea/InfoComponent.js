@@ -18,7 +18,8 @@ define(function() {
     			return {
     				"userAreaController": own.userAreaController,
     				"teamScores": {},
-    				"timeout": 0
+    				"timeout": 0,
+    				"overallTimeout": 1
     			};
   			},
   			render: function() {
@@ -40,7 +41,7 @@ define(function() {
 					}
 
 					var scoreContainer = React.createElement("div", { className: 'score-container' }, teamContainer);
-					var progressBar = React.createElement("div", { className: 'turn-progress-bar', style: {width: this.state.timeout/60000 * 683 + "px"}});
+					var progressBar = React.createElement("div", { className: 'turn-progress-bar', style: {width: this.state.timeout/this.state.overallTimeout * 683 + "px"}});
 					var timeoutContainer = React.createElement("div", { className: 'timeout-container', onClick: this.progressBarClicked }, progressBar);
 					teamScores.push(scoreContainer, timeoutContainer);
 				}.bind(this)); 
@@ -62,9 +63,10 @@ define(function() {
 		});
 	};
 
-	function adjustTimeout(timeout) {
+	function adjustTimeout(ttl) {
 		this.reactComponent.setState({
-			"timeout": timeout,
+			"timeout": ttl.timeout,
+			"overallTimeout": ttl.overallTimeout
 		});	
 	}
 

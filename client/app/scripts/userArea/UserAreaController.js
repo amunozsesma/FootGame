@@ -38,7 +38,7 @@ define(["Emitter"], function(Emitter) {
 
 	UserAreaController.prototype.adjustTimeout = function(timeout) {
 		//TODO this will come from the server
-		this.trigger("timeout-adjustment", timeout);
+		this.trigger("timeout-adjustment", {"timeout":timeout, "overallTimeout":this.stateHelper.getOverallTimeout()});
 	}
 
 	UserAreaController.prototype.onTimeoutExpired = function() {

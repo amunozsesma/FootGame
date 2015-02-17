@@ -159,6 +159,10 @@ define(function() {
 		return (playerPosition.x === ballPosition.x && playerPosition.y === ballPosition.y);
 	};
 
+	StateHelper.prototype.getOverallTimeout = function() {
+		return this.config.overallTimeout;
+	};
+
 	function getPlayersConfig() {
 		var players = {};
 		if (Object.keys(this.inputState).length === 0) {

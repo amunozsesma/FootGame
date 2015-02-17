@@ -57,7 +57,8 @@ mockInitialMessage = {
 		"actions": {
 			"attacking": ["Move", "Pass", "Shoot", "Card"],
 			"defending": ["Move", "Press", "Card"]
-		}
+		},
+		"overallTimeout":60000
 	},
 	"state": {
 		"players": {
@@ -450,11 +451,15 @@ GameManager = (function() {
 			return;
 		}
 
-		var timeout = 60000;
+		var timeout = this.state.config.overallTimeout;
 		this.turnTimeout =  window.setInterval(function() {
-			timeout -= 100;
+			timeout -= 50;
+			if (timeout === 0) {
+				window.clearInterval(this.turnTimeout);		
+				this.endTurn();
+			}
 			this.userAreaController.adjustTimeout(timeout);
-		}.bind(this), 100)
+		}.bind(this), 50)
 
 	}
 
