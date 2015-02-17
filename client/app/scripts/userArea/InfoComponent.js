@@ -7,6 +7,7 @@ define(function() {
 
 		init.call(this);
 		this.userAreaController.on("load-state", loadState, this);
+		this.userAreaController.on("timeout-adjustment", adjustTimeout, this);
 	};
 
 	function init() {
@@ -17,6 +18,7 @@ define(function() {
     			return {
     				"userAreaController": own.userAreaController,
     				"teamScores": {},
+    				"timeout": 0
     			};
   			},
   			render: function() {
@@ -37,11 +39,16 @@ define(function() {
 						teamContainer = [teamName, teamScore];
 					}
 
-					var scoreContainer = React.createElement("div", { className: 'score-container' }, teamContainer);	
-					teamScores.push(scoreContainer);
+					var scoreContainer = React.createElement("div", { className: 'score-container' }, teamContainer);
+					var progressBar = React.createElement("div", { className: 'turn-progress-bar', style: {width: this.state.timeout/60000 * 683 + "px"}});
+					var timeoutContainer = React.createElement("div", { className: 'timeout-container', onClick: this.progressBarClicked }, progressBar);
+					teamScores.push(scoreContainer, timeoutContainer);
 				}.bind(this)); 
 
 				return teamScores;
+  			},
+  			progressBarClicked: function() {
+  				this.state.userAreaController.onUserClickedTurnEnd();
   			}
 		});
 
@@ -51,9 +58,15 @@ define(function() {
 
 	function loadState(userAreaController) {
 		this.reactComponent.setState({
-			"teamScores": userAreaController.getTeamScores()
+			"teamScores": userAreaController.getTeamScores(),
 		});
 	};
+
+	function adjustTimeout(timeout) {
+		this.reactComponent.setState({
+			"timeout": timeout,
+		});	
+	}
 
 	return InfoComponent;
 

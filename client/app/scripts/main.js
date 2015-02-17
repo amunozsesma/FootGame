@@ -153,12 +153,6 @@ MockTurnResolver = (function(){
 			this.outputState.state.players[playerName].action = "";
 		}.bind(this));
 
-		//Pass Action
-		if (playerPass) {
-			this.outputState.state.ball.x = this.outputState.state.players[playerPass].x;
-			this.outputState.state.ball.y = this.outputState.state.players[playerPass].y;
-		}
-		
 		//Rival players
 		Object.keys(rivalPlayers).forEach(function(playerName) {
 			var playersResolved = {};
@@ -183,12 +177,14 @@ MockTurnResolver = (function(){
 			if (stateHelper.playerHasBall(playerName)) {
 				this.outputState.state.ball.x = this.outputState.state.players[playerName].x;
 				this.outputState.state.ball.y = this.outputState.state.players[playerName].y;
-			} else {
-				this.outputState.state.ball.x = this.previousState.state.ball.x;
-				this.outputState.state.ball.y = this.previousState.state.ball.y;
-			}
+			} 
 		}.bind(this));
 
+		//Pass Action
+		if (playerPass) {
+			this.outputState.state.ball.x = this.outputState.state.players[playerPass].x;
+			this.outputState.state.ball.y = this.outputState.state.players[playerPass].y;
+		}
 	};
 
 	function resolveWithConflicts() {
@@ -378,7 +374,9 @@ GameManager = (function() {
 		this.userAreaController = userAreaController;
 		this.state = {};
 		this.userTeams = {};
+		this.turnTimeout = null;
 		
+		this.userAreaController.on("turn-end", sendTurnEnd.bind(this))
 		//TODO get rid once we require
 		this.StateHelperContructor = StateHelperContructor;
 	};
@@ -414,6 +412,15 @@ GameManager = (function() {
 		this.state.userTeams = this.userTeams;
 			
 		this.userAreaController.loadState(new this.StateHelperContructor(this.state), true);
+
+		startTimeout.call(this);
+	};
+
+	function sendTurnEnd() {
+		//TODO tell the server a user has selected tuen end
+		//AJAXService.userEndedTurn(callback);
+
+		this.endTurn();
 	};
 
 	//This will come from the server
@@ -429,7 +436,27 @@ GameManager = (function() {
 	GameManager.prototype.nextTurn = function(state) {
 		this.state = state;
 		this.userAreaController.loadState(new this.StateHelperContructor(this.state), true);
+		startTimeout.call(this);
 	};	
+
+	function startTimeout(stopTimeout) {
+		//TODO read value from server
+		
+		if (this.turnTimeout) {
+			window.clearInterval(this.turnTimeout);
+		}
+
+		if (stopTimeout) {
+			return;
+		}
+
+		var timeout = 60000;
+		this.turnTimeout =  window.setInterval(function() {
+			timeout -= 100;
+			this.userAreaController.adjustTimeout(timeout);
+		}.bind(this), 100)
+
+	}
 
 	return GameManager;
 

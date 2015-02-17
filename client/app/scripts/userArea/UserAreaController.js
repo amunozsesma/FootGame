@@ -36,6 +36,19 @@ define(["Emitter"], function(Emitter) {
 		this.trigger("load-state", this);
 	};
 
+	UserAreaController.prototype.adjustTimeout = function(timeout) {
+		//TODO this will come from the server
+		this.trigger("timeout-adjustment", timeout);
+	}
+
+	UserAreaController.prototype.onTimeoutExpired = function() {
+		this.trigger("turn-end");
+	};
+
+	UserAreaController.prototype.onUserClickedTurnEnd = function() {
+		this.trigger("turn-end");
+	};
+
 	UserAreaController.prototype.getTurnEndResult = function() {
 		var outputState = this.stateHelper.generateOutputState(this.seletecActions, this.cellChosen);
 		return outputState;
@@ -66,6 +79,7 @@ define(["Emitter"], function(Emitter) {
 		}
 		this.trigger("action-state-changed", this);
 	};
+
 
 	UserAreaController.prototype.getDimensions = function() {
 		return this.stateHelper.getDimensions();
