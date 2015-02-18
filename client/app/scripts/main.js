@@ -58,7 +58,7 @@ mockInitialMessage = {
 			"attacking": ["Move", "Pass", "Shoot", "Card"],
 			"defending": ["Move", "Press", "Card"]
 		},
-		"overallTimeout":60000
+		"overallTimeout":30000
 	},
 	"state": {
 		"players": {
@@ -225,12 +225,7 @@ MockTurnResolver = (function(){
 						if (!result) {
 							movesAfterConflicts[player] = {};
 							var playerWithBall = playerAgainst;
-							if (this.outputState.state.players[player].x === this.previousState.state.players[player].x && this.outputState.state.players[player].y === this.previousState.state.players[player].y) {
-								movePlayerBack.call(this, this.outputState.state.side, movesAfterConflicts[player], this.previousState.state.players[player], dimensions);
-							} else {
-								movesAfterConflicts[player].x = this.previousState.state.players[player].x;
-								movesAfterConflicts[player].y = this.previousState.state.players[player].y;
-							}
+							movePlayerBack.call(this, this.outputState.state.side, movesAfterConflicts[player], this.previousState.state.players[player], dimensions);
 							console.log("------- " + playerAgainst);
 						} else {
 							movesAfterConflicts[playerAgainst] = {};
@@ -243,12 +238,7 @@ MockTurnResolver = (function(){
 						var result = generateResolution(inputState.getPlayerStats(player).STRENGTH, inputState.getPlayerStats(playerAgainst).STRENGTH);
 						if (!result) {
 							movesAfterConflicts[player] = {};
-							if (this.outputState.state.players[player].x === this.previousState.state.players[player].x && this.outputState.state.players[player].y === this.previousState.state.players[player].y) {
-								movePlayerBack.call(this, this.outputState.state.side, movesAfterConflicts[player], this.previousState.state.players[player], dimensions);
-							} else {
-								movesAfterConflicts[player].x = this.previousState.state.players[player].x;
-								movesAfterConflicts[player].y = this.previousState.state.players[player].y;
-							}
+							movePlayerBack.call(this, this.outputState.state.side, movesAfterConflicts[player], this.previousState.state.players[player], dimensions);
 							console.log("------- " + playerAgainst);
 						} else {
 							movesAfterConflicts[playerAgainst] = {};

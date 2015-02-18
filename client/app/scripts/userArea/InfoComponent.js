@@ -42,7 +42,8 @@ define(function() {
 
 					var scoreContainer = React.createElement("div", { className: 'score-container' }, teamContainer);
 					var progressBar = React.createElement("div", { className: 'turn-progress-bar', style: {width: this.state.timeout/this.state.overallTimeout * 683 + "px"}});
-					var timeoutContainer = React.createElement("div", { className: 'timeout-container', onClick: this.progressBarClicked }, progressBar);
+					var message = React.createElement("span", { className: 'progress-bar-message' }, "Click when you are ready");
+					var timeoutContainer = React.createElement("div", { className: 'timeout-container', onClick: this.progressBarClicked }, [progressBar, message]);
 					teamScores.push(scoreContainer, timeoutContainer);
 				}.bind(this)); 
 

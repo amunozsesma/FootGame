@@ -67,10 +67,10 @@ define(function() {
   			createStatsContainer: function() {
   				var stats = [];
   				Object.keys(this.state.playerStats).forEach(function(stat) {
-					var statName = React.createElement("span", {className: "stat-name"}, stat);
-					var statValue = React.createElement("span", {className: "stat-value"}, this.state.playerStats[stat]);
-  					var statContainer = React.createElement("div", {className: "stat-container"}, [statName, statValue]);
-  					stats.push(statContainer);
+					   var statName = React.createElement("span", {className: "stat-name"}, stat);
+					   var statValue = React.createElement("span", {className: "stat-value"}, this.state.playerStats[stat]);
+  					 var statContainer = React.createElement("div", {className: "stat-container"}, [statName, statValue]);
+  					 stats.push(statContainer);
   				}.bind(this));
   				return React.createElement("div", {className: "player-stats-container"}, stats);
   			},
