@@ -1,4 +1,4 @@
-define(["Emitter"], function(Emitter) {
+define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
 	"use strict";
 
 	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility},
@@ -20,13 +20,13 @@ define(["Emitter"], function(Emitter) {
 		this.trigger("load-static-state");
 	};
 
-	UserAreaController.prototype.loadState = function(stateHelper, isInitial) {
+	UserAreaController.prototype.loadState = function(message, isInitial) {
 		this.selectedPlayer = "";
 		this.isPlayerInSelectActionState = false;
 		this.seletecActions = {};
 		this.cellChosen = {};
 
-		this.stateHelper = stateHelper;
+		this.stateHelper = new StateHelper(message);
 		if (!isInitial) {
 			console.log("-- Initial turn");
 			//TODO RESOLVE -> graphics and shit / maybe set resolve mode and then set state
