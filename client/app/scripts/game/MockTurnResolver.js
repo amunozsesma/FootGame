@@ -1,7 +1,6 @@
 define(["game/StateHelper"], function(StateHelper){
 	"use strict";
 
-	//TODO obviously, refactor this once it goes to server
 	var MockTurnResolver = function(previousState, finalState, turnResolutionCallback) {
 		this.previousState = previousState;
 		this.finalState = finalState;
@@ -15,8 +14,6 @@ define(["game/StateHelper"], function(StateHelper){
 
 		this.outputState = {};
 	};
-
-	
 
 	MockTurnResolver.prototype.resolveTurn = function(strategy) {
 		this.outputState.config = this.previousState.config;

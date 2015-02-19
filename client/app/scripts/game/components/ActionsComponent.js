@@ -1,12 +1,3 @@
-// ActionsComponent(actionsContainerElement)
-// showActions(actions);
-// hideActions();
-
-// addListener({
-// 	actionSelected(action),
-
-// })
-
 define(function() {
 	"use strict";
 
@@ -21,14 +12,6 @@ define(function() {
 
 	function init() {
 		var own = this;
-
-		// var userPlayerComponent = React.createClass({
-		// 	render: function(){}
-		// });
-
-		// var rivalPlayerComponent = React.createClass({
-		// 	render: function(){}
-		// });
 
 		var actionsComponent = React.createClass({
   			getInitialState: function() {

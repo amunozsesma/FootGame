@@ -16,10 +16,6 @@ define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
 
 	Emitter.mixInto(UserAreaController);
 
-	UserAreaController.prototype.loadStaticContext = function() {
-		this.trigger("load-static-state");
-	};
-
 	UserAreaController.prototype.loadState = function(message, isInitial) {
 		this.selectedPlayer = "";
 		this.isPlayerInSelectActionState = false;
