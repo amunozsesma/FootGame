@@ -25,7 +25,7 @@ define(["config"], function(config) {
 
 	function loadPanel(panelName) {
 		require([config.panels[panelName]], function(panel) {
-			this.loadedPanels[panelName] = panel;
+			this.loadedPanels[panelName] = new panel(this);
 			show.call(this, panelName);
 		}.bind(this));
 	};
@@ -50,17 +50,14 @@ define(["config"], function(config) {
 
 	function createPanelComponent(elements) {
 		var panelComponent = React.createClass({
-        	getInitialState: function() {
-	            return {
-	                isHidden: false
-	            }
-	        },
-	        render: function() {
-	            return React.createElement("div", {className: "panel", hide: this.state.isHidden}, elements);
-	        }
-	    });
-
-	    return React.createElement(panelComponent);
+			getInitialState: function() {
+				return {isHidden: false};
+			},
+			render: function() {
+				return React.createElement("div", {className: "panel", hide: this.state.isHidden}, elements);
+			}
+		});
+		return React.createElement(panelComponent);	
 	};
 
 	return PanelManager;

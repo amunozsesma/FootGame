@@ -40,5 +40,5 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 		this.gameManager.stop();
 	};
 
-	return new GamePanel();
+	return GamePanel;
 });
