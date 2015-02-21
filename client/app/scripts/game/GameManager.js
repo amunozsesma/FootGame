@@ -1,17 +1,19 @@
-define(function() {
+define(["utils/ConnectionService"], function(ConnectionService) {
 	"use strict";
 
-	var GameManager = function(userAreaController, connectionService) {
+	var GameManager = function(userAreaController) {
 		this.userAreaController = userAreaController;
 		this.userTeams = {};
 		this.turnTimeout = null;
-		this.connectionService = connectionService;
 		
 		this.userAreaController.on("turn-end", onTurnEndedByUser.bind(this))
 	};
 
 	GameManager.prototype.start = function() {
-		this.connectionService.connect(onConnectionReady.bind(this));
+		ConnectionService.startGameConnection(onConnectionReady.bind(this));
+	};
+
+	GameManager.prototype.stop = function() {
 	};
 
 	function onConnectionReady(message) {
@@ -29,14 +31,14 @@ define(function() {
 		this.userAreaController.loadState(state, true);
 		
 		//TODO this timeout will be redundant once the server calculates it
-		//TODO this.connectionService.requestTurnTimeout();
+		//TODO ConnectionService.requestTurnTimeout();
 		startTimeout.call(this, state.config.overallTimeout);
 	};
 	
 	//TODO register callback on ConnectionListener for this
 	function endTurn() {
 		var outputState = this.userAreaController.getTurnEndResult();
-		this.connectionService.sendEndOfTurnResult(this.previousState, outputState, startTurn.bind(this));
+		ConnectionService.sendEndOfTurnResult(this.previousState, outputState, startTurn.bind(this));
 	};
 
 

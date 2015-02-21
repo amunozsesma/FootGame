@@ -104,13 +104,6 @@ define(function() {
 		});
 	};
 
-	function loadState(userAreaController) {
-		this.reactComponent.setState({
-
-		});	
-	};
-	
-
 	return ActionsComponent;
 
 });

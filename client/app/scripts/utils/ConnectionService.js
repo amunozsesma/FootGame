@@ -1,24 +1,28 @@
-define(["game/MockTurnResolver"], function(TurnResolver) {
+define(["game/MockTurnResolver", "config"], function(TurnResolver, config) {
 	"use strict";
-	function ConnectionService (mockData) {
-		if (mockData) {
-			this.mockMessage = mockData.mockMessage;
-			this.usingMocks = mockData.usesMocks;
-		}
+	function ConnectionService () {
 	};
 
-	ConnectionService.prototype.connect = function(callback) {
-		if (this.usingMocks) {
-			callback(this.mockMessage);
+	ConnectionService.prototype.connect = function() {
+
+	};
+
+	ConnectionService.prototype.disconnect = function() {
+
+	};	
+
+	ConnectionService.prototype.startGameConnection = function(callback) {
+		if (config.mocks) {
+			callback(config.mockMessage);
 		}
 	};
 
 	ConnectionService.prototype.sendEndOfTurnResult = function(previousMessage, message, callback) {
-		if (this.usingMocks) {
+		if (config.mocks) {
 			var turnResolver = new TurnResolver(previousMessage, message, callback); 
 			turnResolver.resolveTurn("SIMPLE_CONFLICTS");
 		}
 	};
 
-	return ConnectionService; 
+	return new ConnectionService(); 
 });
