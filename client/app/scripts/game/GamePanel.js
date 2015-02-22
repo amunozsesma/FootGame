@@ -10,6 +10,12 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 	function GamePanel() {
 		this.userAreaController = new UserAreaController();
 		this.gameManager = new GameManager(this.userAreaController);
+
+		this.keyPressHandler = function(event) {
+			if (event.keyCode === 13) {
+				this.gameManager.onTurnEndedByUser();			
+			}
+		}.bind(this);
 	};
 
 	GamePanel.prototype.getElement = function() {
@@ -30,10 +36,12 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 
 	GamePanel.prototype.onShow = function() {
 		this.gameManager.start();
+
+		document.body.addEventListener("keypress", this.keyPressHandler);
 	};
 
 	GamePanel.prototype.onHide = function() {
-
+		document.body.removeEventListener("keypress", this.keyPressHandler);
 	};	
 	
 	GamePanel.prototype.onClose = function() {

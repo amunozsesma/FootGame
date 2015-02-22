@@ -32,10 +32,10 @@ define(function() {
   			},
   			createDescriptionContainer: function() {
   				var name = React.createElement("div", { className: "name"}, this.state.userAreaController.getSelectedPlayer());
-  				var photoConainer = this.createPhotContainer();
+  				var photoConainer = this.createPhotoContainer();
   				return React.createElement("div", { className: "description-container"}, [name, photoConainer]);	
   			},
-  			createPhotContainer: function() {
+  			createPhotoContainer: function() {
   				var props = {
   					className: "skeleton photo-container"
   				};

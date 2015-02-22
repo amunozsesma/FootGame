@@ -6,7 +6,7 @@ define(["utils/ConnectionService"], function(ConnectionService) {
 		this.userTeams = {};
 		this.turnTimeout = null;
 		
-		this.userAreaController.on("turn-end", onTurnEndedByUser.bind(this))
+		this.userAreaController.on("turn-end", this.onTurnEndedByUser, this);
 	};
 
 	GameManager.prototype.start = function() {
@@ -20,7 +20,7 @@ define(["utils/ConnectionService"], function(ConnectionService) {
 		startTurn.call(this, message);
 	};
 
-	function onTurnEndedByUser() {
+	GameManager.prototype.onTurnEndedByUser = function() {
 		endTurn.call(this);
 	};
 
