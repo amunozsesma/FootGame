@@ -36,7 +36,7 @@ define(["config"], function(config) {
 				this.panelComponents[key].setState({isHidden: true});
 				this.loadedPanels[key].onHide();
 			}
-		});
+		}, this);
 		
 		if (!this.panelComponents[panel]) {
 			var panelComponent = createPanelComponent(this.loadedPanels[panel].getElement());

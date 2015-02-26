@@ -20,7 +20,7 @@ body {
 
 .skeleton {
     border: 1px solid #9C9C9C;
-    text-align: center;
+    /*text-align: center;*/
     font-size: 20px;
     font-weight: bold;
 }

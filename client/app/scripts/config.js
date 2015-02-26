@@ -1,9 +1,10 @@
 define(function() {
 	conf = {
 		panels: {
-			"game": "game/GamePanel"
+			"game": "game/GamePanel",
+			"teamSelection": "management/TeamSelectionPanel"
 		},
-		initialPanel: "game",
+		initialPanel: "teamSelection",
 		mocks: true,
 		mockMessage: {
 			"config": {

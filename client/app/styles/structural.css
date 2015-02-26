@@ -251,6 +251,7 @@
 	width: 100%;
 	border-radius: 5px;
 	cursor: pointer;
+	text-align: center;
 }
 
 .timeout-container .turn-progress-bar {

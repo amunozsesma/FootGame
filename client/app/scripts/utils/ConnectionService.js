@@ -9,7 +9,10 @@ define(["game/MockTurnResolver", "config"], function(TurnResolver, config) {
 
 	ConnectionService.prototype.disconnect = function() {
 
-	};	
+	};
+
+	ConnectionService.prototype.teamNameSelected = function(teamName) {
+	}
 
 	ConnectionService.prototype.startGameConnection = function(callback) {
 		if (config.mocks) {
