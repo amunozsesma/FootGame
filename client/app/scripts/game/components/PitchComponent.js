@@ -76,9 +76,9 @@ define(function() {
   				var player = null;
   				var userPlayersLength = Object.keys(this.state.userPlayers).length;
   				if (userPlayersLength !== 0) {
-  					player = this.loadPlayer(this.state.userPlayers, x, y, 'mine');
+  					player = this.loadPlayer(this.state.userPlayers, x, y, 'mine fa fa-child');
   					if (!player) {
-  						player = this.loadPlayer(this.state.rivalPlayers, x, y, 'rival');
+  						player = this.loadPlayer(this.state.rivalPlayers, x, y, 'rival fa fa-child');
   					}
   				}
 
