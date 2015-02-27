@@ -14,8 +14,17 @@
 	margin-top: 10px;
 }
 
+.validation-intput input {
+	border-radius: 5px;
+}
+
 .validation-intput.has-success input {
-	box-shadow: 0px 0px 10px 1px green;	
+	box-shadow: 0px 0px 5px 2px green;	
+}
+
+.validation-intput.has-success input:focus {
+	outline: -webkit-focus-ring-color auto 0px;
+	outline-offset: 0px;
 }
 
 #continue-container {
