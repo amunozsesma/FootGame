@@ -1,0 +1,9 @@
+{
+  "name": "footgame-server-test",
+  "version": "0.0.1",
+  "description": "foot game server",
+  "dependencies": {
+    "express": "^4.12.2",
+    "socket.io": "^1.3.5"
+  }
+}
