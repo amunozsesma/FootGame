@@ -18,6 +18,13 @@ body {
     user-select: none;
 }
 
+input {
+    font-family: inherit;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
 .skeleton {
     border: 1px solid #9C9C9C;
     /*text-align: center;*/
