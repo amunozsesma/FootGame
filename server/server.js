@@ -21,10 +21,15 @@ function init() {
     
 users = [];
 
-    
+app.use(express.static(__dirname + '/www'));
 app.get('/', function(req, res){
+  res.sendFile(__dirname + '/www/index.html');
+});
+    
+app.get('/test', function(req, res){
   res.sendfile('public/index.html');
 });
+
     
 app.use(express.static('public'));
 
