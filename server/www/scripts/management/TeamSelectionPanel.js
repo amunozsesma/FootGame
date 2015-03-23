@@ -24,26 +24,7 @@ define(["utils/ConnectionService", "management/components/LabeledInput"], functi
 	};
 
 	TeamSelectionPanel.prototype.onOpen = function() {
-		var self = this;
-		var continueSection = React.createClass({
-			getInitialState: function() {
-				return {
-					enabled: false,
-					panelManager: self.panelManager
-				};
-			},
-			handleClick: function(event) {
-				if (this.state.enabled) {
-					this.state.panelManager.showPanel("game");
-				}
-			},
-			render: function() {
-				var continueImage = React.createElement("i", {className: "continue-img fa fa-play fa-4", onClick: this.handleClick});
-				var section = React.createElement("div", {className: "section" + ((this.state.enabled) ? " enabled" : "") }, continueImage);
-				return section;
-			}
-		});
-
+		var continueSection = createConinueComponent.call(this);
 		this.continueComponent = React.render(React.createElement(continueSection), document.getElementById("continue-container"));
 	};
 
@@ -68,6 +49,30 @@ define(["utils/ConnectionService", "management/components/LabeledInput"], functi
 		}
 
 		this.continueComponent.setState({enabled: userReady && teamReady });
+	};
+
+	function createConinueComponent() {
+		var self = this;
+		var continueSection = React.createClass({
+			getInitialState: function() {
+				return {
+					enabled: false,
+					panelManager: self.panelManager
+				};
+			},
+			handleClick: function(event) {
+				if (this.state.enabled) {
+					this.state.panelManager.showPanel("game");
+				}
+			},
+			render: function() {
+				var continueImage = React.createElement("i", {className: "continue-img fa fa-play fa-4", onClick: this.handleClick});
+				var section = React.createElement("div", {className: "section" + ((this.state.enabled) ? " enabled" : "") }, continueImage);
+				return section;
+			}
+		});
+
+		return continueSection;
 	};
 
 	return TeamSelectionPanel;

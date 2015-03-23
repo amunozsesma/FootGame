@@ -91,6 +91,8 @@ function onNewUser(data) {
     
     console.log("New user " + newUser.name, newUser.team);
 
+    //TODO block till we have 2 users connected, then broadcast (new user --> game start)
+h
 	// Broadcast new user to clients. What data should we send?
 	this.broadcast.emit("new user", {id: newUser.id});
 
