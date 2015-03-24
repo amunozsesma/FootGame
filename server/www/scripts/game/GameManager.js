@@ -1,4 +1,4 @@
-define(["utils/ConnectionService"], function(ConnectionService) {
+define(["utils/ConnectionService", "utils/ClientData"], function(ConnectionService, ClientData) {
 	"use strict";
 
 	var GameManager = function(userAreaController) {
@@ -10,35 +10,46 @@ define(["utils/ConnectionService"], function(ConnectionService) {
 	};
 
 	GameManager.prototype.start = function() {
-		ConnectionService.startGameConnection(onConnectionReady.bind(this));
+		ConnectionService.subscribe("game-start", startTurn.bind(this));
+		ConnectionService.subscribe("new-turn", render.bind(this));
+		ConnectionService.send("new-user", JSON.stringify({"name": ClientData.get("userName"), "teamName": ClientData.get("teamName")}));
+		// ConnectionService.startGameConnection(onConnectionReady.bind(this));
 	};
 
 	GameManager.prototype.stop = function() {
 	};
 
-	function onConnectionReady(message) {
-		startTurn.call(this, message);
-	};
+	// function onConnectionReady(message) {
+	// 	// console.log("Receiving: " + message);
+	// 	// state = JSON.parse(message);
+	// 	startTurn.call(this, message);
+	// };
 
 	GameManager.prototype.onTurnEndedByUser = function() {
 		endTurn.call(this);
 	};
 
-	function startTurn(state) {
-		this.previousState = state;
+	function render(state) {
+		this.state = JSON.parse(state);
 
 		//TODO register callback to request timeout once everything has finished loading/rendering
-		this.userAreaController.loadState(state, true);
+		this.userAreaController.loadState(this.state, true);
+		ConnectionService.send("user-ready");
 		
-		//TODO this timeout will be redundant once the server calculates it
-		//TODO ConnectionService.requestTurnTimeout();
-		startTimeout.call(this, state.config.overallTimeout);
 	};
 	
+	function startTurn() {
+		//TODO this timeout will be redundant once the server calculates it
+		//TODO ConnectionService.requestTurnTimeout();
+		startTimeout.call(this, this.state.config.overallTimeout);
+	};
+
 	//TODO register callback on ConnectionListener for this
 	function endTurn() {
 		var outputState = this.userAreaController.getTurnEndResult();
-		ConnectionService.sendEndOfTurnResult(this.previousState, outputState, startTurn.bind(this));
+		
+		//Mocks
+		ConnectionService.sendEndOfTurnResult(this.state, outputState, render.bind(this));
 	};
 
 

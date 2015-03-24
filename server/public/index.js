@@ -73,7 +73,7 @@ function ready() {
 }
 
 function onGameStart (data) {
-    
+    	
     var jsonData = JSON.stringify(data.state);
     
     document.getElementById("state").innerHTML = jsonData;

@@ -1,4 +1,4 @@
-define(["utils/ConnectionService", "management/components/LabeledInput"], function(ConnectionService, LabeledInput){
+define(["utils/ConnectionService", "utils/ClientData", "management/components/LabeledInput"], function(ConnectionService, ClientData, LabeledInput){
 	"use strict";
 
 	function TeamSelectionPanel (panelManager) {
@@ -57,12 +57,12 @@ define(["utils/ConnectionService", "management/components/LabeledInput"], functi
 			getInitialState: function() {
 				return {
 					enabled: false,
-					panelManager: self.panelManager
+					panel: self
 				};
 			},
 			handleClick: function(event) {
 				if (this.state.enabled) {
-					this.state.panelManager.showPanel("game");
+					self.onContinueClicked();
 				}
 			},
 			render: function() {
@@ -73,6 +73,18 @@ define(["utils/ConnectionService", "management/components/LabeledInput"], functi
 		});
 
 		return continueSection;
+	};
+
+
+	TeamSelectionPanel.prototype.onContinueClicked = function() {
+		// ConnectionService.subscribe("new-turn", function() {
+		// 	console.log("new turn reveived");
+		// });
+		ClientData
+			.set("userName", this.userName)
+			.set("teamName", this.teamName);
+
+		this.panelManager.showPanel("game");
 	};
 
 	return TeamSelectionPanel;

@@ -10,7 +10,8 @@ define(["utils/ConnectionService"], function(ConnectionService) {
 	};
 
 	GameManager.prototype.start = function() {
-		ConnectionService.startGameConnection(onConnectionReady.bind(this));
+		// ConnectionService.startGameConnection(onConnectionReady.bind(this));
+		ConnectionService.subscribe("new-turn", onConnectionReady.bind(this));
 	};
 
 	GameManager.prototype.stop = function() {

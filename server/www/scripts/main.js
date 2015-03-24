@@ -1,4 +1,16 @@
-require(["config", "panel/PanelManager"], function(config, PanelManager) {
+require(["config", "panel/PanelManager", "utils/ConnectionService"], function(config, PanelManager, ConnectionService) {
 	var panelManager = new PanelManager(document.getElementById("game-area"));
-	panelManager.showPanel(config.initialPanel);
+	// PanelOverlayController.showOverlay({
+	// 	title: "Connecting to Server...",
+	// 	loader: "spinner"
+	// });
+
+	ConnectionService.connect(function() {
+		// PanelOverlayController.hideOverlay();
+		panelManager.showPanel(config.initialPanel);
+	});
+
+	window.onbeforeunload = function() {
+		ConnectionService.send("disconnect");
+	};
 });
