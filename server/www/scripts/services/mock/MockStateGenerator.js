@@ -1,10 +1,9 @@
 define(["game/StateHelper"], function(StateHelper){
 	"use strict";
 
-	var MockTurnResolver = function(previousState, finalState, turnResolutionCallback) {
+	var MockStateGenerator = function(previousState, finalState) {
 		this.previousState = previousState;
 		this.finalState = finalState;
-		this.callback = turnResolutionCallback;
 
 		this.resolutionStrategies = {
 			"NO_CONFLICTS": generateRandomOutputTurn.bind(this),
@@ -15,7 +14,7 @@ define(["game/StateHelper"], function(StateHelper){
 		this.outputState = {};
 	};
 
-	MockTurnResolver.prototype.resolveTurn = function(strategy) {
+	MockStateGenerator.prototype.generateState = function(strategy) {
 		this.outputState.config = this.previousState.config;
 
 		if (this.resolutionStrategies[strategy]) {
@@ -25,7 +24,7 @@ define(["game/StateHelper"], function(StateHelper){
 		}
 
 		console.log(this.outputState);
-		this.callback(this.outputState);
+		return this.outputState;
 
 	};
 
@@ -263,6 +262,6 @@ define(["game/StateHelper"], function(StateHelper){
 	};
 
 
-	return MockTurnResolver;
+	return MockStateGenerator;
 
 });

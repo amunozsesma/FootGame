@@ -28,14 +28,12 @@ function init() {
 	app.get('/', function(req, res){
 	  res.sendFile(__dirname + '/www/index.html');
 	});
-	    
+
 	app.get('/test', function(req, res){
 	  res.sendfile('public/index.html');
 	});
 
-	    
 	app.use(express.static('public'));
-
 	http.listen(3000, function(){
 	  console.log('listening on *:3000');
 	});
@@ -45,7 +43,7 @@ function init() {
 
 
 var setEventHandlers = function() {
-	// Socket.IO
+	// TODO namespace sockets to handle several games
 	io.on("connection", onSocketConnection);
 };
 
@@ -53,19 +51,12 @@ var setEventHandlers = function() {
 function onSocketConnection(clientSocket) {
 	console.log("New user has connected: "+ clientSocket.id);
 
-	// Listen for client disconnected
 	clientSocket.on("disconnect", onClientDisconnect);
-
-	// Listen for new user message
 	clientSocket.on("new-user", onNewUser);
-    
-     //User ready
     clientSocket.on("user-ready", onUserReady);
-
     clientSocket.on("end-turn", onUserTurnEnded);
 };
 
-// Socket client has disconnected
 function onClientDisconnect() {
 	console.log("user has disconnected: " + this.id);
 	usersReadyForTurnStart--;
@@ -107,7 +98,7 @@ function onUserReady (data) {
     if (usersReadyForTurnStart === 2) {
     	usersReadyForTurnStart = 0;
    		console.log("game start sent");
-    	io.emit("game-start"); //Start counter in the server
+    	io.emit("game-start"); //Start counter in the server 
     } 
 };
 

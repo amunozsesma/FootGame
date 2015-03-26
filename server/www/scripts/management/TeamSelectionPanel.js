@@ -1,4 +1,4 @@
-define(["utils/ConnectionService", "utils/ClientData", "management/components/LabeledInput"], function(ConnectionService, ClientData, LabeledInput){
+define(["utils/ClientData", "management/components/LabeledInput"], function(ClientData, LabeledInput){
 	"use strict";
 
 	function TeamSelectionPanel (panelManager) {
@@ -35,7 +35,6 @@ define(["utils/ConnectionService", "utils/ClientData", "management/components/La
 	};
 
 	TeamSelectionPanel.prototype.onHide = function() {
-		ConnectionService.teamNameSelected(this.teamName);			
 	};
 
 	function inputReady(propertyName, value) {
@@ -77,9 +76,6 @@ define(["utils/ConnectionService", "utils/ClientData", "management/components/La
 
 
 	TeamSelectionPanel.prototype.onContinueClicked = function() {
-		// ConnectionService.subscribe("new-turn", function() {
-		// 	console.log("new turn reveived");
-		// });
 		ClientData
 			.set("userName", this.userName)
 			.set("teamName", this.teamName);

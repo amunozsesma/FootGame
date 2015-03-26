@@ -1,4 +1,4 @@
-require(["config", "panel/PanelManager", "utils/ConnectionService"], function(config, PanelManager, ConnectionService) {
+require(["config", "panel/PanelManager", "services/ConnectionService"], function(config, PanelManager, ConnectionService) {
 	var panelManager = new PanelManager(document.getElementById("game-area"));
 	// PanelOverlayController.showOverlay({
 	// 	title: "Connecting to Server...",
