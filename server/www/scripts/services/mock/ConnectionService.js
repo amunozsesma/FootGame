@@ -1,11 +1,11 @@
-define(["services/mock/MockStateGenerator", "config"], function(TurnResolver, config) {
+define(["services/mock/MockStateGenerator", "config"], function(StateGenerator, config) {
 	"use strict";
 	function ConnectionService () {
 		this.subscribers = {};
 		this.timeout = 30000;
 		this.intervalId = null;
 
-		this.state = config.mockMessage;
+		this.state = StateGenerator.getInitialState();
 	};
 
 	var events = {
@@ -48,8 +48,8 @@ define(["services/mock/MockStateGenerator", "config"], function(TurnResolver, co
 	};
 
 	function generateNewState(previousMessage, message) {
-		var turnResolver = new TurnResolver(previousMessage, message); 
-		return turnResolver.generateState("SIMPLE_CONFLICTS");
+		var stateGenerator = new StateGenerator(previousMessage, message);
+		return stateGenerator.generateState("SIMPLE_CONFLICTS");
 	};
 
 	function startTimeout(timeout) {
