@@ -38,9 +38,6 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 	
 	function startTurn() {
 		PanelOverlay.hide();
-		
-		//TODO remove once timeout comes from the server
-		// startTimeout.call(this, this.state.config.overallTimeout);
 	};
 
 	function endTurn() {
@@ -52,23 +49,5 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		this.userAreaController.adjustTimeout(timeout);
 	};
 
-	//TODO remove once this comes from the server
-	// function startTimeout(timeout) {
-	// 	if (this.turnTimeout) {
-	// 		window.clearInterval(this.turnTimeout);
-	// 	}
-
-	// 	this.turnTimeout =  window.setInterval(function() {
-	// 		timeout -= 50;
-	// 		if (timeout === 0) {
-	// 			window.clearInterval(this.turnTimeout);		
-	// 			endTurn.call(this);
-	// 		}
-	// 		adjustTimeout.call(this, timeout);
-	// 	}.bind(this), 50)
-
-	// }
-
 	return GameManager;
-
 });

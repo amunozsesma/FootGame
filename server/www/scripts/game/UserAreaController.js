@@ -33,7 +33,6 @@ define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
 	};
 
 	UserAreaController.prototype.adjustTimeout = function(timeout) {
-		//TODO this will come from the server
 		this.trigger("timeout-adjustment", {"timeout":timeout, "overallTimeout":this.stateHelper.getOverallTimeout()});
 	}
 
@@ -51,7 +50,6 @@ define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
 	};
 
 	UserAreaController.prototype.cellClicked = function(x, y) {
-
 		if (this.isPlayerInSelectActionState) {
 			setChosenCell.call(this, x, y);
 		} else {
@@ -159,8 +157,5 @@ define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
 		}
 	};
 
-
-
 	return UserAreaController;
-
 });

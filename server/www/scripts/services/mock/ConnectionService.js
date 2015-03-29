@@ -69,8 +69,7 @@ define(["services/mock/MockStateGenerator", "config"], function(StateGenerator, 
 			}
 			adjustTimeoutCallback(timeout);
 		}.bind(this), 50)
-
-	}
+	};
 
 	return new ConnectionService(); 
 });

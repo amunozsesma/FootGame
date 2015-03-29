@@ -1,4 +1,4 @@
-define(["config"], function(config) {
+define(["config", "panel/PanelOverlayController"], function(config, PanelOverlay) {
 	"use strict";
 	function ConnectionService () {
 	};
@@ -18,12 +18,9 @@ define(["config"], function(config) {
 
 	function onConnectionStablished(callback) {
 		this._socket.on("disconnect", function() {
+			//TODO heartbeats
 			console.log("Disconnected :(");
-			//TODO reconnection
-			//PanelOverlayController.showOverlay({
-				// 	title: "Connecting lost to Server, reconnecting...",
-				// 	loader: "spinner"
-			// });
+			PanelOverlay.show("Connection lost, reconnecting...");
 		});
 
 		console.log("Connected :)");
