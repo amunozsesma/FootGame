@@ -1,4 +1,4 @@
-define(["services/ConnectionService", "utils/ClientData"], function(ConnectionService, ClientData) {
+define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayController"], function(ConnectionService, ClientData, PanelOverlay) {
 	"use strict";
 
 	var GameManager = function(userAreaController) {
@@ -10,11 +10,14 @@ define(["services/ConnectionService", "utils/ClientData"], function(ConnectionSe
 	};
 
 	GameManager.prototype.start = function() {
+		PanelOverlay.show("Waiting for rival...");
+		
 		ConnectionService.subscribe("game-start", startTurn.bind(this));
 		ConnectionService.subscribe("new-turn", render.bind(this));
 		ConnectionService.subscribe("countdown-adjust", adjustTimeout.bind(this));
 		ConnectionService.subscribe("countdown-end", endTurn.bind(this));
 		ConnectionService.send("new-user", JSON.stringify({"name": ClientData.get("userName"), "teamName": ClientData.get("teamName")}));
+	
 	};
 
 	GameManager.prototype.stop = function() {
@@ -25,6 +28,7 @@ define(["services/ConnectionService", "utils/ClientData"], function(ConnectionSe
 	};
 
 	function render(state) {
+		PanelOverlay.show("Game starting...");
 		this.state = JSON.parse(state);
 
 		this.userAreaController.loadState(this.state, true);
@@ -33,6 +37,8 @@ define(["services/ConnectionService", "utils/ClientData"], function(ConnectionSe
 	};
 	
 	function startTurn() {
+		PanelOverlay.hide();
+		
 		//TODO remove once timeout comes from the server
 		// startTimeout.call(this, this.state.config.overallTimeout);
 	};

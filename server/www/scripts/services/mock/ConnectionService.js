@@ -32,6 +32,7 @@ define(["services/mock/MockStateGenerator", "config"], function(StateGenerator, 
 				this.subscribers[events.server.NEW_TURN](JSON.stringify(this.state));
 				break;
 			case events.client.USER_READY:
+				this.subscribers[events.server.GAME_START]();
 				startTimeout.call(this, this.timeout);
 				break;
 			case events.client.TURN_END:

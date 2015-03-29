@@ -58,4 +58,40 @@ input {
     height: 100%;
 }
 
+.overlay {
+    z-index: 1;
+    background-color: white;
+    opacity: 0.8;
+}
+
+.overlay .info {
+	position: absolute;
+	border: 1px black solid;
+	height: 30%;
+	width: 30%;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	top: 50%;
+	transform: translateY(-50%);
+	padding: 20px;
+}
+
+.overlay .message {
+	text-align: center;	
+}
+
+.overlay .spinner {
+	position: absolute;
+	width: 100px;
+	height: 100px;
+	top: 40%;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+
+	background-image: url('/images/soccer_ball_spins.gif');
+	background-size: 100% 100%;
+}
+
 
