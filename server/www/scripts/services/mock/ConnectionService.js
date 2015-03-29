@@ -1,6 +1,6 @@
 define(["services/mock/MockStateGenerator", "config"], function(TurnResolver, config) {
 	"use strict";
-	function ConnectionServiceMock () {
+	function ConnectionService () {
 		this.subscribers = {};
 		this.timeout = 30000;
 		this.intervalId = null;
@@ -22,11 +22,11 @@ define(["services/mock/MockStateGenerator", "config"], function(TurnResolver, co
 		}
 	}
 
-	ConnectionServiceMock.prototype.connect = function(callback) {
+	ConnectionService.prototype.connect = function(callback) {
 		callback();
 	};
 
-	ConnectionServiceMock.prototype.send = function(eventName, data) {
+	ConnectionService.prototype.send = function(eventName, data) {
 		switch(eventName) {
 			case events.client.NEW_USER:
 				this.subscribers[events.server.NEW_TURN](JSON.stringify(this.state));
@@ -39,11 +39,11 @@ define(["services/mock/MockStateGenerator", "config"], function(TurnResolver, co
 				this.subscribers[events.server.NEW_TURN](JSON.stringify(this.state));
 				break;
 			default:
-				console.log("No actions defined for " + eventName + " in the ConnectionServiceMock.");
+				console.log("No actions defined for " + eventName + " in the ConnectionService.");
 		}
 	};
 
-	ConnectionServiceMock.prototype.subscribe = function(eventName, callback) {
+	ConnectionService.prototype.subscribe = function(eventName, callback) {
 		this.subscribers[eventName] = callback;
 	};
 
@@ -71,5 +71,5 @@ define(["services/mock/MockStateGenerator", "config"], function(TurnResolver, co
 
 	}
 
-	return new ConnectionServiceMock(); 
+	return new ConnectionService(); 
 });

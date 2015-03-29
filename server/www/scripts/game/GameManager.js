@@ -34,7 +34,7 @@ define(["services/ConnectionService", "utils/ClientData"], function(ConnectionSe
 	
 	function startTurn() {
 		//TODO remove once timeout comes from the server
-		startTimeout.call(this, this.state.config.overallTimeout);
+		// startTimeout.call(this, this.state.config.overallTimeout);
 	};
 
 	function endTurn() {
@@ -47,21 +47,21 @@ define(["services/ConnectionService", "utils/ClientData"], function(ConnectionSe
 	};
 
 	//TODO remove once this comes from the server
-	function startTimeout(timeout) {
-		if (this.turnTimeout) {
-			window.clearInterval(this.turnTimeout);
-		}
+	// function startTimeout(timeout) {
+	// 	if (this.turnTimeout) {
+	// 		window.clearInterval(this.turnTimeout);
+	// 	}
 
-		this.turnTimeout =  window.setInterval(function() {
-			timeout -= 50;
-			if (timeout === 0) {
-				window.clearInterval(this.turnTimeout);		
-				endTurn.call(this);
-			}
-			adjustTimeout.call(this, timeout);
-		}.bind(this), 50)
+	// 	this.turnTimeout =  window.setInterval(function() {
+	// 		timeout -= 50;
+	// 		if (timeout === 0) {
+	// 			window.clearInterval(this.turnTimeout);		
+	// 			endTurn.call(this);
+	// 		}
+	// 		adjustTimeout.call(this, timeout);
+	// 	}.bind(this), 50)
 
-	}
+	// }
 
 	return GameManager;
 
