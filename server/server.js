@@ -3,18 +3,22 @@
 **************************************************/
 var util = require("util")					
 var	User = require("./user").User;	
-var team = require ("./team").team;
-var player = require ("./player").player;
-var position = require ("./position").position;
-var ball = require ("./ball").ball;
-var stats = require ("./stats").stats;
-var express = require('express');
+var	State = require("./state").State;	
+var Team = require ("./team").Team;
+var Player = require ("./player").Player;
+var Position = require ("./position").Position;
+var Ball = require ("./ball").Ball;
+var Stats = require ("./stats").Stats;
+var Game = require ("./game").Game;
+var Config = require("./config").Config;
+var express = require("express");
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
 
 var socket,
 	users;	// Array of connected users
+var usersReadyCounter = 0;
 
 function init() {
 	// Create an empty array to store users
@@ -52,10 +56,8 @@ function onSocketConnection(client) {
 	client.on("new user", onNewUser);
     
      //User ready
-    client.on ("user ready", onUserReady)
-
-/*	// Listen for move user message
-	client.on("move user", onMoveUser);*/
+    client.on ("user ready", onUserReady);
+    
 };
 
 // Socket client has disconnected
@@ -80,7 +82,8 @@ function onClientDisconnect() {
 // New user has joined
 function onNewUser(data) {
 	// Create a new user. Get name from the client. The rest is generated here.
-	var newUser = new User(data.name, data.teamName);
+    
+	var newUser = createNewUser(data.name, data.teamName);
     
 	newUser.id = this.id;
     
@@ -105,8 +108,8 @@ function onUserReady (data) {
     //TODO Check both users ready and broadcast state instead of emit.
     // Then the client will retrieve each player by id and its state
     //var readyUser = userById(this.id);
-    
-    var state = {		"config": {
+        
+/*    var state = {		"config": {
 				"players":3,
 				"rows":5,
 				"columns": 10,
@@ -165,17 +168,31 @@ function onUserReady (data) {
 					"Culo Gordo F.C.": 1
 				}
 			}
-		}
+		}*/
     
-    
-    this.emit("game start", {state: state})
-  
+    //TOFO Check IDs
+    usersReadyCounter++;
+    if(usersReadyCounter === 2) {
+        usersReadyCounter = 0;
+        this.emit("game start", {state: generateInitialGameState()});
+    }
 }
 
-function createState () {
+function generateInitialGameState () {
+    
+    var config = new Config(3,5,10);
+    var ball = new Ball(createRandomPosition());
+    var game = new Game(users, config, ball)
+    var state = new State(game);
+    
+    return state;
+    
+}
 
-//create state here
 
+function updateGameState(game) {
+
+    return new State(game)
 
 }
 
@@ -190,10 +207,51 @@ function userById(id) {
 	return false;
 };
 
+function createNewUser (userName, teamName){
+    
+  
+    var user = new User(userName, createTeam(teamName));
+    return user;
+    
+}
+
+function createTeam(teamName){
+
+    var team = new Team(teamName, createPlayers(teamName));
+    return team;
+
+}
+
+
+function createPlayers (teamName) {
+    var players = [];
+    var i;
+    for (i=0; i< 3 ; i++) {
+       var player = new Player(teamName +"_Player" + i, createRandomPosition(), createRandomStats());      
+       players.push(player);  
+    }
+    return players;
+}
+    
+function createRandomStats () {
+
+    var stats = new Stats(getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10));
+    return stats;
+
+}
+
+function createRandomPosition () {
+
+    var position = new Position(getRandomNumber(1,10), getRandomNumber(1,10));
+    return position;
+
+}
+
 // TODO change this shit!!
 function getRandomNumber(min, max) {
-    return Math.random() * (max - min) + min;
+    return Math.round(Math.random() * (max - min) + min);
 }
+
 
 /**************************************************
 ** RUN THE GAME

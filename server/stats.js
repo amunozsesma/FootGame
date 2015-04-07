@@ -1,10 +1,11 @@
 /**************************************************
 ** STATS
 **************************************************/
-var Stats = function(speed, stamina, power) {
-	this.speed = speed;
-    this.stamina = stamina;
-    this.power = power;
+var Stats = function(attack, defense, speed, strength) {
+	this.attack = attack;
+    this.defense = defense;
+    this.speed = speed;
+    this.strength = strength;
 }
 
 exports.Stats = Stats;
