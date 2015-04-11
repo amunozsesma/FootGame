@@ -1,6 +1,7 @@
 
 	var socket;			
     var localUser;
+    var user;
 
 function init() {
     
@@ -17,6 +18,7 @@ function init() {
 	localUser = new User("Culo Gordo", "Team Culo Gordo");
     
 	setEventHandlers();
+    
 };
 
 var setEventHandlers = function() {
@@ -31,7 +33,7 @@ var setEventHandlers = function() {
 	socket.on("new user", onNewUser);
     
 	// End of turn
-	//socket.on("end of turn", onEndOfTurn);
+	socket.on("end of turn", onEndOfTurn);
     
     //New turn
 	//socket.on("new turn", onEndOfTurn);
@@ -45,7 +47,6 @@ var setEventHandlers = function() {
 
 function onSocketConnected() {
 	console.log("Connected to socket server");
-var user = new User();
 	// Send local player data to the game server
 	socket.emit("new user", {name: localUser.name, teamName: localUser.teamName});
 };
@@ -66,13 +67,35 @@ function onNewUser(data) {
 	remoteUsers.push(newUser);
 };
 
+function onEndOfTurn(data) {
+
+    alert("End of turn");
+    var userState = {
+                     "TwerkinPlayer1": {"x":3, "y":0, "action":"pass"},
+				     "TwerkinPlayer2": {"x":3, "y":2, "action":"shoot"},
+					 "TwerkinPlayer3": {"x":3, "y":4, "action":"move"}}
+    socket.emit("end of turn", {userState: userState});
+
+}
+
 
 function ready() {
     
  socket.emit("user ready", {id: localUser.id});
 }
 
+function finishTurn() {
+
+     var userState = {
+                         "TwerkinPlayer1": {"x":3, "y":0, "action":"pass"},
+                         "TwerkinPlayer2": {"x":3, "y":2, "action":"shoot"},
+                         "TwerkinPlayer3": {"x":3, "y":4, "action":"move"}}
+     socket.emit("end of turn", {userState: userState});
+}
+
 function onGameStart (data) {
+    
+    state = data.state;
     
     var jsonData = JSON.stringify(data.state);
     
@@ -81,11 +104,6 @@ function onGameStart (data) {
 }
 
 
-// End of turn
-
-function endOfTurn() {
-	//Emit state to the server 
-};
 
 // Remove user
 function onRemoveUser(data) {

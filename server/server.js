@@ -42,7 +42,7 @@ http.listen(3000, function(){
 
 var setEventHandlers = function() {
 	// Socket.IO
-	io.on("connection", onSocketConnection);
+	io.sockets.on("connection", onSocketConnection);
 };
 
 // New socket connection
@@ -57,6 +57,8 @@ function onSocketConnection(client) {
     
      //User ready
     client.on ("user ready", onUserReady);
+    
+    client.on ("end of turn", onEndOfTurn);
     
 };
 
@@ -104,6 +106,8 @@ function onNewUser(data) {
 };
 
 function onUserReady (data) {
+    
+    own = this;
     
     //TODO Check both users ready and broadcast state instead of emit.
     // Then the client will retrieve each player by id and its state
@@ -170,12 +174,27 @@ function onUserReady (data) {
 			}
 		}*/
     
-    //TOFO Check IDs
+    //TODO Check IDs
     usersReadyCounter++;
     if(usersReadyCounter === 2) {
         usersReadyCounter = 0;
         this.emit("game start", {state: generateInitialGameState()});
+        setTimeout(function(){own.emit("end of turn")},180000);
+        
     }
+}
+
+function onEndOfTurn(data) {
+
+    //check received end of turns from both users
+    //get state from users
+    //Resolve turn
+    //Send new state to both users
+    
+    console.log(JSON.stringify(data.userState));
+    user = userById(this.id);
+    console.log(JSON.stringify(user));
+
 }
 
 function generateInitialGameState () {
