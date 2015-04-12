@@ -1,14 +1,14 @@
 /**************************************************
 ** FOOTBALL PLAYER CLASS
 **************************************************/
-var Player = function(name, position, playerStats) {
+var Player = function(name, position, stats) {
 	this.name = name;
     this.position = position;
-    this.playerStats = playerStats;
+    this.stats = stats;
 }
 
 Player.prototype.updatePosition = function(position) {
-    this.position
+    this.position;
 }
 
 exports.Player = Player;

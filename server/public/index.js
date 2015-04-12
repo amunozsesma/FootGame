@@ -1,6 +1,7 @@
 
 	var socket;			
     var localUser;
+    var user;
 
 function init() {
     
@@ -10,11 +11,11 @@ function init() {
     this.teamName = teamName;
 }
 	
-    socket = io();
-    
 	remoteUsers = [];
     
-	localUser = new User("Culo Gordo", "Team Culo Gordo");
+	localUser = {};
+    
+     socket = io();
     
 	setEventHandlers();
 };
@@ -31,7 +32,7 @@ var setEventHandlers = function() {
 	socket.on("new user", onNewUser);
     
 	// End of turn
-	//socket.on("end of turn", onEndOfTurn);
+	socket.on("end of turn", onEndOfTurn);
     
     //New turn
 	//socket.on("new turn", onEndOfTurn);
@@ -45,8 +46,10 @@ var setEventHandlers = function() {
 
 function onSocketConnected() {
 	console.log("Connected to socket server");
-var user = new User();
-	// Send local player data to the game server
+	// Create local player and send data to the game server
+    var params = parseQueryString();
+    localUser = new User(params["name"], params["team"]); 
+    localUser.id = socket.id;
 	socket.emit("new user", {name: localUser.name, teamName: localUser.teamName});
 };
 
@@ -66,13 +69,36 @@ function onNewUser(data) {
 	remoteUsers.push(newUser);
 };
 
+function onEndOfTurn(data) {
+
+    alert("End of turn");
+    var userState = {
+                     "player1": {"x":3, "y":0, "action":"pass"},
+				     "player2": {"x":3, "y":2, "action":"shoot"},
+					 "player3": {"x":3, "y":4, "action":"move"}}
+    socket.emit("end of turn", {userState: userState});
+
+}
+
 
 function ready() {
     
- socket.emit("user ready", {id: localUser.id});
+    
+    socket.emit("user ready", {user: localUser});
+}
+
+function finishTurn() {
+
+     var userState = {
+                         "player1": {"x":3, "y":0, "action":"pass"},
+                         "player2": {"x":3, "y":2, "action":"shoot"},
+                         "player3": {"x":3, "y":4, "action":"move"}}
+     socket.emit("end of turn", {userState: userState});
 }
 
 function onGameStart (data) {
+    
+    state = data.state;
     
     var jsonData = JSON.stringify(data.state);
     
@@ -81,11 +107,6 @@ function onGameStart (data) {
 }
 
 
-// End of turn
-
-function endOfTurn() {
-	//Emit state to the server 
-};
 
 // Remove user
 function onRemoveUser(data) {
@@ -112,5 +133,20 @@ function UserById(id) {
 	
 	return false;
 };
+
+var parseQueryString = function() {
+
+    var str = window.location.search;
+    var objURL = {};
+
+    str.replace(
+        new RegExp( "([^?=&]+)(=([^&]*))?", "g" ),
+        function( $0, $1, $2, $3 ){
+            objURL[ $1 ] = $3;
+        }
+    );
+    return objURL;
+};
+
 
 init();

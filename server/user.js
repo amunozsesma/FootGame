@@ -6,7 +6,7 @@ var User = function(name, team) {
     this.id;
 	this.name = name;
     this.team = team;
-    this.stats;
+    this.score;
 }
 
 exports.User = User;
