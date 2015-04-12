@@ -107,7 +107,6 @@ function onNewUser(data) {
 
 function onUserReady (data) {
     
-    own = this;
     
     //TODO Check both users ready and broadcast state instead of emit.
     // Then the client will retrieve each player by id and its state
@@ -178,8 +177,8 @@ function onUserReady (data) {
     usersReadyCounter++;
     if(usersReadyCounter === 2) {
         usersReadyCounter = 0;
-        this.emit("game start", {state: generateInitialGameState()});
-        setTimeout(function(){own.emit("end of turn")},180000);
+        io.sockets.emit("game start", {state: generateInitialGameState()});
+        setTimeout(function(){io.sockets.emit("end of turn")},180000);
         
     }
 }
@@ -193,7 +192,7 @@ function onEndOfTurn(data) {
     
     console.log(JSON.stringify(data.userState));
     user = userById(this.id);
-    console.log(JSON.stringify(user));
+    console.log(data.userState.TwerkinPlayer1.x);
 
 }
 
@@ -246,7 +245,7 @@ function createPlayers (teamName) {
     var players = [];
     var i;
     for (i=0; i< 3 ; i++) {
-       var player = new Player(teamName +"_Player" + i, createRandomPosition(), createRandomStats());      
+       var player = new Player(teamName +"_Player_" + i, createRandomPosition(), createRandomStats());      
        players.push(player);  
     }
     return players;
