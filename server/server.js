@@ -3,202 +3,216 @@
 **************************************************/
 var util = require("util")					
 var	User = require("./user").User;	
-var team = require ("./team").team;
-var player = require ("./player").player;
-var position = require ("./position").position;
-var ball = require ("./ball").ball;
-var stats = require ("./stats").stats;
-var express = require('express');
+var	State = require("./state").State;	
+var Team = require ("./team").Team;
+var Player = require ("./player").Player;
+var Position = require ("./position").Position;
+var Ball = require ("./ball").Ball;
+var Stats = require ("./stats").Stats;
+var Game = require ("./game").Game;
+var Config = require("./config").Config;
+var express = require("express");
 var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var url = require('url');
-
-var connectedClients = {};
-var usersReadyForTurnStart = 0;
+var http = require("http").Server(app);
+var io = require("socket.io")(http);
 
 var socket,
 	users;	// Array of connected users
+var usersReadyCounter = 0;
 
 function init() {
 	// Create an empty array to store users
-	mockMode = false;
+    
+users = [];
 
-	users = [];
-	var mockProxy = function(req, res, next) {
-		if (mockMode) {
-			var parts = url.parse(req.url);
-			var m = parts.pathname.match(/(\/scripts\/services\/)(.*Service.js)/);
-			if (m) {
-				console.log('Sending mock instead: ' + m[0] + ' -> ' + m[1] + 'mock/' + m[2]);
-				req.url = m[1] + 'mock/' + m[2];
-			}
-		}
-		next();
-	};
+    
+app.get('/', function(req, res){
+  res.sendfile('public/index.html');
+});
+    
+app.use(express.static('public'));
 
-	var sendIndex = function(req, res) {
-		res.sendFile(__dirname + '/www/index.html');
-	};
-
-	app.use(mockProxy);
-	app.use(express.static(__dirname + '/www'));
-	app.get('/mock', function(req, res, next) {
-		mockMode = true;
-		next();
-	}, sendIndex);
-	app.get('/', sendIndex);
-
-	app.get('/test', function(req, res){
-	  res.sendfile('public/index.html');
-	});
-
-	app.use(express.static('public'));
-	http.listen(3000, function(){
-	  console.log('listening on *:3000');
-	});
+http.listen(3000, function(){
+  console.log('listening on *:3000');
+});
 
 	setEventHandlers();
 };
 
 
 var setEventHandlers = function() {
-	// TODO namespace sockets to handle several games
-	io.on("connection", onSocketConnection);
+	// Socket.IO
+	io.sockets.on("connection", onSocketConnection);
 };
 
 // New socket connection
-function onSocketConnection(clientSocket) {
-	console.log("New user has connected: "+ clientSocket.id);
+function onSocketConnection(client) {
+	util.log("New user has connected: "+client.id);
 
-	clientSocket.on("disconnect", onClientDisconnect);
-	clientSocket.on("new-user", onNewUser);
-    clientSocket.on("user-ready", onUserReady);
-    clientSocket.on("end-turn", onUserTurnEnded);
+	// Listen for client disconnected
+	client.on("disconnect", onClientDisconnect);
+
+	// Listen for new user message
+	client.on("new user", onNewUser);
+    
+     //User ready
+    client.on ("user ready", onUserReady);
+    
+    client.on ("end of turn", onEndOfTurn);
+    
 };
 
+// Socket client has disconnected
 function onClientDisconnect() {
-	console.log("user has disconnected: " + this.id);
-	usersReadyForTurnStart--;
-	delete connectedClients[this.id];
+	util.log("user has disconnected: "+this.id);
+
+	var removeUser = userById(this.id);
+
+	// user not found
+	if (!removeUser) {
+		util.log("user not found: "+this.id);
+		return;
+	};
+
+	// Remove user from users array
+	users.splice(users.indexOf(removeUser), 1);
+
+	// Broadcast removed user to connected socket clients
+	this.broadcast.emit("remove user", {id: this.id});
 };
 
+// New user has joined
 function onNewUser(data) {
-	
 	// Create a new user. Get name from the client. The rest is generated here.
-	var data = JSON.parse(data);
-	var newUser = new User(data.name, data.teamName, this);
+    
+	var newUser = createNewUser(data.name, data.teamName);
+    
 	newUser.id = this.id;
     
-    console.log("New user (name: " + newUser.name + " | teamName: " + newUser.team + ")");
-    connectedClients[this.id] = newUser;
-	
-	// Add new user to the users array --> not neccesary
-	// users.push(newUser);
+    console.log("New user " + newUser.name, newUser.team);
 
-	var clientsArray = Object.keys(connectedClients);
-    if (clientsArray.length === 2) {
-    	clientsArray.forEach(function(client, index) {
-    		var user = connectedClients[client];
-    		var rivalUser = connectedClients[clientsArray[Math.abs(index - 1)]];
-    		sendInitialState(this, user, rivalUser);
-    	}, this);
-    }
-};
+	// Broadcast new user to clients. What data should we send?
+	this.broadcast.emit("new user", {id: newUser.id});
 
-function sendInitialState(socket, user, rivalUser) {
-	var state = createState(user, rivalUser);
-	user.socket.emit("new-turn", state);
+	// Send existing users to the new user
+	var i, existingUser;
+	for (i = 0; i < users.length; i++) {
+		existingUser = users[i];
+		this.emit("new user", {id: existingUser.id});
+	};
+		
+	// Add new user to the users array
+	users.push(newUser);
 };
 
 function onUserReady (data) {
-    console.log("User is ready");
-    usersReadyForTurnStart++;
-
-    if (usersReadyForTurnStart === 2) {
-    	usersReadyForTurnStart = 0;
-   		console.log("game start sent");
-    	io.emit("game-start"); //Start counter in the server 
-    } 
-};
-
-function onUserTurnEnded(data) {
-
-};
-
-function endTurn() {
-};
-
-//Remove this, is just to select side.
-var side = 0;
-function createState (user, rivalUser) {
-    var state = {
-		"config": {
-			"players":3,
-			"rows":5,
-			"columns": 10,
-			"user":"alvarito",
-			"userTeam": user.team,
-			"rivalTeam": rivalUser.team,
-			"teams": {},
-			"actions": {
-				"attacking": ["Move", "Pass", "Shoot", "Card"],
-				"defending": ["Move", "Press", "Card"]
+    
+    
+    //TODO Check both users ready and broadcast state instead of emit.
+    // Then the client will retrieve each player by id and its state
+    //var readyUser = userById(this.id);
+        
+/*    var state = {		"config": {
+				"players":3,
+				"rows":5,
+				"columns": 10,
+				"user":"alvarito",
+				"userTeam": "A.D. Twerkin",
+				"rivalTeam": "Culo Gordo F.C.",
+				"teams": {
+					"A.D. Twerkin": {
+						"TwerkinPlayer1": {
+							"stats": {"ATTACK": 2, "DEFENCE": 3, "PASS": 3, "STRENGTH": 5},
+							"img":"images/twerking1.jpg"
+						},
+						"TwerkinPlayer2": {
+							"stats": {"ATTACK": 4, "DEFENCE": 1, "PASS": 5, "STRENGTH": 2}, 
+							"img":"images/twerking2.jpg"
+						},
+						"TwerkinPlayer3": {
+							"stats": {"ATTACK": 7, "DEFENCE": 1, "PASS": 9, "STRENGTH": 7}, 
+							"img":"images/twerking3.jpg"
+						}
+					},
+					"Culo Gordo F.C.": {
+						"CuloGordoPlayer1": {
+							"stats": {"ATTACK": 3, "DEFENCE": 3, "PASS": 2, "STRENGTH": 8},
+							"img":"images/culogordo1.jpg"
+						},
+						"CuloGordoPlayer2": {
+							"stats": {"ATTACK": 2, "DEFENCE": 8, "PASS": 3, "STRENGTH": 4},
+							"img":"images/culogordo2.jpg"
+						},
+						"CuloGordoPlayer3": {
+							"stats": {"ATTACK": 7, "DEFENCE": 7, "PASS": 5, "STRENGTH": 9},
+							"img":"images/culogordo3.jpg"
+						}
+					}
+				},
+				"actions": {
+					"attacking": ["Move", "Pass", "Shoot", "Card"],
+					"defending": ["Move", "Press", "Card"]
+				},
+				"overallTimeout":30000
 			},
-			"overallTimeout":30000
-		},
-		"state": {
-			"players": {
-				"TwerkinPlayer1": {"x":3, "y":0, "action":""},
-				"TwerkinPlayer2": {"x":3, "y":2, "action":""},
-				"TwerkinPlayer3": {"x":3, "y":4, "action":""},
-				"CuloGordoPlayer1": {"x":4, "y":0, "action":""},
-				"CuloGordoPlayer2": {"x":4, "y":2, "action":""},
-				"CuloGordoPlayer3": {"x":4, "y":4, "action":""}
-			},
-			"side": (side===0) ? "attacking" : "defending",
-			"ball": {"x":3,"y":2},
-			"scores": {}
-		}
-	};
+			"state": {
+				"players": {
+					"TwerkinPlayer1": {"x":3, "y":0, "action":""},
+					"TwerkinPlayer2": {"x":3, "y":2, "action":""},
+					"TwerkinPlayer3": {"x":3, "y":4, "action":""},
+					"CuloGordoPlayer1": {"x":4, "y":0, "action":""},
+					"CuloGordoPlayer2": {"x":4, "y":2, "action":""},
+					"CuloGordoPlayer3": {"x":4, "y":4, "action":""}
+				},
+				"side":"attacking",
+				"ball": {"x":3,"y":2},
+				"scores": {
+					"A.D. Twerkin": 0,
+					"Culo Gordo F.C.": 1
+				}
+			}
+		}*/
+    
+    //TODO Check IDs
+    usersReadyCounter++;
+    if(usersReadyCounter === 2) {
+        usersReadyCounter = 0;
+        io.sockets.emit("game start", {state: generateInitialGameState()});
+        setTimeout(function(){io.sockets.emit("end of turn")},180000);
+        
+    }
+}
 
-	side++;
+function onEndOfTurn(data) {
 
-	state.config.teams[user.team] = {
-		"TwerkinPlayer1": {
-			"stats": {"ATTACK": 2, "DEFENCE": 3, "PASS": 3, "STRENGTH": 5},
-			"img":"images/twerking1.jpg"
-		},
-		"TwerkinPlayer2": {
-			"stats": {"ATTACK": 4, "DEFENCE": 1, "PASS": 5, "STRENGTH": 2}, 
-			"img":"images/twerking2.jpg"
-		},
-		"TwerkinPlayer3": {
-			"stats": {"ATTACK": 7, "DEFENCE": 1, "PASS": 9, "STRENGTH": 7}, 
-			"img":"images/twerking3.jpg"
-		}
-	};
+    //check received end of turns from both users
+    //get state from users
+    //Resolve turn
+    //Send new state to both users
+    
+    console.log(JSON.stringify(data.userState));
+    user = userById(this.id);
+    console.log(data.userState.TwerkinPlayer1.x);
 
-	state.config.teams[rivalUser.team] = {
-		"CuloGordoPlayer1": {
-			"stats": {"ATTACK": 3, "DEFENCE": 3, "PASS": 2, "STRENGTH": 8},
-			"img":"images/culogordo1.jpg"
-		},
-		"CuloGordoPlayer2": {
-			"stats": {"ATTACK": 2, "DEFENCE": 8, "PASS": 3, "STRENGTH": 4},
-			"img":"images/culogordo2.jpg"
-		},
-		"CuloGordoPlayer3": {
-			"stats": {"ATTACK": 7, "DEFENCE": 7, "PASS": 5, "STRENGTH": 9},
-			"img":"images/culogordo3.jpg"
-		}
-	};
+}
 
-	state.state.scores[user.team] = 0;
-	state.state.scores[rivalUser.team] = 0;
+function generateInitialGameState () {
+    
+    var config = new Config(3,5,10);
+    var ball = new Ball(createRandomPosition());
+    var game = new Game(users, config, ball)
+    var state = new State(game);
+    
+    return state;
+    
+}
 
-	return JSON.stringify(state);
-};
+
+function updateGameState(game) {
+
+    return new State(game)
+
+}
 
 // Game helper find user by ID
 function userById(id) {
@@ -210,6 +224,52 @@ function userById(id) {
 	
 	return false;
 };
+
+function createNewUser (userName, teamName){
+    
+  
+    var user = new User(userName, createTeam(teamName));
+    return user;
+    
+}
+
+function createTeam(teamName){
+
+    var team = new Team(teamName, createPlayers(teamName));
+    return team;
+
+}
+
+
+function createPlayers (teamName) {
+    var players = [];
+    var i;
+    for (i=0; i< 3 ; i++) {
+       var player = new Player(teamName +"_Player_" + i, createRandomPosition(), createRandomStats());      
+       players.push(player);  
+    }
+    return players;
+}
+    
+function createRandomStats () {
+
+    var stats = new Stats(getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10));
+    return stats;
+
+}
+
+function createRandomPosition () {
+
+    var position = new Position(getRandomNumber(1,10), getRandomNumber(1,10));
+    return position;
+
+}
+
+// TODO change this shit!!
+function getRandomNumber(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+}
+
 
 /**************************************************
 ** RUN THE GAME

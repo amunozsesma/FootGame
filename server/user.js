@@ -1,14 +1,12 @@
 /**************************************************
 ** USER CLASS
 **************************************************/
-var User = function(name, team, socket) {
+var User = function(name, team) {
     
     this.id;
 	this.name = name;
     this.team = team;
-	this.socket = socket;
-
-    this.stats;
+    this.score;
 }
 
 exports.User = User;
