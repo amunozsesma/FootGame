@@ -61,7 +61,7 @@ module.exports = function(http) {
 
 		// Broadcast removed user to connected socket clients --> the other client does not care. 
 		//TODO Remove
-		this.broadcast.emit("remove user", {id: socket.id});
+		socket.broadcast.emit("remove user", {id: socket.id});
 	};
 
 	function onNewUser(socket, data) {
@@ -73,7 +73,7 @@ module.exports = function(http) {
 
 		// Broadcast new user to clients. What data should we send --> the other use does not care
 		//TODO remove
-		this.broadcast.emit("new user", {id: newUser.id});
+		socket.broadcast.emit("new user", {id: newUser.id});
 
 		// Send existing users to the new user 
 		//TODO we will need to send the initial state to both clients once both are connected

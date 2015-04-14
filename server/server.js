@@ -32,6 +32,7 @@ function init() {
 	}, sendIndex);
 	app.get('/', sendIndex);
 
+	app.use(express.static('public'));
 	app.get('/test', function(req, res){
 	  res.sendfile('public/index.html');
 	});
