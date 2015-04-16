@@ -42,9 +42,9 @@ module.exports = function(http) {
 		util.log("New user has connected with socket id: " + socket.id);
 		
 		socket.on("disconnect", onClientDisconnect.bind(this, socket));
-		socket.on("new user", onNewUser.bind(this, socket));
-		socket.on("user ready", onUserReady.bind(this, socket));
-		socket.on("end of turn", onEndOfTurn.bind(this, socket));
+		socket.on(client_events.NEW_USER, onNewUser.bind(this, socket));
+		socket.on(client_events.USER_READY, onUserReady.bind(this, socket));
+		socket.on(client_events.TURN_END, onEndOfTurn.bind(this, socket));
 	};
 
 	function onClientDisconnect(socket) {
@@ -71,19 +71,23 @@ module.exports = function(http) {
 
 		console.log("New user " + newUser.name, newUser.team);
 
-		// Broadcast new user to clients. What data should we send --> the other use does not care
-		//TODO remove
-		socket.broadcast.emit("new user", {id: newUser.id});
+		users.push(newUser);
 
 		// Send existing users to the new user 
 		//TODO we will need to send the initial state to both clients once both are connected
 		var i, existingUser;
-		for (i = 0; i < users.length; i++) {
-			existingUser = users[i];
-			socket.emit("new user", {id: existingUser.id});
-		};
+		if (users.length === 2) {
+			users.forEach(function(user) {
+				var state = generateInitialGameState();
+				io.emit(server_events.NEW_TURN, state);
+			});
+		}
+		
+		// for (i = 0; i < users.length; i++) {
+		// 	existingUser = users[i];
+		// 	socket.emit(client_events.NEW_USER, {id: existingUser.id});
+		// };
 			
-		users.push(newUser);
 	};
 
 	function onUserReady (socket, data) {
@@ -95,8 +99,8 @@ module.exports = function(http) {
 		usersReadyCounter++;
 		if(usersReadyCounter === 2) {
 			usersReadyCounter = 0;
-			io.sockets.emit("game start", {state: generateInitialGameState()});
-			setTimeout(function(){io.sockets.emit("end of turn")},180000);
+			io.emit(server_events.GAME_START);
+			// setTimeout(function(){io.sockets.emit(client_events.TURN_END)},180000);
 		}
 	};
 
@@ -111,7 +115,7 @@ module.exports = function(http) {
 		console.log(data.userState.TwerkinPlayer1.x);
 	};
 
-	function generateInitialGameState () {
+	function generateInitialGameState (id) {
 		var config = new Config(3,5,10);
 		var ball = new Ball(createRandomPosition());
 		var game = new Game(users, config, ball)
@@ -133,7 +137,7 @@ module.exports = function(http) {
 		return false;
 	};
 
-	function createNewUser (userName, teamName){
+	function createNewUser (userName, teamName, socket){
 		var user = new User(userName, createTeam(teamName));
 		return user;
 	};

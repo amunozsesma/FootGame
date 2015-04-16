@@ -29,7 +29,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 
 	function render(state) {
 		PanelOverlay.show("Game starting...");
-		this.state = JSON.parse(state);
+		this.state = state;
 
 		this.userAreaController.loadState(this.state, true);
 		ConnectionService.send("user-ready");

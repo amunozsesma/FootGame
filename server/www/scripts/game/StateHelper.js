@@ -1,6 +1,35 @@
 define(function() {
 	"use strict";
 
+	// game: {
+	// 	ball: {
+	// 		position: {x:, y:}
+	// 	},
+	// 	config: {
+	// 		numColumns:, numPlayers:, numRows:
+	// 	},
+	// 	users: [
+	// 		{
+	// 			id:,
+	// 			team: {
+	// 				players:[
+	// 					{
+	// 						name:,
+	// 						position: {
+	// 							x: , y:
+	// 						},
+	// 						stats: {
+	// 							attack:, defence:, speed:, strength:
+	// 						}
+	// 					},
+	// 					...
+	// 				]
+	// 			}
+	// 		},
+	// 		...
+	// 	]
+	// }
+
 	var StateHelper = function(inputMessage) {
 		this.inputState = inputMessage.state;
 		this.config = inputMessage.config;
