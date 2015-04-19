@@ -29,7 +29,38 @@ define(["game/StateHelper"], function(StateHelper){
 	};
 
 	MockStateGenerator.getInitialState = function() {
-		var mockMessage = {
+		// game: {
+	// 	ball: {
+	// 		position: {x:, y:}
+	// 	},
+	// 	config: {
+	// 		numColumns:, numPlayers:, numRows:
+	// 	},
+	// 	users: [
+	// 		{
+	// 			id:,
+	// 			team: {
+	// 				players:[
+	// 					{
+	// 						name:,
+	// 						position: {
+	// 							x: , y:
+	// 						},
+	// 						stats: {
+	// 							attack:, defence:, speed:, strength:
+	// 						}
+	// 					},
+	// 					...
+	// 				]
+	// 			},
+	//			side:,
+	// 		},
+	// 		...
+	// 	]
+	// }
+
+
+	var mockMessage = {
 			"config": {
 				"players":3,
 				"rows":5,

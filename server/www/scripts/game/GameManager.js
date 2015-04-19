@@ -16,7 +16,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		ConnectionService.subscribe("new-turn", render.bind(this));
 		ConnectionService.subscribe("countdown-adjust", adjustTimeout.bind(this));
 		ConnectionService.subscribe("countdown-end", endTurn.bind(this));
-		ConnectionService.send("new-user", JSON.stringify({"name": ClientData.get("userName"), "teamName": ClientData.get("teamName")}));
+		ConnectionService.send("new-user", {"name": ClientData.get("userName"), "teamName": ClientData.get("teamName")});
 	
 	};
 

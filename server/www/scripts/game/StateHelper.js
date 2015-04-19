@@ -1,133 +1,87 @@
 define(function() {
 	"use strict";
 
-	// game: {
-	// 	ball: {
-	// 		position: {x:, y:}
-	// 	},
-	// 	config: {
-	// 		numColumns:, numPlayers:, numRows:
-	// 	},
-	// 	users: [
-	// 		{
-	// 			id:,
-	// 			team: {
-	// 				players:[
-	// 					{
-	// 						name:,
-	// 						position: {
-	// 							x: , y:
-	// 						},
-	// 						stats: {
-	// 							attack:, defence:, speed:, strength:
-	// 						}
-	// 					},
-	// 					...
-	// 				]
-	// 			}
-	// 		},
-	// 		...
-	// 	]
-	// }
+	var StateHelper = function(inputMessage, userId) {
+		this.state = inputMessage.game;
 
-	var StateHelper = function(inputMessage) {
-		this.inputState = inputMessage.state;
-		this.config = inputMessage.config;
-		this.outputState = {};
+		var teams = getTeams.call(this, userId);
+		this.userTeam = teams.user;
+		this.rivalTeam = teams.rival;
+		this.allPlayers = getAllPlayers.call(this);
 
+		this.outputState = this.generateOutputState({}, {});
 		this.playersConfig = {};
-		processState.call(this);
-	};
-
-	function processState() {
-		//TODO performance: make the state map plain: {player: {1: 2}}
-		this.playersConfig = getPlayersConfig.call(this);
-
-		var userTeam = this.config.userTeam;
-		this.outputState = getPlayersState.call(this, userTeam)
 	};
 
 	StateHelper.prototype.generateOutputState = function(playerActions, playerSelectedCells) {
 		var outputState = {};
-		var userTeam = this.config.userTeam;
-		var userPlayerState = getPlayersState.call(this, userTeam, true);
 
-		Object.keys(userPlayerState).forEach(function(playerName) {
+		this.userTeam.players.forEach(function(player) {
+			var playerName = player.name
 			outputState[playerName] = {};
 			outputState[playerName].action = (playerActions[playerName]) ? playerActions[playerName] : ""; 
-			outputState[playerName].x = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].x : userPlayerState[playerName].x;
-			outputState[playerName].y = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].y : userPlayerState[playerName].y;
+			outputState[playerName].x = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].x : this.allPlayers[playerName].x;
+			outputState[playerName].y = (playerSelectedCells[playerName]) ? playerSelectedCells[playerName].y : this.allPlayers[playerName].y;
 		}.bind(this));
 
-		// console.log(outputState);
 		return outputState;
 	};
 
-	StateHelper.prototype.getUser = function() {
-		return this.config.user;
-	};
-
 	StateHelper.prototype.getDimensions = function() {
-		var columns = this.config.columns;
-		var rows = this.config.rows;
+		var columns = this.state.config.numColumns;
+		var rows = this.state.config.numRows;
 
 		return {"columns": columns, "rows": rows};
 	};
 
 	StateHelper.prototype.getUserPlayerPositions = function() {
-		var userTeam = this.config.userTeam;
-		return getPlayersState.call(this, userTeam, true);
+		return getPositions.call(this, this.userTeam);
 	};
 
 	StateHelper.prototype.getRivalPlayerPositions = function() {
-		var rivalTeam = this.config.rivalTeam;
-		return getPlayersState.call(this, rivalTeam, true);
+		return getPositions.call(this, this.rivalTeam, true);
 	};
-
+	
 	StateHelper.prototype.getBallPosition = function() {
-		return this.inputState.ball;
+		return this.state.ball.position;
 	};
-
+	
 	StateHelper.prototype.getPlayerImage = function(playerName) {
-		return (playerName) ? this.playersConfig[playerName].img : "";
+		return "";
 	};
 
 	StateHelper.prototype.getPlayerStats = function(playerName) {
-		return (playerName) ? this.playersConfig[playerName].stats : {};
+		var player = this.allPlayers[playerName];
+		return (playerName) ? player.stats : {};
 	};
-
+	
 	StateHelper.prototype.getPlayerActions = function(playerName) {
-		var userTeam = this.config.userTeam;
-		var userPlayers = getPlayersState.call(this, userTeam); 
-		if (Object.keys(userPlayers).indexOf(playerName) !== -1 ) {
-			return this.config.actions[this.inputState.side];
-		} else {
+		var player = this.allPlayers[playerName];
+		if (!player) {
 			return [];
 		}
+
+		return (player.side === "attacking") ? ["PASS", "SHOOT", "MOVE", "CARD"] : ["MOVE", "PRESS", "CARD"];
 	};
-
+	
 	StateHelper.prototype.getPlayerPosition = function(playerName) {
-		var playerPosition = {};
-		var playerState = this.inputState.players[playerName];
-
-		playerPosition.x = playerState.x;
-		playerPosition.y = playerState.y;
-
-		return playerPosition;
+		var player = this.allPlayers[playerName];
+		return player.position;
 	};
 
 	StateHelper.prototype.getSelectedAction = function(playerName) {
-		return (playerName) ? this.outputState.players[playerName].action : "";
+		return (playerName) ? this.outputState[playerName].action : "";
 	};
 
+	//TODO - Has to come from the server message
 	StateHelper.prototype.getTeamScores = function() {
-		return this.inputState.scores;
+		return {"Team 1": 0, "Team 2": 0};
 	};
-
+	
 	StateHelper.prototype.getPlayerIn = function(x, y) {
 		var player = "";
-		for (var playerName in this.inputState.players) {
-			if (this.inputState.players[playerName].x === x && this.inputState.players[playerName].y === y) {
+		for (var playerName in this.allPlayers) {
+			if (this.allPlayers[playerName].position.x === x && this.allPlayers[playerName].position.y === y) {
 				player = playerName;
 				break;
 			}
@@ -180,7 +134,7 @@ define(function() {
 		return posibilities;
 
 	};
-
+	
 	StateHelper.prototype.playerHasBall = function(playerName) {
 		var playerPosition = this.getPlayerPosition(playerName);
 		var ballPosition = this.getBallPosition();
@@ -188,36 +142,47 @@ define(function() {
 		return (playerPosition.x === ballPosition.x && playerPosition.y === ballPosition.y);
 	};
 
+	//TODO Has to come from the server!!
 	StateHelper.prototype.getOverallTimeout = function() {
-		return this.config.overallTimeout;
+		return 30000;
 	};
 
-	function getPlayersConfig() {
+	
+	function getTeams(id) {
+		var teams = {user: {}, rival: {}};
+
+		this.state.users.forEach(function(user) {
+			if (user.id === id) {
+				teams.user = user.team;
+			} else {
+				teams.rival = user.team;
+			}
+		});
+
+		return teams;
+	};
+	
+	function getPositions(team) {
+		var positions = [];
+		team.players.forEach(function(player) {
+			positions.push({x: player.position.x, y: player.position.y })
+		});
+
+		return positions;
+	};
+	
+	function getAllPlayers() {
 		var players = {};
-		if (Object.keys(this.inputState).length === 0) {
-			return null;
-		}
-
-		var userTeam = this.config.teams[this.config.userTeam];
-		var rivalTeam = this.config.teams[this.config.rivalTeam];
-
-		for (var player in userTeam) {
-			players[player] = userTeam[player];
-		}
-		for (var player in rivalTeam) {
-			players[player] = rivalTeam[player];
-		}
+		this.state.users.forEach(function(user) {
+			user.team.players.forEach(function(player) {
+				players[player.name] = {};
+				players[player.name].stats = player.stats;
+				players[player.name].position = player.position;
+				players[player.name].side = user.side;
+			});
+		}, this);
 
 		return players;
-	};
-
-	function getPlayersState(teamName, copyState) {
-		var playersState = {};
-		Object.keys(this.config.teams[teamName]).forEach(function(player) {
-			playersState[player] = (copyState) ? this.inputState.players[player] : {};
-		}.bind(this));
-
-		return playersState;
 	};
 
 	return StateHelper;

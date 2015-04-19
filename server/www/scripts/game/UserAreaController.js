@@ -1,4 +1,4 @@
-define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
+define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitter, StateHelper, ClientData) {
 	"use strict";
 
 	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility},
@@ -22,7 +22,7 @@ define(["libs/Emitter", "game/StateHelper"], function(Emitter, StateHelper) {
 		this.seletecActions = {};
 		this.cellChosen = {};
 
-		this.stateHelper = new StateHelper(message);
+		this.stateHelper = new StateHelper(message, ClientData.get("userId"));
 		if (!isInitial) {
 			console.log("-- Initial turn");
 			//TODO RESOLVE -> graphics and shit / maybe set resolve mode and then set state

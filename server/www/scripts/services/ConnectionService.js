@@ -1,4 +1,4 @@
-define(["config", "panel/PanelOverlayController"], function(config, PanelOverlay) {
+define(["config", "panel/PanelOverlayController", "utils/ClientData"], function(config, PanelOverlay, ClientData) {
 	"use strict";
 	function ConnectionService () {
 	};
@@ -17,6 +17,8 @@ define(["config", "panel/PanelOverlayController"], function(config, PanelOverlay
 	};
 
 	function onConnectionStablished(callback) {
+		ClientData.set("userId", this._socket.id);
+
 		this._socket.on("disconnect", function() {
 			//TODO heartbeats
 			console.log("Disconnected :(");

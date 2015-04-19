@@ -163,7 +163,7 @@ module.exports = function(http) {
 	};
 
 	function createRandomPosition () {
-		var position = new Position(getRandomNumber(1,10), getRandomNumber(1,10));
+		var position = new Position(getRandomNumber(0,9), getRandomNumber(0,4));
 		return position;
 	};
 
