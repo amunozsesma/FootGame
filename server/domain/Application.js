@@ -16,6 +16,7 @@ module.exports = function(http) {
 	
 	var users = [];
 	var usersReadyCounter = 0;
+	var overallTimeout = 30000;
 
 	//TODO use constants for event names
 	var server_events = {
@@ -35,6 +36,7 @@ module.exports = function(http) {
 	};
 
 	Application.prototype.start = function() {
+		this.intervalId = null;
 		io.on("connection", setEventHandlers);
 	};
 
@@ -100,8 +102,24 @@ module.exports = function(http) {
 		if(usersReadyCounter === 2) {
 			usersReadyCounter = 0;
 			io.emit(server_events.GAME_START);
-			// setTimeout(function(){io.sockets.emit(client_events.TURN_END)},180000);
+			this.intervalId = null;
+			startTimeout.call(this, overallTimeout);
 		}
+	};
+
+	function startTimeout(timeout) {
+		if (this.intervalId) {
+			clearInterval(this.intervalId);
+		}
+
+		this.intervalId =  setInterval(function() {
+			timeout -= 50;
+			if (timeout === 0) {
+				clearInterval(this.intervalId);		
+				io.emit(server_events.COUNTDOWN_END);
+			}
+			io.emit(server_events.COUNTDOWN_ADJUST, timeout);
+		}.bind(this), 50)
 	};
 
 	function onEndOfTurn(socket, data) {
@@ -116,7 +134,7 @@ module.exports = function(http) {
 	};
 
 	function generateInitialGameState (id) {
-		var config = new Config(3,5,10);
+		var config = new Config(3,5,10, 30000);
 		var ball = new Ball(createRandomPosition());
 		var game = new Game(users, config, ball)
 		var state = new State(game);
@@ -175,8 +193,13 @@ module.exports = function(http) {
 	return new Application();
 };
 
-//TODO
+//CHANGES
 //onNewUser sends initial state emitting new-turn (this is so clientes reneder the state and then send a user ready)
 //when server receives onUserReady from both broadcasts game-start and starts counter
+//Server sends timeout-adjust to sync both clients and countdown-end to notify timeout has expired
+
+//TODO
 //Nice to have: State generation has to be asynchronous and notify of state generation with a successCallback/errorCallbacl
 //	as this information will come from a third party in the future (eg ddbb)
+//User has to send turn-end when manullay ended or after receiving countdown-end. After that start again, server broadcasts new-turn with new state, etc
+//End turn

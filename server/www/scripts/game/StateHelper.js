@@ -142,12 +142,10 @@ define(function() {
 		return (playerPosition.x === ballPosition.x && playerPosition.y === ballPosition.y);
 	};
 
-	//TODO Has to come from the server!!
 	StateHelper.prototype.getOverallTimeout = function() {
-		return 30000;
+		return this.state.config.overallTimeout;
 	};
 
-	
 	function getTeams(id) {
 		var teams = {user: {}, rival: {}};
 
