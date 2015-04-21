@@ -16,6 +16,7 @@ module.exports = function(http) {
 	
 	var users = [];
 	var usersReadyCounter = 0;
+	var endOfTurnReceived = 0;
 	var overallTimeout = 30000;
 
 	//TODO use constants for event names
@@ -79,10 +80,8 @@ module.exports = function(http) {
 		//TODO we will need to send the initial state to both clients once both are connected
 		var i, existingUser;
 		if (users.length === 2) {
-			users.forEach(function(user) {
-				var state = generateInitialGameState();
-				io.emit(server_events.NEW_TURN, state);
-			});
+			var state = generateInitialGameState();
+			io.emit(server_events.NEW_TURN, state);
 		}
 		
 		// for (i = 0; i < users.length; i++) {
@@ -128,9 +127,21 @@ module.exports = function(http) {
 		//Resolve turn
 		//Send new state to both users
 
-		console.log(JSON.stringify(data.userState));
-		user = userById(socket.id);
-		console.log(data.userState.TwerkinPlayer1.x);
+		endOfTurnReceived++;
+		if(endOfTurnReceived === 2) {
+			if (this.intervalId) {
+				clearInterval(this.intervalId);
+			}
+
+			endOfTurnReceived = 0;
+			//StateGenerator.getState();
+			var state = generateInitialGameState(); 
+			io.emit(server_events.NEW_TURN, state);
+		}
+
+		// console.log(JSON.stringify(data.userState));
+		// user = userById(socket.id);
+		// console.log(data.userState.TwerkinPlayer1.x);
 	};
 
 	function generateInitialGameState (id) {
@@ -201,5 +212,6 @@ module.exports = function(http) {
 //TODO
 //Nice to have: State generation has to be asynchronous and notify of state generation with a successCallback/errorCallbacl
 //	as this information will come from a third party in the future (eg ddbb)
-//User has to send turn-end when manullay ended or after receiving countdown-end. After that start again, server broadcasts new-turn with new state, etc
-//End turn
+//Client: User has to send turn-end when manullay ended or after receiving countdown-end. After that start again, server broadcasts new-turn with new state, etc
+//Client: Send end of turn state.
+//Server: Next turn resolution

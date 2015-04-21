@@ -5,7 +5,6 @@ define(function() {
 		this.pitchElement = pitchElement;
 		this.userAreaController = userAreaController;
 
-		// createReactElements.call(this);
 		init.call(this);
 		this.userAreaController.on("load-state", loadState, this);
 		this.userAreaController.on("player-selected", selectPlayer, this);
@@ -21,7 +20,7 @@ define(function() {
 			getInitialState: function() {
 				return {
 					"userAreaController": own.userAreaController, //pitch
-							"dimensions": {"columns": 1, "rows": 1},      //pitch
+					"dimensions": {"columns": 1, "rows": 1},      //pitch
 					"userPlayers": null,                            //pitch
 					"selectActionState": false,                   //pitch
 					"rivalPlayers": null,                           //pitch

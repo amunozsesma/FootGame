@@ -5,6 +5,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		this.userAreaController = userAreaController;
 		this.userTeams = {};
 		this.turnTimeout = null;
+		this.listenForTimeoutAdjust = false;
 		
 		this.userAreaController.on("turn-end", this.onTurnEndedByUser, this);
 	};
@@ -38,15 +39,21 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 	
 	function startTurn() {
 		PanelOverlay.hide();
+		this.listenForTimeoutAdjust = true;
 	};
 
 	function endTurn() {
 		var outputState = this.userAreaController.getTurnEndResult();
+		//TODO waiting for the other player
+		this.listenForTimeoutAdjust = false;
 		ConnectionService.send("turn-end", JSON.stringify(outputState));
 	};
 
 	function adjustTimeout(timeout) {
-		this.userAreaController.adjustTimeout(timeout);
+		if (this.listenForTimeoutAdjust) {
+			this.userAreaController.adjustTimeout(timeout);
+		}
+
 	};
 
 	return GameManager;
