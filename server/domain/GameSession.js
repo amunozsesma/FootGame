@@ -65,11 +65,10 @@ module.exports = function(io) {
 		var index = usersOnTurnEnd.indexOf(socket.id);
 		(index !== -1) && usersOnTurnEnd.splice(index, 1);
 		if (usersOnTurnEnd.length === 0) {
+			usersOnTurnEnd = [];
 			if (this.intervalId) {
 				clearInterval(this.intervalId);
 			}
-
-			endOfTurnReceived = 0;
 
 			this.state = this.stateHandler.generateInitialState(this.users); 
 			startTurn.call(this);
@@ -85,9 +84,9 @@ module.exports = function(io) {
 			timeout -= 50;
 			if (timeout === 0) {
 				clearInterval(this.intervalId);		
-				io.emit(server_events.COUNTDOWN_END);
+				io.to(this.sessionId).emit(server_events.COUNTDOWN_END);
 			}
-			io.emit(server_events.COUNTDOWN_ADJUST, timeout);
+			io.to(this.sessionId).emit(server_events.COUNTDOWN_ADJUST, timeout);
 		}.bind(this), 50)
 	};
 
