@@ -3,12 +3,14 @@ define(function() {
 
 	var StateHelper = function(inputMessage, userId) {
 		this.state = inputMessage.game;
-
-		var teams = getTeams.call(this, userId);
+		this.userId = userId;
+		
+		var teams = getTeams.call(this);
 		this.userTeam = teams.user;
 		this.rivalTeam = teams.rival;
+		
 		this.allPlayers = getAllPlayers.call(this);
-		this.userSide = getUserSide.call(this, userId);
+		this.userSide = getUserSide.call(this);
 
 		this.outputState = this.generateOutputState({}, {});
 		this.playersConfig = {};
@@ -43,7 +45,7 @@ define(function() {
 	};
 	
 	StateHelper.prototype.getBallPosition = function() {
-		return this.state.ball.position;
+		return this.state.ball;
 	};
 	
 	StateHelper.prototype.getPlayerImage = function(playerName) {
@@ -146,16 +148,16 @@ define(function() {
 		return this.state.config.overallTimeout;
 	};
 
-	function getTeams(id) {
+	function getTeams() {
 		var teams = {user: {}, rival: {}};
 
 		this.state.users.forEach(function(user) {
-			if (user.id === id) {
+			if (user.id === this.userId) {
 				teams.user = getPlayers(user.team);
 			} else {
 				teams.rival = getPlayers(user.team);
 			}
-		});
+		}, this);
 
 		return teams;
 	};
@@ -192,10 +194,10 @@ define(function() {
 		return players;
 	};
 
-	function getUserSide(userId) {
+	function getUserSide() {
 		var users = this.state.users; 
 		for (var i = 0; i < users.length; i++) {
-			if (users[i].id === userId) {
+			if (users[i].id === this.userId) {
 				return users[i].side;
 			}
 		};

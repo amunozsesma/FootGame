@@ -20,12 +20,12 @@ module.exports = function(io) {
 	var usersNotReady = [];
 	var usersOnTurnEnd = [];
 	var overallTimeout = 30000;
+	var endOfTurnData = {};
 
 	var GameSession = function(sessions, sessionId) {
 		this.sessionId = "GameSession_" + sessionId;
 
 		this.users = [];
-		this.stateHandler = new StateHandler(); 
 		this.state = null;
 		
 		sessions.forEach(function(session) {
@@ -33,10 +33,11 @@ module.exports = function(io) {
 			this.users.push(session.user);
 		}, this);
 		
+		this.stateHandler = new StateHandler(this.users); 
 	};
 
 	GameSession.prototype.startGame = function() {
-		this.state = this.stateHandler.generateInitialState(this.users);
+		this.state = this.stateHandler.generateInitialState();
 		startTurn.call(this);
 	};
 
@@ -50,7 +51,6 @@ module.exports = function(io) {
 
 
 	function onUserReady(socket) {
-		//TODO extract to method to apply to onEndOfTurn
 		var index = usersNotReady.indexOf(socket.id);
 		(index !== -1) && usersNotReady.splice(index, 1);
 		if (usersNotReady.length === 0) {
@@ -63,14 +63,20 @@ module.exports = function(io) {
 
 	function onEndOfTurn(socket, data) {
 		var index = usersOnTurnEnd.indexOf(socket.id);
-		(index !== -1) && usersOnTurnEnd.splice(index, 1);
+		if (index !== -1) {
+			usersOnTurnEnd.splice(index, 1);
+			endOfTurnData[socket.id] = data;
+			console.log("Receiving endOfTurnData: " + data);
+		}
+
 		if (usersOnTurnEnd.length === 0) {
 			usersOnTurnEnd = [];
 			if (this.intervalId) {
 				clearInterval(this.intervalId);
 			}
 
-			this.state = this.stateHandler.generateInitialState(this.users); 
+			//this.state = this.stateHandler.generateNextState(endOfTurnData);
+			this.state = this.stateHandler.generateInitialState(); 
 			startTurn.call(this);
 		}
 	};
@@ -96,6 +102,7 @@ module.exports = function(io) {
 			usersOnTurnEnd.push(user.id);
 		}, this);	
 
+		console.log("Sending new turn: " + JSON.stringify(this.state));
 		io.to(this.sessionId).emit(server_events.NEW_TURN, this.state);
 	};
 
