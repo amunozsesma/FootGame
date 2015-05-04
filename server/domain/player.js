@@ -7,8 +7,8 @@ var Player = function(name, position, stats) {
     this.stats = stats;
 }
 
-Player.prototype.updatePosition = function(position) {
-    this.position;
-}
+// Player.prototype.updatePosition = function(position) {
+//     this.position;
+// }
 
 exports.Player = Player;

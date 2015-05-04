@@ -32,7 +32,7 @@ module.exports = function(io) {
 			setHandlers.call(this, session);
 			this.users.push(session.user);
 		}, this);
-		
+
 		this.stateHandler = new StateHandler(this.users); 
 	};
 
@@ -66,7 +66,7 @@ module.exports = function(io) {
 		if (index !== -1) {
 			usersOnTurnEnd.splice(index, 1);
 			endOfTurnData[socket.id] = data;
-			console.log("Receiving endOfTurnData: " + data);
+			console.log("Receiving endOfTurnData: " + JSON.stringify(data));
 		}
 
 		if (usersOnTurnEnd.length === 0) {
@@ -75,8 +75,8 @@ module.exports = function(io) {
 				clearInterval(this.intervalId);
 			}
 
-			//this.state = this.stateHandler.generateNextState(endOfTurnData);
-			this.state = this.stateHandler.generateInitialState(); 
+			this.state = this.stateHandler.generateNewState(endOfTurnData);
+			// this.state = this.stateHandler.generateInitialState(); 
 			startTurn.call(this);
 		}
 	};

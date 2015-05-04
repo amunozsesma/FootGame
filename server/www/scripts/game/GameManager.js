@@ -46,7 +46,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		var outputState = this.userAreaController.getTurnEndResult();
 		//TODO waiting for the other player
 		this.listenForTimeoutAdjust = false;
-		ConnectionService.send("turn-end", JSON.stringify(outputState));
+		ConnectionService.send("turn-end", outputState);
 	};
 
 	function adjustTimeout(timeout) {

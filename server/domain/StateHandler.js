@@ -1,14 +1,14 @@
 //Has states created with user objects, adduserdata when turn ends, handles the different turn states, resolves conflicts, etc
 
-var	State = require("./State");	
+var	State = require("./State")();	
 
 var newState = {};
 var previousState = {};
 var users = null;
 
 var conflict = {
-	"position": {},
-	"userPlayers": [{"id": "", "playerName": ""}]
+	"position": {"x":0, "y":0},
+	"userPlayers": [{"playerName": "", "side":"", "hasBall": ""}]
 }
 
 var StateHandler = function(users) {
@@ -17,9 +17,37 @@ var StateHandler = function(users) {
 
 StateHandler.prototype.generateInitialState = function() {
 	newState = new State(this.users);
-	console.log("Generating new state: " + JSON.stringify(newState.generateMessage()));
 	return newState.generateMessage();
 };
+
+StateHandler.prototype.generateNewState = function(userData) {
+	previousState = newState;
+	newState = new State(this.users);
+	newState.modifyState(userData);
+
+	// var conflicts = newState.getConflicts(users);
+	// var conflictResolution = resolveConflicts(conflicts, previousState);
+
+	// newState.modifyState(conflictResolution);
+	return newState.generateMessage();
+};
+
+
+//TODO State is a class allows you to get player positions, etc
+//TODO User is a class with accessor methods
+//TODO Remove Game, teams, pitch, stats, etc. Just leave User and State
+
+//A modify state message: 
+//{	"1HI-xnSlqhJUNXz9AAAA": 
+//	{
+//		"lo_Player_0":{"action":"","x":5,"y":1},
+//		"lo_Player_1":{"action":"","x":9,"y":1},
+//		"lo_Player_2":{"action":"","x":1,"y":3}
+//	},
+//	...
+//}
+
+
 
 // function generateUserData(users) {
 // 	var userData = {};
@@ -31,22 +59,6 @@ StateHandler.prototype.generateInitialState = function() {
 // 	});
 
 // 	return userData;
-// };
-
-
-// StateHandler.prototype.generateNewState = function(userData) {
-// 	previousState = newState;
-
-// 	var users = {};
-// 	Object.keys(userData).forEach(function(userId) {
-// 		users[userId] = User.convert(userData[userId]);
-// 	});
-
-// 	var conflicts = getConflicts(users);
-// 	conflicts.forEach(function(conflict) {
-// 		resolveConflict(users, conflict);
-// 	});
-
 // };
 
 // function getConflicts(users) {
@@ -98,6 +110,5 @@ StateHandler.prototype.generateInitialState = function() {
 
 // };
 
-//TODO State is a class allows you to get player positions, etc
-//TODO User is a class with accessor methods
-//TODO Remove Game, teams, pitch, stats, etc. Just leave User and State
+
+module.exports = StateHandler;
