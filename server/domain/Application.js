@@ -5,7 +5,7 @@ module.exports = function(http) {
 	var io = require("socket.io")(http);
 	var GameSession = require("./GameSession")(io);
 
-	var	User = require("./user")();
+	var	User = require("./UserBuilder")();
 	var Team = require ("./team").Team;
 	var Player = require ("./player").Player;
 	var Position = require ("./position").Position;

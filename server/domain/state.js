@@ -2,41 +2,39 @@
 module.exports = function() {
 	"use strict";
 	
-	var userMap = {};
+	var TeamManager = require("./TeamManager")();
 
 	var config = {"numPlayers":3,"numRows":5,"numColumns":10,"overallTimeout":30000};
 	var ball = {"x":9,"y":4};
 
 	var State = function(users) {
 		this.users = users;
+		this.teams = {};
+
 		this.users.forEach(function(user) {
-			//users is each of the user objects
-			userMap[user.id] = user;
-		});
+			this.teams[user.id] = new TeamManager(user);
+		}, this);
 	};
 
-	//Modifies the state
 	State.prototype.modifyState = function(data) {
 		Object.keys(data).forEach(function(userId) {
 			var user = data[userId];
 			Object.keys(user).forEach(function(playerName) {
 				var playerData = user[playerName];
-				userMap[userId].scheduleAction(playerName, playerData);
-				//Resolves player position depending on the action
-			});
-		});
+				this.teams[userId].scheduleAction(playerName, playerData);
+			}, this);
+		}, this);
 
 		//Actions will be executed secuentialy across all users.
 		var allActionsExecuted = false;
 		while (!allActionsExecuted) {
-			Object.keys(userMap).forEach(function(userId) {
-				allActionsExecuted = userMap[userId].executeNextAction();
-			});
+			Object.keys(this.teams).forEach(function(userId) {
+				allActionsExecuted = this.teams[userId].executeNextAction();
+			}, this);
 		}
 		console.log("state modified");
 	};
 
-	//TODO rename StateBuilder and method to build -> this basically builds all the underlying objects to generate the message
 	State.prototype.generateMessage = function() {
 		var state = {
 			"config": config,
@@ -44,9 +42,9 @@ module.exports = function() {
 			"users": []
 		};
 
-		Object.keys(userMap).forEach(function(userId) {
-			state.users.push(userMap[userId].generateMessage());
-		});
+		Object.keys(this.teams).forEach(function(userId) {
+			state.users.push(this.teams[userId].generateMessage());
+		}, this);
 
 		return {"game": state};
 	};
