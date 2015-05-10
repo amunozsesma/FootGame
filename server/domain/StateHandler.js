@@ -21,9 +21,9 @@ StateHandler.prototype.generateInitialState = function() {
 };
 
 StateHandler.prototype.generateNewState = function(userData) {
-	previousState = newState;
-	newState = new State(this.users);
+	newState = new State(this.users, previousState.ballPosition);
 	newState.modifyState(userData);
+	previousState = newState;
 
 	// var conflicts = newState.getConflicts(users);
 	// var conflictResolution = resolveConflicts(conflicts, previousState);

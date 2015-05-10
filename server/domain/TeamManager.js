@@ -8,14 +8,15 @@ module.exports = function() {
 	var actions = {"Move" : move, "Pass" : pass, "Shoot": shoot, "Press": press, "Card" : card};
 	var actionOrder = ["Card", "Pass", "Shoot", "Move", "Press"];
 
-	var TeamManager = function(userBuilder) {
+	var TeamManager = function(userBuilder, ballPosition) {
 	    this.userBuilder = userBuilder;
 
 	    this.players = createPlayers.call(this);
 		this.nextActionIndex = 0;
 		this.actionScheduler = {"Move" : [], "Pass" : [], "Shoot": [], "Press": [], "Card" : []};
 
-		this.playerWithBall = null;
+		this.ballPosition = ballPosition;
+		this.playerWithBall = (this.ballPosition) ? getPlayerIn.call(this, this.ballPosition) : null;
 	};
 
 	//Modifies builder and builds it
@@ -25,6 +26,7 @@ module.exports = function() {
 				this.userBuilder.setPosition(playerName, this.players[playerName].position.x, this.players[playerName].position.y);
 			}, this);
 		}
+		this.userBuilder.side = (this.playerWithBall !== null) ? "attacking" : "defending";
 
 		return this.userBuilder.build();
 	};
@@ -48,6 +50,10 @@ module.exports = function() {
 		return (this.nextActionIndex === 0);
 	};
 
+	TeamManager.prototype.getBallPosition = function() {
+		return (this.playerWithBall !== null) ? {"x": this.players[this.playerWithBall].position.x, "y": this.players[this.playerWithBall].position.y} : null;
+	};	
+
 	function createPlayers() {
 		var playerNames = this.userBuilder.getPlayerNames();
 		var players = {};
@@ -60,14 +66,31 @@ module.exports = function() {
 		return players;
 	};
 
+	function getPlayerIn(ballPosition) {
+		var player = null;
+		for (var playerName in this.players) {
+			if (this.players[playerName].position.x === ballPosition.x && this.players[playerName].position.y === ballPosition.y) {
+				player = playerName;
+				break;
+			}
+		}
+		return player;
+	};
+
 	//Action functions
 	function move(playerName, posX, posY) {
 		this.players[playerName].position.x = posX;
 		this.players[playerName].position.y = posY;
+		
+		if (this.ballPosition.x === posX && this.ballPosition.y === posY) {
+			this.playerWithBall = playerName;
+		}
 	};
 
 	function pass(playerName, posX, posY) {
-
+		if (this.playerWithBall === playerName) {
+			this.playerWithBall = getPlayerIn.call(this, {"x": posX, "y": posY});
+		}
 	};
 
 	function shoot(playerName, posX, posY) {

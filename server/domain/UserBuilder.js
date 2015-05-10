@@ -7,6 +7,7 @@ module.exports = function() {
 		this.name = name;
 	    this.team = team;
 	    this.teamName = teamName;
+	    this.side = "";
 	};
 
 	UserBuilder.prototype.build = function() {

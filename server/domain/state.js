@@ -5,14 +5,14 @@ module.exports = function() {
 	var TeamManager = require("./TeamManager")();
 
 	var config = {"numPlayers":3,"numRows":5,"numColumns":10,"overallTimeout":30000};
-	var ball = {"x":9,"y":4};
 
-	var State = function(users) {
+	var State = function(users, ballPosition) {
 		this.users = users;
 		this.teams = {};
+		this.ballPosition = (ballPosition) ? ballPosition : {"x": 4, "y": 2}; 
 
 		this.users.forEach(function(user) {
-			this.teams[user.id] = new TeamManager(user);
+			this.teams[user.id] = new TeamManager(user, this.ballPosition);
 		}, this);
 	};
 
@@ -38,11 +38,16 @@ module.exports = function() {
 	State.prototype.generateMessage = function() {
 		var state = {
 			"config": config,
-			"ball": ball,
+			"ball": this.ballPosition,
 			"users": []
 		};
 
 		Object.keys(this.teams).forEach(function(userId) {
+			var ballPosition = this.teams[userId].getBallPosition();
+			if (ballPosition !== null) {
+				this.ballPosition = ballPosition;
+				state.ball = ballPosition;
+			}
 			state.users.push(this.teams[userId].generateMessage());
 		}, this);
 
