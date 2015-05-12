@@ -5,6 +5,7 @@
 module.exports = function() {
 	"use strict";
 
+	var pitchUtils = require("./PitchUtils");
 	var actions = {"Move" : move, "Pass" : pass, "Shoot": shoot, "Press": press, "Card" : card};
 	var actionOrder = ["Card", "Pass", "Shoot", "Move", "Press"];
 
@@ -66,10 +67,10 @@ module.exports = function() {
 		return players;
 	};
 
-	function getPlayerIn(ballPosition) {
+	function getPlayerIn(position) {
 		var player = null;
 		for (var playerName in this.players) {
-			if (this.players[playerName].position.x === ballPosition.x && this.players[playerName].position.y === ballPosition.y) {
+			if (this.players[playerName].position.x === position.x && this.players[playerName].position.y === position.y) {
 				player = playerName;
 				break;
 			}
@@ -79,11 +80,17 @@ module.exports = function() {
 
 	//Action functions
 	function move(playerName, posX, posY) {
-		this.players[playerName].position.x = posX;
-		this.players[playerName].position.y = posY;
-		
-		if (this.ballPosition.x === posX && this.ballPosition.y === posY) {
-			this.playerWithBall = playerName;
+		var posibilities = pitchUtils.getAdjacentPositions(this.players[playerName].position.x, this.players[playerName].position.y, 1);
+		if (posibilities.indexOf(JSON.stringify({"x": posX, "y":posY})) !== -1) {
+			this.players[playerName].position.x = posX;
+			this.players[playerName].position.y = posY;
+			
+			if (this.ballPosition.x === posX && this.ballPosition.y === posY) {
+				this.playerWithBall = playerName;
+			}
+		} else {
+			//TODO possible hack from client
+			console.log("Position [" + posX + ", " + posY + "] is not valid for '" + playerName + "'.");
 		}
 	};
 
@@ -98,7 +105,11 @@ module.exports = function() {
 	};
 
 	function press(playerName, posX, posY) {
-
+		//TODO use the Pitch class to determine the new position of the player press was initially pointing to
+		var position = this.players[playerName].position;
+		var nextPosition = pitchUtils.nextPosition(position, {"x": posX, "y": posY}, 1);
+		this.players[playerName].position.x = nextPosition.x;
+		this.players[playerName].position.y = nextPosition.y;
 	};
 
 	function card(playerName, posX, posY) {

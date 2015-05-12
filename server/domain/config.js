@@ -1,12 +1,10 @@
-/**************************************************
-** CONFIG CLASS
-**************************************************/
-var Config = function(numPlayers, numRows, numColumns, overallTimeout) {
-    
-	this.numPlayers = numPlayers;
-    this.numRows = numRows;
-    this.numColumns = numColumns;
-    this.overallTimeout = 30000;
-}
+"use strict";
 
-exports.Config = Config;
+var config = {
+	numPlayers: 3,
+    numRows: 5,
+    numColumns: 10,
+    overallTimeout: 30000
+};
+
+module.exports = config;

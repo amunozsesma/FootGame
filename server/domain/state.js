@@ -4,7 +4,7 @@ module.exports = function() {
 	
 	var TeamManager = require("./TeamManager")();
 
-	var config = {"numPlayers":3,"numRows":5,"numColumns":10,"overallTimeout":30000};
+	var config = require("./Config");
 
 	var State = function(users, ballPosition) {
 		this.users = users;

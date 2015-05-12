@@ -16,7 +16,6 @@ module.exports = function(http) {
 	var endOfTurnReceived = 0;
 	var overallTimeout = 30000;
 
-	//TODO use constants for event names
 	var server_events = {
 		GAME_START: "game-start",
 		NEW_TURN: "new-turn",
@@ -68,6 +67,10 @@ module.exports = function(http) {
 			gameSessions.push(gameSession);
 			sessions = [];
 		}
+	};
+
+	function onSocketError() {
+
 	};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
