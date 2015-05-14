@@ -7,24 +7,31 @@ module.exports = function() {
 		this.ballInitialPosition = ballPosition;
 		this.ballMovedPosition = null;
 		this.playerHasBall = null;
-		this.team = {};
+		this.teams = {};
 	};
 
 	Pitch.prototype.setTeam = function(team) {
 		var players = team.players;
-		this.team[team.name] = [];
+		this.teams[team.name] = [];
 		players.forEach(function(player) {
 			this.playerInitialPositions[player.name] = {"x": player.position.x, "y": player.position.y};
-			this.team[team.name].push(player.name);
+			this.teams[team.name].push(player.name);
 			if (samePosition(this.ballInitialPosition, player.position.x, player.position.y)) {
 				this.playerHasBall = player.name;
 			}
 		}, this);
 	};
 
+	Pitch.prototype.setScore = function(score) {
+		this.score = score;
+	};
+
+	Pitch.prototype.getScore = function() {
+		return this.score;
+	};
 	
 	Pitch.prototype.getSide = function(teamName) {
-		return (this.team[teamName].indexOf(this.playerHasBall) !== -1) ? "attacking" : "defending";
+		return (this.teams[teamName].indexOf(this.playerHasBall) !== -1) ? "attacking" : "defending";
 	};
 
 	//Ball moves always before players move -> check in old position

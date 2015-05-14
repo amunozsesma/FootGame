@@ -77,7 +77,7 @@ define(function() {
 
 	//TODO - Has to come from the server message
 	StateHelper.prototype.getTeamScores = function() {
-		return {"Team 1": 0, "Team 2": 0};
+		return this.state.score;
 	};
 	
 	StateHelper.prototype.getPlayerIn = function(x, y) {

@@ -11,16 +11,16 @@ module.exports = function() {
 		this.users = users;
 		this.teams = {};
 		this.ballPosition = (ballPosition) ? ballPosition : {"x": 4, "y": 2};
-		// this.score = (score) ? score : {};
+		this.score = (score) ? score : {};
 		this.pitchRepresetation = new Pitch(this.ballPosition);
 
 		this.users.forEach(function(user) {
-			// (!score) && this.score[user.team.name] = 0;
+			!score && (this.score[user.team.name] = 0);
 			this.pitchRepresetation.setTeam(user.team);
 			this.teams[user.id] = new TeamManager(user, this.pitchRepresetation);			
 		}, this);
 
-		// this.pitchRepresetation.setScore(this.score);
+		this.pitchRepresetation.setScore(this.score);
 	};
 
 	State.prototype.modifyState = function(data) {
@@ -43,10 +43,13 @@ module.exports = function() {
 	};
 
 	State.prototype.generateMessage = function() {
+		this.ballPosition = this.pitchRepresetation.getBallPosition();
+		this.score = this.pitchRepresetation.getScore();
+
 		var state = {
 			"config": config,
-			"ball": this.pitchRepresetation.getBallPosition(),
-			// "score": this.pitchRepresetation.getScore(),
+			"ball": this.ballPosition,
+			"score": this.score,
 			"users": []
 		};
 

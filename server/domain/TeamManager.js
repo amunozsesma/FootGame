@@ -65,7 +65,7 @@ module.exports = function() {
 		return players;
 	};
 
-	//Action functions
+	//Actions
 	function move(playerName, posX, posY) {
 		var posibilities = pitchUtils.getAdjacentPositions(this.players[playerName].position.x, this.players[playerName].position.y, 1);
 		if (posibilities.indexOf(JSON.stringify({"x": posX, "y":posY})) !== -1) {
