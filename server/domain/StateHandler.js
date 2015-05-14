@@ -21,7 +21,7 @@ StateHandler.prototype.generateInitialState = function() {
 };
 
 StateHandler.prototype.generateNewState = function(userData) {
-	newState = new State(this.users, previousState.ballPosition);
+	newState = new State(this.users, previousState.ballPosition, previousState.score);
 	newState.modifyState(userData);
 	previousState = newState;
 

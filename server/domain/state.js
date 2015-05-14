@@ -3,17 +3,24 @@ module.exports = function() {
 	"use strict";
 	
 	var TeamManager = require("./TeamManager")();
+	var Pitch = require("./Pitch")();
 
 	var config = require("./Config");
 
-	var State = function(users, ballPosition) {
+	var State = function(users, ballPosition, score) {
 		this.users = users;
 		this.teams = {};
-		this.ballPosition = (ballPosition) ? ballPosition : {"x": 4, "y": 2}; 
+		this.ballPosition = (ballPosition) ? ballPosition : {"x": 4, "y": 2};
+		// this.score = (score) ? score : {};
+		this.pitchRepresetation = new Pitch(this.ballPosition);
 
 		this.users.forEach(function(user) {
-			this.teams[user.id] = new TeamManager(user, this.ballPosition);
+			// (!score) && this.score[user.team.name] = 0;
+			this.pitchRepresetation.setTeam(user.team);
+			this.teams[user.id] = new TeamManager(user, this.pitchRepresetation);			
 		}, this);
+
+		// this.pitchRepresetation.setScore(this.score);
 	};
 
 	State.prototype.modifyState = function(data) {
@@ -38,16 +45,12 @@ module.exports = function() {
 	State.prototype.generateMessage = function() {
 		var state = {
 			"config": config,
-			"ball": this.ballPosition,
+			"ball": this.pitchRepresetation.getBallPosition(),
+			// "score": this.pitchRepresetation.getScore(),
 			"users": []
 		};
 
 		Object.keys(this.teams).forEach(function(userId) {
-			var ballPosition = this.teams[userId].getBallPosition();
-			if (ballPosition !== null) {
-				this.ballPosition = ballPosition;
-				state.ball = ballPosition;
-			}
 			state.users.push(this.teams[userId].generateMessage());
 		}, this);
 

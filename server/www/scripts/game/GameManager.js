@@ -12,7 +12,6 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 
 	GameManager.prototype.start = function() {
 		PanelOverlay.show("Waiting for rival...");
-		
 		ConnectionService.subscribe("game-start", startTurn.bind(this));
 		ConnectionService.subscribe("new-turn", render.bind(this));
 		ConnectionService.subscribe("countdown-adjust", adjustTimeout.bind(this));

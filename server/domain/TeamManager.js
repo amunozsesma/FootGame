@@ -9,15 +9,14 @@ module.exports = function() {
 	var actions = {"Move" : move, "Pass" : pass, "Shoot": shoot, "Press": press, "Card" : card};
 	var actionOrder = ["Card", "Pass", "Shoot", "Move", "Press"];
 
-	var TeamManager = function(userBuilder, ballPosition) {
+	var TeamManager = function(userBuilder, pitch) {
 	    this.userBuilder = userBuilder;
 
 	    this.players = createPlayers.call(this);
 		this.nextActionIndex = 0;
 		this.actionScheduler = {"Move" : [], "Pass" : [], "Shoot": [], "Press": [], "Card" : []};
 
-		this.ballPosition = ballPosition;
-		this.playerWithBall = (this.ballPosition) ? getPlayerIn.call(this, this.ballPosition) : null;
+		this.pitch = pitch;
 	};
 
 	//Modifies builder and builds it
@@ -27,7 +26,10 @@ module.exports = function() {
 				this.userBuilder.setPosition(playerName, this.players[playerName].position.x, this.players[playerName].position.y);
 			}, this);
 		}
-		this.userBuilder.side = (this.playerWithBall !== null) ? "attacking" : "defending";
+		
+		var teamName = this.userBuilder.team.name;
+		this.userBuilder.side = this.pitch.getSide(teamName);
+		// this.userBuilder.side = (this.playerWithBall !== null) ? "attacking" : "defending";
 
 		return this.userBuilder.build();
 	};
@@ -51,10 +53,6 @@ module.exports = function() {
 		return (this.nextActionIndex === 0);
 	};
 
-	TeamManager.prototype.getBallPosition = function() {
-		return (this.playerWithBall !== null) ? {"x": this.players[this.playerWithBall].position.x, "y": this.players[this.playerWithBall].position.y} : null;
-	};	
-
 	function createPlayers() {
 		var playerNames = this.userBuilder.getPlayerNames();
 		var players = {};
@@ -67,17 +65,6 @@ module.exports = function() {
 		return players;
 	};
 
-	function getPlayerIn(position) {
-		var player = null;
-		for (var playerName in this.players) {
-			if (this.players[playerName].position.x === position.x && this.players[playerName].position.y === position.y) {
-				player = playerName;
-				break;
-			}
-		}
-		return player;
-	};
-
 	//Action functions
 	function move(playerName, posX, posY) {
 		var posibilities = pitchUtils.getAdjacentPositions(this.players[playerName].position.x, this.players[playerName].position.y, 1);
@@ -85,18 +72,17 @@ module.exports = function() {
 			this.players[playerName].position.x = posX;
 			this.players[playerName].position.y = posY;
 			
-			if (this.ballPosition.x === posX && this.ballPosition.y === posY) {
-				this.playerWithBall = playerName;
-			}
+			this.pitch.movePlayer(playerName, posX, posY);
 		} else {
 			//TODO possible hack from client
 			console.log("Position [" + posX + ", " + posY + "] is not valid for '" + playerName + "'.");
 		}
+		
 	};
 
 	function pass(playerName, posX, posY) {
-		if (this.playerWithBall === playerName) {
-			this.playerWithBall = getPlayerIn.call(this, {"x": posX, "y": posY});
+		if (this.pitch.hasPlayerTheBall(playerName)) {
+			this.pitch.moveBall(posX, posY);
 		}
 	};
 
@@ -105,11 +91,13 @@ module.exports = function() {
 	};
 
 	function press(playerName, posX, posY) {
-		//TODO use the Pitch class to determine the new position of the player press was initially pointing to
-		var position = this.players[playerName].position;
-		var nextPosition = pitchUtils.nextPosition(position, {"x": posX, "y": posY}, 1);
+		var from = this.players[playerName].position;
+		var to = this.pitch.getPlayerPosition(posX, posY);
+		var nextPosition = pitchUtils.nextPosition(from, to, 1);
+
 		this.players[playerName].position.x = nextPosition.x;
 		this.players[playerName].position.y = nextPosition.y;
+		this.pitch.movePlayer(playerName, posX, posY);
 	};
 
 	function card(playerName, posX, posY) {
