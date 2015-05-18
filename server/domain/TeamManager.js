@@ -57,7 +57,9 @@ module.exports = function() {
 	};
 
 	function shoot(playerName, posX, posY) {
-
+		if (this.pitch.hasPlayerTheBall(playerName)) {
+			this.pitch.shoot(playerName, posX, posY);
+		}
 	};
 
 	function press(playerName, posX, posY) {

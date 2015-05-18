@@ -37,6 +37,13 @@ module.exports = function() {
 		return playerNames;
 	};
 
+	UserBuilder.prototype.resetPositions = function() {
+		var team = this.team.players;
+		team.forEach(function(player) {
+			player.position = {};
+		});
+	};
+
 	function getPlayer(playerName) {
 		var team = this.team.players;
 		for (var i =0, len = team.length; i < len; i++) {

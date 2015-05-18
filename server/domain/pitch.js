@@ -11,6 +11,7 @@ module.exports = function() {
 		this.playerHasBall = null;
 		this.teams = {};
 		this.userBuilders = {};
+		this.score = {};
 	};
 
 	Pitch.STARTING_POSITION_LEFT = 0;
@@ -72,6 +73,18 @@ module.exports = function() {
 		if (!this.playerHasBall && samePosition(this.ballInitialPosition, posX, posY)) {
 			this.playerHasBall = playerName;
 		} 
+	};
+
+	Pitch.prototype.shoot = function(playerName, posX, posY) {
+		Object.keys(this.teams).forEach(function(teamName, index) {
+			this.userBuilders[teamName].resetPositions();
+			this.setUser(this.userBuilders[teamName], index);
+			this.playerHasBall = null;
+			if (this.teams[teamName].indexOf(playerName) !== -1) {
+				this.score[teamName]++;
+			}
+		}, this);
+
 	};
 
 	Pitch.prototype.hasPlayerTheBall = function(playerName) {
