@@ -69,7 +69,10 @@ module.exports = function(io) {
 		if (index !== -1) {
 			usersOnTurnEnd.splice(index, 1);
 			endOfTurnData[socket.id] = data;
-			console.log("Receiving endOfTurnData: " + JSON.stringify(data));
+
+			console.log("\n----------------------------- END OF TURN DATA -----------------------------");
+			console.log(JSON.stringify(data));
+			console.log("----------------------------------------------------------------------------");
 		}
 
 		if (usersOnTurnEnd.length === 0) {
@@ -105,7 +108,10 @@ module.exports = function(io) {
 		}, this);	
 
 		//TODO set users ids and send messages xxxx'ing out socket ids for each of the users' rivals.
-		console.log("Sending new turn: " + JSON.stringify(this.state));
+		
+		console.log("\n\n\n----------------------------- NEW TURN GENERATED -----------------------------");
+		console.log(JSON.stringify(this.state));
+		console.log("------------------------------------------------------------------------------");
 		io.to(this.sessionId).emit(server_events.NEW_TURN, this.state);
 	};
 

@@ -2,12 +2,10 @@
 module.exports = function() {
 	"use strict";
 
-	// var UserBuilder = function(name, team, teamName, id) {
 	var UserBuilder = function(name, team) {
 	    this.id = null;
 		this.name = name;
 	    this.team = team;
-	    // this.teamName = teamName;
 	    this.side = "";
 	};
 
@@ -15,6 +13,11 @@ module.exports = function() {
 		return this;
 	};
 
+	UserBuilder.prototype.isPositionSet = function(playerName) {
+		var position = this.getPosition(playerName);
+		return (!!position.x);
+	};
+	
 	UserBuilder.prototype.setPosition = function(playerName, x, y) {
 		var player = getPlayer.call(this, playerName);
 		player.position.x = x;

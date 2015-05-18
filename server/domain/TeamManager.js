@@ -13,27 +13,10 @@ module.exports = function() {
 	    this.userBuilder = userBuilder;
 		this.pitch = pitch;
 
-	    this.players = createPlayers.call(this);
 		this.nextActionIndex = 0;
 		this.actionScheduler = {"Move" : [], "Pass" : [], "Shoot": [], "Press": [], "Card" : []};
 
 	};
-
-	//Modifies builder and builds it
-	//////////////////////////////////////////////////////////////// TODO do in the pitch and remove this method
-	TeamManager.prototype.generateMessage = function() {
-		if (this.players) {
-			Object.keys(this.players).forEach(function(playerName) {
-				this.userBuilder.setPosition(playerName, this.players[playerName].position.x, this.players[playerName].position.y);
-			}, this);
-		}
-		
-		var teamName = this.userBuilder.team.name;
-		this.userBuilder.side = this.pitch.getSide(teamName);
-
-		return this.userBuilder.build();
-	};
-	/////////////////////////////////////////////////////////////////
 
 	//Plans actions
 	TeamManager.prototype.scheduleAction = function(playerName, data) {
@@ -54,29 +37,11 @@ module.exports = function() {
 		return (this.nextActionIndex === 0);
 	};
 
-	////////////////////////////////////////////////////////////////TODO no need as we have the userbuilders
-	function createPlayers() {
-		var playerNames = this.userBuilder.getPlayerNames();
-		var players = {};
-		playerNames.forEach(function(playerName) {
-			var position = this.userBuilder.getPosition(playerName);
-			players[playerName] = {};
-			players[playerName].position = (position.x) ? {"x": position.x, "y": position.y} : this.pitch.getPlayerPosition(playerName);
-		}, this);
-
-		return players;
-	};
-	//////////////////////////////////////////////////////////////////////////////
-
 	//Actions
 	function move(playerName, posX, posY) {
-		var posibilities = pitchUtils.getAdjacentPositions(this.players[playerName].position.x, this.players[playerName].position.y, 1);
+		var playerPosition = this.userBuilder.getPosition(playerName);
+		var posibilities = pitchUtils.getAdjacentPositions(playerPosition.x, playerPosition.y, 1);
 		if (posibilities.indexOf(JSON.stringify({"x": posX, "y":posY})) !== -1) {
-			///////////////////////////////////////////////CAll to pitch should be enough
-			this.players[playerName].position.x = posX;
-			this.players[playerName].position.y = posY;
-			////////////////////////////////////////////////////////////////////////////
-			
 			this.pitch.movePlayer(playerName, posX, posY);
 		} else {
 			//TODO possible hack from client
@@ -96,16 +61,11 @@ module.exports = function() {
 	};
 
 	function press(playerName, posX, posY) {
-		var from = this.players[playerName].position;
+		var from = this.userBuilder.getPosition(playerName);
 		var to = this.pitch.getPlayerPosition(this.pitch.getPlayerIn(posX, posY));
 		var nextPosition = pitchUtils.nextPosition(from, to, 1);
 
-		///////////////////////////////////////////////CAll to pitch should be enough
-		this.players[playerName].position.x = nextPosition.x;
-		this.players[playerName].position.y = nextPosition.y;
-		/////////////////////////////////////////////////////////////////////////////
-
-		this.pitch.movePlayer(playerName, posX, posY);
+		this.pitch.movePlayer(playerName, nextPosition.x, nextPosition.y);
 	};
 
 	function card(playerName, posX, posY) {

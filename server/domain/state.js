@@ -16,7 +16,7 @@ module.exports = function() {
 
 		this.users.forEach(function(user, index) {
 			!score && (this.score[user.team.name] = 0);
-			this.pitchRepresetation.setTeam(user.team, index);
+			this.pitchRepresetation.setUser(user, index);
 			this.teams[user.id] = new TeamManager(user, this.pitchRepresetation);			
 		}, this);
 
@@ -39,7 +39,6 @@ module.exports = function() {
 				allActionsExecuted = this.teams[userId].executeNextAction();
 			}, this);
 		}
-		console.log("state modified");
 	};
 
 	State.prototype.generateMessage = function() {
@@ -50,26 +49,11 @@ module.exports = function() {
 			"config": config,
 			"ball": this.ballPosition,
 			"score": this.score,
-			"users": []
+			"users": this.pitchRepresetation.buildUsers()
 		};
-
-		Object.keys(this.teams).forEach(function(userId) {
-			state.users.push(this.teams[userId].generateMessage());
-		}, this);
 
 		return {"game": state};
 	};
 
 	return State;
 };
-
-
-//A modify state message: 
-//{	"1HI-xnSlqhJUNXz9AAAA": 
-//	{
-//		"lo_Player_0":{"action":"","x":5,"y":1},
-//		"lo_Player_1":{"action":"","x":9,"y":1},
-//		"lo_Player_2":{"action":"","x":1,"y":3}
-//	},
-//	...
-//}

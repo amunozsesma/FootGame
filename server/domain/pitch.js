@@ -10,21 +10,40 @@ module.exports = function() {
 		this.ballMovedPosition = null;
 		this.playerHasBall = null;
 		this.teams = {};
+		this.userBuilders = {};
 	};
 
 	Pitch.STARTING_POSITION_LEFT = 0;
 	Pitch.STARTING_POSITION_RIGHT = 0;
 
-	Pitch.prototype.setTeam = function(team, startingPosition) {
+	Pitch.prototype.setUser = function(user, startingPosition) {
+		var team = user.team;
 		var players = team.players;
+
+		this.userBuilders[team.name] = user;
 		this.teams[team.name] = [];
 		players.forEach(function(player ,index) {
-			this.playerInitialPositions[player.name] = (player.position.x) ? {"x": player.position.x, "y": player.position.y} : generateInitialPosition(startingPosition, index);
+			this.playerInitialPositions[player.name] = (user.isPositionSet(player.name)) ? {"x": player.position.x, "y": player.position.y} : generateInitialPosition(startingPosition, index);
 			this.teams[team.name].push(player.name);
 			if (samePosition(this.ballInitialPosition, player.position.x, player.position.y)) {
 				this.playerHasBall = player.name;
 			}
 		}, this);
+	};
+
+	Pitch.prototype.buildUsers = function() {
+		var users = [];
+
+		Object.keys(this.teams).forEach(function(teamName) {
+			this.teams[teamName].forEach(function (playerName) {
+				var position = (this.playerMovedPositions[playerName]) ? this.playerMovedPositions[playerName] : this.playerInitialPositions[playerName];
+				this.userBuilders[teamName].setPosition(playerName, position.x, position.y);
+				this.userBuilders[teamName].side = this.getSide(teamName);
+				users.push(this.userBuilders[teamName].build());
+			}, this);
+		}, this);
+
+		return users;
 	};
 
 	Pitch.prototype.setScore = function(score) {
