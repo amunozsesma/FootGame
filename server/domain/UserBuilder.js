@@ -2,11 +2,12 @@
 module.exports = function() {
 	"use strict";
 
-	var UserBuilder = function(name, team, teamName, id) {
-	    this.id = id;
+	// var UserBuilder = function(name, team, teamName, id) {
+	var UserBuilder = function(name, team) {
+	    this.id = null;
 		this.name = name;
 	    this.team = team;
-	    this.teamName = teamName;
+	    // this.teamName = teamName;
 	    this.side = "";
 	};
 
@@ -22,7 +23,7 @@ module.exports = function() {
 
 	UserBuilder.prototype.getPosition = function(playerName) {
 		var player = getPlayer.call(this, playerName);
-		return {"x": player.position.x, "y":player.position.y};
+		return player.position;
 	};
 
 	UserBuilder.prototype.getPlayerNames = function() {

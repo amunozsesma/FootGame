@@ -4,12 +4,13 @@ module.exports = function(http) {
 	var util = require("util");				
 	var io = require("socket.io")(http);
 	var GameSession = require("./GameSession")(io);
+	var UserManager = require("./UserManager")();
 
-	var	User = require("./UserBuilder")();
-	var Team = require ("./team").Team;
-	var Player = require ("./player").Player;
-	var Position = require ("./position").Position;
-	var Stats = require ("./stats").Stats;
+	// var	User = require("./UserBuilder")();
+	// var Team = require ("./team").Team;
+	// var Player = require ("./player").Player;
+	// var Position = require ("./position").Position;
+	// var Stats = require ("./stats").Stats;
 
 	var users = [];
 	var usersReadyCounter = 0;
@@ -50,10 +51,27 @@ module.exports = function(http) {
 	};
 
 	function onNewUser(socket, data) {
-		//TODO This will need to come from an ecternal class and game session will need to be created on a callback as in the 
+		//TODO This will need to come from an external class and game session will need to be created on a callback as in the 
 		// future, data for the user players will come from a thirparty storage
-		var user = createNewUser(data.name, data.teamName, socket);
+		// var user = createNewUser(data.name, data.teamName, socket);
+		UserManager.getUserData(data.name, data.teamName, onUserData.bind(this, socket), onError);
 
+		// var session = {
+		// 	"user": user,
+		// 	"socket": socket 
+		// };
+
+		// sessions.push(session);
+		// if (sessions.length === 2) {
+		// 	//TODO this will handle every game session formed of 2 players, we can add listeners to then monitor it if we need to
+		// 	var gameSession = new GameSession(sessions, ++sessionId);
+		// 	gameSession.startGame();
+		// 	gameSessions.push(gameSession);
+		// 	sessions = [];
+		// }
+	};
+
+	function onUserData(socket, user) {
 		var session = {
 			"user": user,
 			"socket": socket 
@@ -69,44 +87,44 @@ module.exports = function(http) {
 		}
 	};
 
-	function onSocketError() {
+	function onError() {
 
 	};
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	function createNewUser (userName, teamName, socket){
-		var user = new User(userName, createTeam(teamName), teamName, socket.id);
-		return user;
-	};
+	// function createNewUser (userName, teamName, socket){
+	// 	var user = new User(userName, createTeam(teamName), teamName, socket.id);
+	// 	return user;
+	// };
 
-	function createTeam(teamName){
-		var team = new Team(teamName, createPlayers(teamName));
-		return team;
-	};
+	// function createTeam(teamName){
+	// 	var team = new Team(teamName, createPlayers(teamName));
+	// 	return team;
+	// };
 
-	function createPlayers (teamName) {
-		var players = [];
-		var i;
-		for (i=0; i< 3 ; i++) {
-			var player = new Player(teamName +"_Player_" + i, createRandomPosition(), createRandomStats());      
-			players.push(player);  
-		}
-		return players;
-	};
+	// function createPlayers (teamName) {
+	// 	var players = [];
+	// 	var i;
+	// 	for (i=0; i< 3 ; i++) {
+	// 		var player = new Player(teamName +"_Player_" + i, createRandomPosition(), createRandomStats());      
+	// 		players.push(player);  
+	// 	}
+	// 	return players;
+	// };
 
-	function createRandomStats () {
-		var stats = new Stats(getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10));
-		return stats;
-	};
+	// function createRandomStats () {
+	// 	var stats = new Stats(getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10), getRandomNumber(1,10));
+	// 	return stats;
+	// };
 
-	function createRandomPosition () {
-		var position = new Position(getRandomNumber(0,9), getRandomNumber(0,4));
-		return position;
-	};
+	// function createRandomPosition () {
+	// 	var position = new Position(getRandomNumber(0,9), getRandomNumber(0,4));
+	// 	return position;
+	// };
 
-	function getRandomNumber(min, max) {
-		return Math.round(Math.random() * (max - min) + min);
-	};
+	// function getRandomNumber(min, max) {
+	// 	return Math.round(Math.random() * (max - min) + min);
+	// };
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	return new Application();

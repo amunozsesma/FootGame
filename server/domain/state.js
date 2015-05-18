@@ -10,13 +10,13 @@ module.exports = function() {
 	var State = function(users, ballPosition, score) {
 		this.users = users;
 		this.teams = {};
-		this.ballPosition = (ballPosition) ? ballPosition : {"x": 4, "y": 2};
+		this.ballPosition = (ballPosition) ? ballPosition : {"x": 5, "y": 2};
 		this.score = (score) ? score : {};
 		this.pitchRepresetation = new Pitch(this.ballPosition);
 
-		this.users.forEach(function(user) {
+		this.users.forEach(function(user, index) {
 			!score && (this.score[user.team.name] = 0);
-			this.pitchRepresetation.setTeam(user.team);
+			this.pitchRepresetation.setTeam(user.team, index);
 			this.teams[user.id] = new TeamManager(user, this.pitchRepresetation);			
 		}, this);
 

@@ -16,6 +16,7 @@ module.exports = function(io) {
 		TURN_END: "turn-end"
 	};
 
+	//TODO these variables need to belong to the class, otherwise they will be share across every GameSession
 	var endOfTurnReceived = 0;
 	var usersNotReady = [];
 	var usersOnTurnEnd = [];
@@ -29,8 +30,11 @@ module.exports = function(io) {
 		this.state = null;
 		
 		sessions.forEach(function(session) {
-			setHandlers.call(this, session);
+			//The id will be set every time we do the start turn
+			var user = session.user;
+			user.id = session.socket.id;
 			this.users.push(session.user);
+			setHandlers.call(this, session);
 		}, this);
 
 		this.stateHandler = new StateHandler(this.users); 
@@ -48,7 +52,6 @@ module.exports = function(io) {
 		socket.on(client_events.USER_READY, onUserReady.bind(this, socket));
 		socket.on(client_events.TURN_END, onEndOfTurn.bind(this, socket));
 	};
-
 
 	function onUserReady(socket) {
 		var index = usersNotReady.indexOf(socket.id);
@@ -76,7 +79,6 @@ module.exports = function(io) {
 			}
 
 			this.state = this.stateHandler.generateNewState(endOfTurnData);
-			// this.state = this.stateHandler.generateInitialState(); 
 			startTurn.call(this);
 		}
 	};
@@ -102,6 +104,7 @@ module.exports = function(io) {
 			usersOnTurnEnd.push(user.id);
 		}, this);	
 
+		//TODO set users ids and send messages xxxx'ing out socket ids for each of the users' rivals.
 		console.log("Sending new turn: " + JSON.stringify(this.state));
 		io.to(this.sessionId).emit(server_events.NEW_TURN, this.state);
 	};
