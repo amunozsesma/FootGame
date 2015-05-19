@@ -1,6 +1,7 @@
 //Has states created with user objects, adduserdata when turn ends, handles the different turn states, resolves conflicts, etc
 
-var	State = require("./State")();	
+var	State = require("./State")();
+var UserHelper = require("./UserHelper")();
 
 var newState = {};
 var previousState = {};
@@ -12,16 +13,16 @@ var conflict = {
 }
 
 var StateHandler = function(users) {
-	this.users = users;
+	this.userHelper = new UserHelper(users);
 };
 
 StateHandler.prototype.generateInitialState = function() {
-	newState = new State(this.users);
+	newState = new State(this.userHelper);
 	return newState.generateMessage();
 };
 
 StateHandler.prototype.generateNewState = function(userData) {
-	newState = new State(this.users, previousState.ballPosition, previousState.score);
+	newState = new State(this.userHelper, previousState.ballPosition, previousState.score);
 	newState.modifyState(userData);
 	previousState = newState;
 

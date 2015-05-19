@@ -3,13 +3,13 @@ module.exports = function() {
 
 	var UserBuilder = require("./UserBuilder")();
 
-	var UserManager = function() {
+	var UserDataLoader = function() {
 		//init db connection
 	};
 
-	UserManager.NUM_PLAYERS = 3;
+	UserDataLoader.NUM_PLAYERS = 3;
 
-	UserManager.prototype.getUserData = function(userName, teamName, successCallback, errorCallback) {
+	UserDataLoader.prototype.getUserData = function(userName, teamName, successCallback, errorCallback) {
 		var team = getTeam(userName, teamName);
 		successCallback(new UserBuilder(userName, team));
 	};
@@ -25,7 +25,7 @@ module.exports = function() {
 	//TODO comes from db
 	function getPlayers(teamName) {
 		var players = [];
-		for(var i = 0; i < UserManager.NUM_PLAYERS; i++) {
+		for(var i = 0; i < UserDataLoader.NUM_PLAYERS; i++) {
 			players.push({
 				name: teamName + "_Player_" + i,
 				position: {},
@@ -36,6 +36,6 @@ module.exports = function() {
 		return players;
 	};
 
-	return new UserManager();
+	return new UserDataLoader();
 };
 

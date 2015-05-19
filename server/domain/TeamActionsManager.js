@@ -9,7 +9,7 @@ module.exports = function() {
 	var actions = {"Move" : move, "Pass" : pass, "Shoot": shoot, "Press": press, "Card" : card};
 	var actionOrder = ["Card", "Pass", "Shoot", "Move", "Press"];
 
-	var TeamManager = function(userBuilder, pitch) {
+	var TeamActionsManager = function(userBuilder, pitch) {
 	    this.userBuilder = userBuilder;
 		this.pitch = pitch;
 
@@ -19,7 +19,7 @@ module.exports = function() {
 	};
 
 	//Plans actions
-	TeamManager.prototype.scheduleAction = function(playerName, data) {
+	TeamActionsManager.prototype.scheduleAction = function(playerName, data) {
 		var action = data["action"];
 		if (action !== "") {
 			this.actionScheduler[action].push(actions[action].bind(this, playerName, data.x, data.y));
@@ -27,7 +27,7 @@ module.exports = function() {
 	};
 
 	//Resolves actions: returns true if all actions have been executed.
-	TeamManager.prototype.executeNextAction = function() {
+	TeamActionsManager.prototype.executeNextAction = function() {
 		var nextAction = actionOrder[this.nextActionIndex];
 		this.actionScheduler[nextAction].forEach(function(action) {
 			action();
@@ -74,7 +74,7 @@ module.exports = function() {
 
 	};
 
-	return TeamManager;
+	return TeamActionsManager;
 };
 
 

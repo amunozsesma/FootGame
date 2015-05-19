@@ -37,11 +37,23 @@ module.exports = function() {
 		return playerNames;
 	};
 
+	UserBuilder.prototype.getTeamName = function() {
+		return this.team.name;
+	};
+
 	UserBuilder.prototype.resetPositions = function() {
 		var team = this.team.players;
 		team.forEach(function(player) {
 			player.position = {};
 		});
+	};
+
+	UserBuilder.prototype.getSide = function(playerName) {
+		return (this.side !== "") ? this.side : "defending";
+	};
+
+	UserBuilder.prototype.setSide = function(side) {
+		this.side = side;
 	};
 
 	function getPlayer(playerName) {

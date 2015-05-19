@@ -3,48 +3,51 @@ module.exports = function() {
 
 	var config = require("./Config");
 
-	var Pitch = function(ballPosition) {
+	// var Pitch = function(ballPosition, userHelper)
+	var Pitch = function(ballPosition, userHelper) {
 		this.playerInitialPositions = {};
 		this.playerMovedPositions = {};
-		this.ballInitialPosition = ballPosition;
+		this.ballInitialPosition = ballPosition || Pitch.BALL_INITIAL_POSITION;
 		this.ballMovedPosition = null;
 		this.playerHasBall = null;
-		this.teams = {};
-		this.userBuilders = {};
 		this.score = {};
+
+		this.userHelper = userHelper;
+
+		setStartingPositions.call(this);
 	};
 
 	Pitch.STARTING_POSITION_LEFT = 0;
 	Pitch.STARTING_POSITION_RIGHT = 0;
+	Pitch.BALL_INITIAL_POSITION = {"x": 5, "y": 2};
 
-	Pitch.prototype.setUser = function(user, startingPosition) {
-		var team = user.team;
-		var players = team.players;
-
-		this.userBuilders[team.name] = user;
-		this.teams[team.name] = [];
-		players.forEach(function(player ,index) {
-			this.playerInitialPositions[player.name] = (user.isPositionSet(player.name)) ? {"x": player.position.x, "y": player.position.y} : generateInitialPosition(startingPosition, index);
-			this.teams[team.name].push(player.name);
-			if (samePosition(this.ballInitialPosition, player.position.x, player.position.y)) {
-				this.playerHasBall = player.name;
-			}
+	function setStartingPositions() {
+		var teams = this.userHelper.getTeams();
+		teams.forEach(function(teamName, teamIndex) {
+			var players = this.userHelper.getPlayers(teamName);
+			players.forEach(function (playerName, playerIndex) {
+				var position = (this.userHelper.isPositionSet(playerName)) ? this.userHelper.getPosition(playerName) : generateInitialPosition(teamIndex, playerIndex);
+				this.playerInitialPositions[playerName] = position;
+				if (samePosition(this.ballInitialPosition, position.x, position.y)) {
+					this.playerHasBall = playerName;
+				}
+			}, this)
 		}, this);
 	};
 
 	Pitch.prototype.buildUsers = function() {
-		var users = [];
 
-		Object.keys(this.teams).forEach(function(teamName) {
-			this.teams[teamName].forEach(function (playerName) {
-				var position = (this.playerMovedPositions[playerName]) ? this.playerMovedPositions[playerName] : this.playerInitialPositions[playerName];
-				this.userBuilders[teamName].setPosition(playerName, position.x, position.y);
-				this.userBuilders[teamName].side = this.getSide(teamName);
-				users.push(this.userBuilders[teamName].build());
-			}, this);
+		//ConflictResolver
+
+		var allPlayers = this.userHelper.getAllPlayers();
+		allPlayers.forEach(function(playerName) {
+			var position = (this.playerMovedPositions[playerName]) ? this.playerMovedPositions[playerName] : this.playerInitialPositions[playerName];
+			var teamName = this.userHelper.getTeam(playerName);
+			this.userHelper.setPosition(playerName, position.x, position.y);
+			this.userHelper.setSide(teamName, this.getSide(teamName));
 		}, this);
 
-		return users;
+		return this.userHelper.buildAllUsers();
 	};
 
 	Pitch.prototype.setScore = function(score) {
@@ -56,7 +59,8 @@ module.exports = function() {
 	};
 	
 	Pitch.prototype.getSide = function(teamName) {
-		return (this.teams[teamName].indexOf(this.playerHasBall) !== -1) ? "attacking" : "defending";
+		var players = this.userHelper.getPlayers(teamName);
+		return (players.indexOf(this.playerHasBall) !== -1) ? "attacking" : "defending";
 	};
 
 	//Ball moves always before players move -> check in old position
@@ -76,15 +80,12 @@ module.exports = function() {
 	};
 
 	Pitch.prototype.shoot = function(playerName, posX, posY) {
-		Object.keys(this.teams).forEach(function(teamName, index) {
-			this.userBuilders[teamName].resetPositions();
-			this.setUser(this.userBuilders[teamName], index);
-			this.playerHasBall = null;
-			if (this.teams[teamName].indexOf(playerName) !== -1) {
-				this.score[teamName]++;
-			}
-		}, this);
-
+		this.userHelper.resetAllPositions();
+		this.playerHasBall = null;
+		this.ballInitialPosition = Pitch.BALL_INITIAL_POSITION;
+		this.ballMovedPosition = null;
+		setStartingPositions.call(this);
+		this.score[this.userHelper.getTeam(playerName)] ++;
 	};
 
 	Pitch.prototype.hasPlayerTheBall = function(playerName) {

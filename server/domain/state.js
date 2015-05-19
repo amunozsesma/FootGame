@@ -2,22 +2,21 @@
 module.exports = function() {
 	"use strict";
 	
-	var TeamManager = require("./TeamManager")();
+	var TeamActionsManager = require("./TeamActionsManager")();
 	var Pitch = require("./Pitch")();
-
 	var config = require("./Config");
 
-	var State = function(users, ballPosition, score) {
-		this.users = users;
-		this.teams = {};
-		this.ballPosition = (ballPosition) ? ballPosition : {"x": 5, "y": 2};
+
+	var State = function(userHelper, ballPosition, score) {
+		this.users = userHelper.getUsers();
+		this.actionManagers = {};
+		this.ballPosition = ballPosition;
 		this.score = (score) ? score : {};
-		this.pitchRepresetation = new Pitch(this.ballPosition);
+		this.pitchRepresetation = new Pitch(this.ballPosition, userHelper);
 
 		this.users.forEach(function(user, index) {
 			!score && (this.score[user.team.name] = 0);
-			this.pitchRepresetation.setUser(user, index);
-			this.teams[user.id] = new TeamManager(user, this.pitchRepresetation);			
+			this.actionManagers[user.id] = new TeamActionsManager(user, this.pitchRepresetation);			
 		}, this);
 
 		this.pitchRepresetation.setScore(this.score);
@@ -28,15 +27,15 @@ module.exports = function() {
 			var user = data[userId];
 			Object.keys(user).forEach(function(playerName) {
 				var playerData = user[playerName];
-				this.teams[userId].scheduleAction(playerName, playerData);
+				this.actionManagers[userId].scheduleAction(playerName, playerData);
 			}, this);
 		}, this);
 
 		//Actions will be executed secuentialy across all users.
 		var allActionsExecuted = false;
 		while (!allActionsExecuted) {
-			Object.keys(this.teams).forEach(function(userId) {
-				allActionsExecuted = this.teams[userId].executeNextAction();
+			Object.keys(this.actionManagers).forEach(function(userId) {
+				allActionsExecuted = this.actionManagers[userId].executeNextAction();
 			}, this);
 		}
 	};

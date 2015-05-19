@@ -4,7 +4,7 @@ module.exports = function(http) {
 	var util = require("util");				
 	var io = require("socket.io")(http);
 	var GameSession = require("./GameSession")(io);
-	var UserManager = require("./UserManager")();
+	var UserDataLoader = require("./UserDataLoader")();
 
 	var users = [];
 	var usersReadyCounter = 0;
@@ -45,7 +45,7 @@ module.exports = function(http) {
 	};
 
 	function onNewUser(socket, data) {
-		UserManager.getUserData(data.name, data.teamName, onUserData.bind(this, socket), onError);
+		UserDataLoader.getUserData(data.name, data.teamName, onUserData.bind(this, socket), onError);
 	};
 
 	function onUserData(socket, user) {
