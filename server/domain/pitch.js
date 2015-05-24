@@ -2,8 +2,8 @@ module.exports = function() {
 	"use strict";
 
 	var config = require("./Config");
+	var ConflictHandler = require("./ConflictHandler")();
 
-	// var Pitch = function(ballPosition, userHelper)
 	var Pitch = function(ballPosition, userHelper) {
 		this.playerInitialPositions = {};
 		this.playerMovedPositions = {};
@@ -13,6 +13,7 @@ module.exports = function() {
 		this.score = {};
 
 		this.userHelper = userHelper;
+		this.conflictHandler = new ConflictHandler(this.userHelper);
 
 		setStartingPositions.call(this);
 	};
@@ -37,12 +38,13 @@ module.exports = function() {
 
 	Pitch.prototype.buildUsers = function() {
 
-		//ConflictResolver
+		this.playerMovedPositions = this.conflictHandler.getResolvedPositions(this.playerInitialPositions, this.playerMovedPositions);
 
 		var allPlayers = this.userHelper.getAllPlayers();
 		allPlayers.forEach(function(playerName) {
 			var position = (this.playerMovedPositions[playerName]) ? this.playerMovedPositions[playerName] : this.playerInitialPositions[playerName];
 			var teamName = this.userHelper.getTeam(playerName);
+			this.ballMovedPosition && samePosition(this.ballMovedPosition, position.x, position.y) && (this.playerHasBall = playerName);
 			this.userHelper.setPosition(playerName, position.x, position.y);
 			this.userHelper.setSide(teamName, this.getSide(teamName));
 		}, this);

@@ -15,6 +15,7 @@ module.exports = function() {
 
 		this.nextActionIndex = 0;
 		this.actionScheduler = {"Move" : [], "Pass" : [], "Shoot": [], "Press": [], "Card" : []};
+		this.ownPlayersMovements = [];
 
 	};
 
@@ -23,6 +24,9 @@ module.exports = function() {
 		var action = data["action"];
 		if (action !== "") {
 			this.actionScheduler[action].push(actions[action].bind(this, playerName, data.x, data.y));
+		} else {
+			var position = this.userBuilder.getPosition(playerName);
+			this.actionScheduler["Move"].push(move.bind(this, playerName, position.x, position.y));
 		}
 	};
 
@@ -41,10 +45,12 @@ module.exports = function() {
 	function move(playerName, posX, posY) {
 		var playerPosition = this.userBuilder.getPosition(playerName);
 		var posibilities = pitchUtils.getAdjacentPositions(playerPosition.x, playerPosition.y, 1);
-		if (posibilities.indexOf(JSON.stringify({"x": posX, "y":posY})) !== -1) {
+		var stringPosition = JSON.stringify({"x": posX, "y":posY});
+		if (posibilities.indexOf(stringPosition) !== -1 && this.ownPlayersMovements.indexOf(stringPosition) === -1) {
+			this.ownPlayersMovements.push(stringPosition);
 			this.pitch.movePlayer(playerName, posX, posY);
 		} else {
-			//TODO possible hack from client
+			//Possible hack from client
 			console.log("Position [" + posX + ", " + posY + "] is not valid for '" + playerName + "'.");
 		}
 		
@@ -67,7 +73,11 @@ module.exports = function() {
 		var to = this.pitch.getPlayerPosition(this.pitch.getPlayerIn(posX, posY));
 		var nextPosition = pitchUtils.nextPosition(from, to, 1);
 
-		this.pitch.movePlayer(playerName, nextPosition.x, nextPosition.y);
+		var stringPosition = JSON.stringify(nextPosition);
+		if (this.ownPlayersMovements.indexOf(stringPosition) === -1) {
+			this.ownPlayersMovements.push(stringPosition);
+			this.pitch.movePlayer(playerName, nextPosition.x, nextPosition.y);
+		}
 	};
 
 	function card(playerName, posX, posY) {

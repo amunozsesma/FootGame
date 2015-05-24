@@ -20,7 +20,6 @@ module.exports = function() {
 	};
 
 	UserHelper.prototype.getPlayers = function(teamName) {
-		debugger;
 		return this.teamPlayers[teamName];
 	};
 
@@ -45,6 +44,15 @@ module.exports = function() {
 
 	UserHelper.prototype.setSide = function(teamName, side) {
 		this.userBuilders[teamName].setSide(side);
+	};
+
+	UserHelper.prototype.getSide = function(teamName) {
+		return this.userBuilders[teamName].getSide();
+	};
+
+	UserHelper.prototype.getPlayerSide = function(playerName) {
+		var teamName = this.getTeam(playerName);
+		return this.userBuilders[teamName].getSide();
 	};
 
 	UserHelper.prototype.resetAllPositions = function() {

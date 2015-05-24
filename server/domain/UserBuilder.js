@@ -48,7 +48,7 @@ module.exports = function() {
 		});
 	};
 
-	UserBuilder.prototype.getSide = function(playerName) {
+	UserBuilder.prototype.getSide = function() {
 		return (this.side !== "") ? this.side : "defending";
 	};
 
