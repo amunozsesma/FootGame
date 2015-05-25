@@ -8,19 +8,35 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		this.listenForTimeoutAdjust = false;
 		
 		this.userAreaController.on("turn-end", this.onTurnEndedByUser, this);
+
+		this.callbacks = {
+			startTurn: startTurn.bind(this),
+			render: render.bind(this),
+			adjustTimeout: adjustTimeout.bind(this),
+			endTurn: endTurn.bind(this)
+		};
 	};
+
+	GameManager.GAME_START = "game-start";
+	GameManager.NEW_TURN = "new-turn";
+	GameManager.COUNTDOWN_ADJUST = "countdown-adjust";
+	GameManager.COUNTDOWN_END = "countdown-end";
 
 	GameManager.prototype.start = function() {
 		PanelOverlay.show("Waiting for rival...");
-		ConnectionService.subscribe("game-start", startTurn.bind(this));
-		ConnectionService.subscribe("new-turn", render.bind(this));
-		ConnectionService.subscribe("countdown-adjust", adjustTimeout.bind(this));
-		ConnectionService.subscribe("countdown-end", endTurn.bind(this));
+		ConnectionService.subscribe(GameManager.GAME_START, this.callbacks.startTurn);
+		ConnectionService.subscribe(GameManager.NEW_TURN, this.callbacks.render);
+		ConnectionService.subscribe(GameManager.COUNTDOWN_ADJUST, this.callbacks.adjustTimeout);
+		ConnectionService.subscribe(GameManager.COUNTDOWN_END, this.callbacks.endTurn);
 		ConnectionService.send("new-user", {"name": ClientData.get("userName"), "teamName": ClientData.get("teamName")});
 	
 	};
 
 	GameManager.prototype.stop = function() {
+		ConnectionService.unsubscribe(GameManager.GAME_START, this.callbacks.startTurn);
+		ConnectionService.unsubscribe(GameManager.NEW_TURN, this.callbacks.render);
+		ConnectionService.unsubscribe(GameManager.COUNTDOWN_ADJUST, this.callbacks.adjustTimeout);
+		ConnectionService.unsubscribe(GameManager.COUNTDOWN_END, this.callbacks.endTurn);
 	};
 
 	GameManager.prototype.onTurnEndedByUser = function() {

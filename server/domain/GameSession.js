@@ -16,16 +16,14 @@ module.exports = function(io) {
 		TURN_END: "turn-end"
 	};
 
-	//TODO these variables need to belong to the class, otherwise they will be share across every GameSession
-	var endOfTurnReceived = 0;
-	var usersNotReady = [];
-	var usersOnTurnEnd = [];
 	var overallTimeout = 30000;
-	var endOfTurnData = {};
 
 	var GameSession = function(sessions, sessionId) {
 		this.sessionId = "GameSession_" + sessionId;
 
+		this.usersOnTurnEnd = [];
+		this.usersNotReady = [];
+		this.endOfTurnData = {};
 		this.users = [];
 		this.state = null;
 		
@@ -54,10 +52,10 @@ module.exports = function(io) {
 	};
 
 	function onUserReady(socket) {
-		var index = usersNotReady.indexOf(socket.id);
-		(index !== -1) && usersNotReady.splice(index, 1);
-		if (usersNotReady.length === 0) {
-			usersNotReady = [];
+		var index = this.usersNotReady.indexOf(socket.id);
+		(index !== -1) && this.usersNotReady.splice(index, 1);
+		if (this.usersNotReady.length === 0) {
+			this.usersNotReady = [];
 			this.intervalId = null;
 			io.to(this.sessionId).emit(server_events.GAME_START);
 			startTimeout.call(this, overallTimeout);
@@ -65,23 +63,23 @@ module.exports = function(io) {
 	};
 
 	function onEndOfTurn(socket, data) {
-		var index = usersOnTurnEnd.indexOf(socket.id);
+		var index = this.usersOnTurnEnd.indexOf(socket.id);
 		if (index !== -1) {
-			usersOnTurnEnd.splice(index, 1);
-			endOfTurnData[socket.id] = data;
+			this.usersOnTurnEnd.splice(index, 1);
+			this.endOfTurnData[socket.id] = data;
 
-			console.log("\n----------------------------- END OF TURN DATA -----------------------------");
+			console.log("\n----------------------------- END OF TURN DATA (" + this.sessionId + ") -----------------------------");
 			console.log(JSON.stringify(data));
 			console.log("----------------------------------------------------------------------------");
 		}
 
-		if (usersOnTurnEnd.length === 0) {
-			usersOnTurnEnd = [];
+		if (this.usersOnTurnEnd.length === 0) {
+			this.usersOnTurnEnd = [];
 			if (this.intervalId) {
 				clearInterval(this.intervalId);
 			}
 
-			this.state = this.stateHandler.generateNewState(endOfTurnData);
+			this.state = this.stateHandler.generateNewState(this.endOfTurnData);
 			startTurn.call(this);
 		}
 	};
@@ -103,13 +101,13 @@ module.exports = function(io) {
 
 	function startTurn() {
 		this.users.forEach(function(user) {
-			usersNotReady.push(user.id);
-			usersOnTurnEnd.push(user.id);
+			this.usersNotReady.push(user.id);
+			this.usersOnTurnEnd.push(user.id);
 		}, this);	
 
 		//TODO set users ids and send messages xxxx'ing out socket ids for each of the users' rivals.
 		
-		console.log("\n\n\n----------------------------- NEW TURN GENERATED -----------------------------");
+		console.log("\n\n\n----------------------------- NEW TURN GENERATED (" + this.sessionId + ") -----------------------------");
 		console.log(JSON.stringify(this.state));
 		console.log("------------------------------------------------------------------------------");
 		io.to(this.sessionId).emit(server_events.NEW_TURN, this.state);

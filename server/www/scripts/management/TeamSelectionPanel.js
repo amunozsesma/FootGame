@@ -23,15 +23,12 @@ define(["utils/ClientData", "management/components/LabeledInput"], function(Clie
 		return [inputsArea, continueToGameContainer];
 	};
 
-	TeamSelectionPanel.prototype.onOpen = function() {
+	TeamSelectionPanel.prototype.onShow = function() {
 		var continueSection = createConinueComponent.call(this);
 		this.continueComponent = React.render(React.createElement(continueSection), document.getElementById("continue-container"));
 	};
 
 	TeamSelectionPanel.prototype.onClose = function() {
-	};
-
-	TeamSelectionPanel.prototype.onShow = function() {
 	};
 
 	TeamSelectionPanel.prototype.onHide = function() {

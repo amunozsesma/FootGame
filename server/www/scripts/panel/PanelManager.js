@@ -1,7 +1,7 @@
 define(["config"], function(config) {
 	function PanelManager(panelContainer) {
 		this.loadedPanels = {};
-		this.panelComponents = {};
+		this.panelElements = {};
 		this.panelContainer = panelContainer;
 	};
 
@@ -20,7 +20,7 @@ define(["config"], function(config) {
 
 		this.loadedPanels[panelName].onClose();
 		delete this.loadedPanels[panelName];
-		delete this.panelComponents[panelName];
+		delete this.panelElements[panelName];
 	};
 
 	function loadPanel(panelName) {
@@ -31,20 +31,18 @@ define(["config"], function(config) {
 	};
 
 	function show(panel) {
-		Object.keys(this.panelComponents).forEach(function(key) {
+		Object.keys(this.loadedPanels).forEach(function(key) {
 			if (key !== panel) {
-				this.panelComponents[key].setState({isHidden: true});
 				this.loadedPanels[key].onHide();
 			}
 		}, this);
 		
-		if (!this.panelComponents[panel]) {
-			var panelComponent = createPanelComponent(this.loadedPanels[panel].getElement());
-			this.panelComponents[panel] = React.render(panelComponent, this.panelContainer);
-			this.loadedPanels[panel].onOpen();
+		if (!this.panelElements[panel]) {
+			var panelElement = this.loadedPanels[panel].getElement();
+			this.panelElements[panel] = panelElement;
 		}
 
-		this.panelComponents[panel].setState({isHidden: false});
+		React.render(createPanelComponent(this.panelElements[panel]), this.panelContainer);
 		this.loadedPanels[panel].onShow();
 	};
 
@@ -54,7 +52,7 @@ define(["config"], function(config) {
 				return {isHidden: false};
 			},
 			render: function() {
-				return React.createElement("div", {className: "panel", hide: this.state.isHidden}, elements);
+				return React.createElement("div", {className: "panel"}, elements);
 			}
 		});
 		return React.createElement(panelComponent);	

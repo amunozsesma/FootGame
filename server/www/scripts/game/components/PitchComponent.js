@@ -27,7 +27,7 @@ define(function() {
 					"selectedPlayerPosition": null,
 					"posibleActions": [],
 					"selectedActionPosition": null,
-					"ballPosition": {"x": 0, "y": 0}
+					"ballPosition": null
 				};
 			},
 			render: function() {
@@ -66,7 +66,7 @@ define(function() {
 				className += (this.state.selectedActionPosition && this.state.selectedActionPosition.x === x && this.state.selectedActionPosition.y === y) ? " action-selected" : "";
 
 				var sons = [player];
-				if (this.state.ballPosition.x === x && this.state.ballPosition.y === y) {
+				if (this.state.ballPosition && this.state.ballPosition.x === x && this.state.ballPosition.y === y) {
 					sons.push(React.createElement("div", {className: "ball"}));
 				}
 				return React.createElement("div", { onClick:this.cellClicked.bind(this, x, y), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, sons);

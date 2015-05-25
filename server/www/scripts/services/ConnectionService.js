@@ -16,11 +16,14 @@ define(["config", "panel/PanelOverlayController", "utils/ClientData"], function(
 		this._socket.on(eventName, callback);
 	};
 
+	ConnectionService.prototype.unsubscribe = function(eventName, callback) {
+		this._socket.off(eventName, callback);
+	};
+
 	function onConnectionStablished(callback) {
 		ClientData.set("userId", this._socket.id);
 
 		this._socket.on("disconnect", function() {
-			//TODO heartbeats
 			console.log("Disconnected :(");
 			PanelOverlay.show("Connection lost, reconnecting...");
 		});

@@ -28,24 +28,21 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 		return [userArea, cardArea]; 
 	};
 
-	GamePanel.prototype.onOpen = function() {
+	GamePanel.prototype.onShow = function() {
 		this.pitchComponent     = new PitchComponent(document.getElementById("pitch-container"), this.userAreaController);
 		this.infoComponent      = new InfoComponent(document.getElementById("info-container"), this.userAreaController);
 		this.actionshComponent  = new ActionsComponent(document.getElementById("actions-container"), this.userAreaController);
-	};
-
-	GamePanel.prototype.onShow = function() {
+		
 		this.gameManager.start();
-
 		document.body.addEventListener("keypress", this.keyPressHandler);
 	};
 
 	GamePanel.prototype.onHide = function() {
 		document.body.removeEventListener("keypress", this.keyPressHandler);
+		this.gameManager.stop();
 	};	
 	
 	GamePanel.prototype.onClose = function() {
-		this.gameManager.stop();
 	};
 
 	return GamePanel;
