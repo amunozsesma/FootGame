@@ -78,6 +78,21 @@ module.exports = function() {
 		return builtUsers;
 	};
 
+	UserHelper.prototype.getPlayerInPosition = function(posX, posY) {
+		var teams = this.getTeams();
+		var playerName = null;
+
+		for (var i = 0, len = teams.length; i < len; i++) {
+			var name = this.userBuilders[teams[i]].getPlayerInPosition(posX, posY);
+			if (name) {
+				playerName = name;
+				break;
+			}
+		}
+
+		return playerName;
+	};
+
 	function init() {
 		this.users.forEach(function (userBuilder) {
 			var teamName = userBuilder.getTeamName();

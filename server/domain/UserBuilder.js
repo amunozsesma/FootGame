@@ -56,6 +56,20 @@ module.exports = function() {
 		this.side = side;
 	};
 
+	UserBuilder.prototype.getPlayerInPosition = function(posX, posY) {
+		var playerName = null;
+		var position = null;
+		for (var i = 0, len = this.team.players.length; i < len; i++) {
+			position = this.team.players[i].position;
+			if (position.x === posX && position.y === posY) {
+				playerName = this.team.players[i].name;
+				break;
+			}
+		}
+
+		return playerName;
+	};
+
 	function getPlayer(playerName) {
 		var team = this.team.players;
 		for (var i =0, len = team.length; i < len; i++) {

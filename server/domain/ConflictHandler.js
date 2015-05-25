@@ -2,11 +2,12 @@ module.exports = function() {
 	"use strict";
 
 	var Utils = require("./PitchUtils");
+	var Config = require("./Config");
 
 	var ConlictHandler = function(userHelper) {
 		this.userHelper = userHelper;
-		this.compareStrategy = "same-cell";
-		this.resolveStrategy = "defender-wins";
+		this.compareStrategy = Config.compareStrategy;
+		this.resolveStrategy = Config.resolveStrategy;
 	};
 
 	// CONFLICT COMPARATOR METHODS - return null or position
@@ -45,7 +46,7 @@ module.exports = function() {
 			loossingPlayer = sides["attacking"];
 		}
 
-		console.log("RESOLVING CONFLICT IN [" + conflict.position.x + ", " + conflict.position.y + "] WIth - Winner: " + winningPlayer.name + " | Looser: " + loossingPlayer.name);
+		// console.log("RESOLVING CONFLICT IN [" + conflict.position.x + ", " + conflict.position.y + "] WIth - Winner: " + winningPlayer.name + " | Looser: " + loossingPlayer.name);
 
 		return generateResolvedPlayers(winningPlayer, loossingPlayer, conflict);
 	};
@@ -85,7 +86,6 @@ module.exports = function() {
 		var rivalPlayers = this.userHelper.getPlayers(teams[1]);
 
 		players.forEach(function(playerName) {
-			//TODO get always form moved
 			var playerPosition = getPositionFromMovedOrInitial(playerName, initialPositions, movedPositions);
 			rivalPlayers.forEach(function(rivalPlayerName) {
 				var rivalPlayerPosition = getPositionFromMovedOrInitial(rivalPlayerName, initialPositions, movedPositions);

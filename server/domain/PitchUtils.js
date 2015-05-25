@@ -11,6 +11,9 @@ var utils = {
 		NONE: "none"
 	},
 
+	PITCH_SIDE_LEFT: 0,
+	PITCH_SIDE_RIGHT: 1,
+
 	nextPosition: function(from , to, distance) {
 		var positions = this.getAdjacentPositions(from.x, from.y, distance);
 		var positionDistances = getDistancesArray(positions, to.x, to.y);
@@ -78,6 +81,25 @@ var utils = {
 		}
 
 		return direction;
+	},
+
+	getAdyacentTowardsGoalFromDirection: function(posX, posY, side) {
+		var position = {};
+
+		if (side === this.PITCH_SIDE_RIGHT && (posX - 1 >= 0)) {
+			position = {"x": posX - 1, "y": posY}; 
+		} else if (side === this.PITCH_SIDE_LEFT && (posX + 1 < config.numColumns)) {
+			position = {"x": posX + 1, "y": posY}; 
+		} else {
+			position = (posY < Math.floor(config.numRows / 2)) ? {"x": posX, "y": posY + 1} : {"x": posX, "y": posY - 1} ;
+		}
+
+		return position;
+	},
+
+	isOverMidFieldFromSide: function(posX, posY, side) {
+		var midX = Math.floor(config.numColumns / 2);
+		return ((side === this.PITCH_SIDE_LEFT && posX > midX) || (side === this.PITCH_SIDE_RIGHT && posX < midX));
 	},
 
 	//min, max inclusive

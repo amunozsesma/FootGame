@@ -3,6 +3,7 @@ module.exports = function() {
 
 	var config = require("./Config");
 	var ConflictHandler = require("./ConflictHandler")();
+	var Utils = require("./PitchUtils");
 
 	var Pitch = function(ballPosition, userHelper) {
 		this.playerInitialPositions = {};
@@ -11,23 +12,30 @@ module.exports = function() {
 		this.ballMovedPosition = null;
 		this.playerHasBall = null;
 		this.score = {};
+		this.pitchSides = {};
 
 		this.userHelper = userHelper;
 		this.conflictHandler = new ConflictHandler(this.userHelper);
 
+		setPitchSides.call(this);
 		setStartingPositions.call(this);
 	};
 
-	Pitch.STARTING_POSITION_LEFT = 0;
-	Pitch.STARTING_POSITION_RIGHT = 0;
 	Pitch.BALL_INITIAL_POSITION = {"x": 5, "y": 2};
+
+	function setPitchSides(invert) {
+		var teams = this.userHelper.getTeams();
+		teams.forEach(function(teamName, index) {
+			this.pitchSides[teamName] = (invert) ? Math.abs(index - 1) : index; 
+		}, this);
+	};
 
 	function setStartingPositions() {
 		var teams = this.userHelper.getTeams();
-		teams.forEach(function(teamName, teamIndex) {
+		teams.forEach(function(teamName) {
 			var players = this.userHelper.getPlayers(teamName);
 			players.forEach(function (playerName, playerIndex) {
-				var position = (this.userHelper.isPositionSet(playerName)) ? this.userHelper.getPosition(playerName) : generateInitialPosition(teamIndex, playerIndex);
+				var position = (this.userHelper.isPositionSet(playerName)) ? this.userHelper.getPosition(playerName) : generateInitialPosition.call(this, teamName, playerIndex);
 				this.playerInitialPositions[playerName] = position;
 				if (samePosition(this.ballInitialPosition, position.x, position.y)) {
 					this.playerHasBall = playerName;
@@ -82,12 +90,16 @@ module.exports = function() {
 	};
 
 	Pitch.prototype.shoot = function(playerName, posX, posY) {
-		this.userHelper.resetAllPositions();
-		this.playerHasBall = null;
-		this.ballInitialPosition = Pitch.BALL_INITIAL_POSITION;
-		this.ballMovedPosition = null;
-		setStartingPositions.call(this);
-		this.score[this.userHelper.getTeam(playerName)] ++;
+		var side = this.pitchSides[this.userHelper.getTeam(playerName)];
+		var adyacentPosInDirection = Utils.getAdyacentTowardsGoalFromDirection(posX, posY, side);
+		var playerInDirection = this.userHelper.getPlayerInPosition(adyacentPosInDirection.x, adyacentPosInDirection.y);
+		
+		if (Utils.isOverMidFieldFromSide(posX, posY, side) && !playerInDirection) {
+			resetPositions.call(this);
+			this.score[this.userHelper.getTeam(playerName)] ++;
+		} else {
+			playerInDirection && (this.playerHasBall = playerInDirection);			
+		}
 	};
 
 	Pitch.prototype.hasPlayerTheBall = function(playerName) {
@@ -112,12 +124,21 @@ module.exports = function() {
 		}
 	};
 
+	function resetPositions() {
+		this.userHelper.resetAllPositions();
+		this.playerHasBall = null;
+		this.ballInitialPosition = Pitch.BALL_INITIAL_POSITION;
+		this.ballMovedPosition = null;
+		setStartingPositions.call(this);
+	};
+
 	function samePosition(position, posX, posY) {
 		return (position.x === posX && position.y === posY);
 	};
 
-	function generateInitialPosition(side, index) {
-		var x = (side === Pitch.STARTING_POSITION_RIGHT) ? Math.floor(3*config.numColumns / 4) : Math.floor(config.numColumns / 4);
+	function generateInitialPosition(teamName, index) {
+		var side = this.pitchSides[teamName];
+		var x = (side === Utils.PITCH_SIDE_RIGHT) ? Math.floor(3*config.numColumns / 4) : Math.floor(config.numColumns / 4);
 		var y = Math.ceil(index * config.numRows / config.numPlayers );
 	
 		return {"x": x, "y": y};
