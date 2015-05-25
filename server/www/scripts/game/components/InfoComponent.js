@@ -8,6 +8,7 @@ define(function() {
 		init.call(this);
 		this.userAreaController.on("load-state", loadState, this);
 		this.userAreaController.on("timeout-adjustment", adjustTimeout, this);
+		this.userAreaController.on("turn-end", waitForNextTurn, this);
 	};
 
 	function init() {
@@ -19,7 +20,9 @@ define(function() {
     				"userAreaController": own.userAreaController,
     				"teamScores": {},
     				"timeout": 0,
-    				"overallTimeout": 1
+    				"overallTimeout": 1,
+    				"progressBarMessage": "Click when you are ready",
+    				"timeoutStop": false
     			};
   			},
   			render: function() {
@@ -41,8 +44,8 @@ define(function() {
 					}
 
 					var scoreContainer = React.createElement("div", { className: 'score-container' }, teamContainer);
-					var progressBar = React.createElement("div", { className: 'turn-progress-bar', style: {width: this.state.timeout/this.state.overallTimeout * 683 + "px"}});
-					var message = React.createElement("span", { className: 'progress-bar-message' }, "Click when you are ready");
+					var progressBar = React.createElement("div", { className: 'turn-progress-bar ' + ((this.state.timeoutStop) ? "turn-end" : ""), style: {width: (this.state.timeoutStop) ? "100%" : this.state.timeout/this.state.overallTimeout * 100 + "%"}});
+					var message = React.createElement("span", { className: 'progress-bar-message' }, this.state.progressBarMessage);
 					var timeoutContainer = React.createElement("div", { className: 'timeout-container', onClick: this.progressBarClicked }, [progressBar, message]);
 					teamScores.push(scoreContainer, timeoutContainer);
 				}.bind(this)); 
@@ -66,10 +69,19 @@ define(function() {
 
 	function adjustTimeout(ttl) {
 		this.reactComponent.setState({
+			"progressBarMessage": "Click when you are ready",
+			"timeoutStop": false,
 			"timeout": ttl.timeout,
 			"overallTimeout": ttl.overallTimeout
 		});	
-	}
+	};
+
+	function waitForNextTurn() {
+		this.reactComponent.setState({
+			"progressBarMessage": "Waiting for other player",
+			"timeoutStop": true
+		});
+	};
 
 	return InfoComponent;
 

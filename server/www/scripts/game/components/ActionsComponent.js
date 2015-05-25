@@ -6,8 +6,10 @@ define(function() {
 		this.userAreaController = userAreaController;
 
 		init.call(this);
+		this.userAreaController.on("load-state", setTurnEnded.bind(this, false));
 		this.userAreaController.on("player-selected", showMenu, this);
 		this.userAreaController.on("player-unselected", hideMenu, this);
+		this.userAreaController.on("turn-end", setTurnEnded.bind(this, true));
 	};
 
 	function init() {
@@ -20,7 +22,8 @@ define(function() {
             		"isHidden": true,
             		"actions": [],
             		"playerStats": {},
-            		"selectedAction": ""
+            		"selectedAction": "",
+            		"turnEnded": true
     			};
   			},
   			render: function() {
@@ -59,24 +62,26 @@ define(function() {
   			},
   			createButtonsContainer: function() {
   				var actionButtons = [];
-  				this.state.actions.forEach(function(action) {
-  					var className = "action-button" + ((this.state.selectedAction === action) ? " selected" : "");
-  					var props = {
-              className: className,
-              onClick: this.actionClicked.bind(this, action)
-            }
-            if (!this.state.userAreaController.canPerform(action)) {
-              props.disabled = true;
-            }
-            var actionButton = React.createElement("button", props, action);
-  					actionButtons.push(actionButton);
-  				}.bind(this));
+  				if (!this.state.turnEnded) {
+	  				this.state.actions.forEach(function(action) {
+						var className = "action-button" + ((this.state.selectedAction === action) ? " selected" : "");
+						var props = {
+		          			className: className,
+		          			onClick: this.actionClicked.bind(this, action)
+		        		}
+						if (!this.state.userAreaController.canPerform(action)) {
+				              props.disabled = true;
+			            }
+						var actionButton = React.createElement("button", props, action);
+						actionButtons.push(actionButton);
+					}.bind(this));
+  				}
 
-  				return React.createElement("div", {className: "buttons-container"}, actionButtons);
+				return React.createElement("div", {className: "buttons-container"}, actionButtons);
   			},
   			actionClicked: function(action) {
   				var selectedAction = (action !== this.state.selectedAction) ? action : "";
-          this.state.userAreaController.actionClicked(selectedAction);
+				this.state.userAreaController.actionClicked(selectedAction);
   				this.setState({"selectedAction": selectedAction});
   			}
 
@@ -98,9 +103,15 @@ define(function() {
 	function hideMenu() {
 		this.reactComponent.setState({
 			"isHidden": true,
-      "actions": [],
-      "playerStats": {},
-      "selectedAction": ""
+			"actions": [],
+			"playerStats": {},
+			"selectedAction": ""
+		});
+	};
+
+	function setTurnEnded(isTurnEnded) {
+		this.reactComponent.setState({
+			"turnEnded": isTurnEnded
 		});
 	};
 

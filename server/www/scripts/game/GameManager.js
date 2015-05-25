@@ -28,22 +28,21 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 	};
 
 	function render(state) {
-		PanelOverlay.show("Game starting...");
+		PanelOverlay.hide();
 		this.state = state;
 
+		//TODO show rendering in the user area controller for when we have graphics
 		this.userAreaController.loadState(this.state, true);
 		ConnectionService.send("user-ready");
 		
 	};
 	
 	function startTurn() {
-		PanelOverlay.hide();
 		this.listenForTimeoutAdjust = true;
 	};
 
 	function endTurn() {
 		var outputState = this.userAreaController.getTurnEndResult();
-		//TODO waiting for the other player
 		this.listenForTimeoutAdjust = false;
 		ConnectionService.send("turn-end", outputState);
 	};
