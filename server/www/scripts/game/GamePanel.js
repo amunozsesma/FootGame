@@ -23,9 +23,10 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 		var pitchContainer   = React.createElement("div", {id: "pitch-container"});
 		var actionsContainer = React.createElement("div", {id: "actions-container"});
 		var userArea         = React.createElement("div", {id: "user-area"}, [infoContainer, pitchContainer, actionsContainer]);
-		var cardArea         = React.createElement("div", {id: "card-area", className: "skeleton red"}, "CARDS");
+		//TODO card area component added here
+		// var cardArea         = React.createElement("div", {id: "card-area", className: "skeleton red"}, "CARDS");
 
-		return [userArea, cardArea]; 
+		return [userArea]; 
 	};
 
 	GamePanel.prototype.onShow = function() {
