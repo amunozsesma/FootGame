@@ -26,7 +26,7 @@ module.exports = function() {
 			this.actionScheduler[action].push(actions[action].bind(this, playerName, data.x, data.y));
 		} else {
 			var position = this.userBuilder.getPosition(playerName);
-			this.actionScheduler["Move"].push(move.bind(this, playerName, position.x, position.y));
+			this.actionScheduler["Move"].splice(0, 0, move.bind(this, playerName, position.x, position.y));
 		}
 	};
 
@@ -51,7 +51,7 @@ module.exports = function() {
 			this.pitch.movePlayer(playerName, posX, posY);
 		} else {
 			//Possible hack from client
-			console.log("Position [" + posX + ", " + posY + "] is not valid for '" + playerName + "'.");
+			console.log("MOVE: Position [" + posX + ", " + posY + "] is not valid for '" + playerName + "'.");
 		}
 		
 	};
@@ -69,8 +69,14 @@ module.exports = function() {
 	};
 
 	function press(playerName, posX, posY) {
+		var playerInPosition = this.pitch.getPlayerIn(posX, posY);
+		if (!playerInPosition) {
+			console.log("PRESS: '" + playerName + "' trying to press on [" + posX + ", " + posY + "] and no player to press");
+			return;
+		}
+
 		var from = this.userBuilder.getPosition(playerName);
-		var to = this.pitch.getPlayerPosition(this.pitch.getPlayerIn(posX, posY));
+		var to = this.pitch.getPlayerPosition();
 		var nextPosition = pitchUtils.nextPosition(from, to, 1);
 
 		var stringPosition = JSON.stringify(nextPosition);

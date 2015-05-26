@@ -45,7 +45,6 @@ module.exports = function() {
 	};
 
 	Pitch.prototype.buildUsers = function() {
-
 		this.playerMovedPositions = this.conflictHandler.getResolvedPositions(this.playerInitialPositions, this.playerMovedPositions);
 
 		var allPlayers = this.userHelper.getAllPlayers();
@@ -117,11 +116,15 @@ module.exports = function() {
 	};
 
 	Pitch.prototype.getPlayerIn = function(posX, posY) {
+		var player = null;
 		for (var playerName in this.playerInitialPositions) {
 			if (samePosition(this.playerInitialPositions[playerName], posX, posY)) {
-				return playerName; 
+				player = playerName;
+				break; 
 			}
 		}
+
+		return playerName; 
 	};
 
 	function resetPositions() {

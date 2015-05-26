@@ -23,6 +23,8 @@ module.exports = function() {
 	};
 
 	State.prototype.modifyState = function(data) {
+		console.log("\n----------------------------- RESOLVING ACTIONS -----------------------------");
+
 		Object.keys(data).forEach(function(userId) {
 			var user = data[userId];
 			Object.keys(user).forEach(function(playerName) {
@@ -38,6 +40,8 @@ module.exports = function() {
 				allActionsExecuted = this.actionManagers[userId].executeNextAction();
 			}, this);
 		}
+
+		console.log("-----------------------------------------------------------------------------");
 	};
 
 	State.prototype.generateMessage = function() {
