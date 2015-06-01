@@ -52,8 +52,36 @@ define(["react"], function (React) {
 	});
 
 	var RevealedCards = React.createClass({
+		getInitialState: function() {
+			return {
+				isElementHovered: false,
+				zoomedCardData: {},
+				zoomedCardPosition: {}
+			}
+		},
+
 		onClick: function(index) {
 			this.props.clickAction(index);
+		},
+
+		onMouseOver: function(card) {
+			var element = this.refs[card.name].getDOMNode();
+			
+			var position = {left: element.offsetWidth/2 + element.offsetLeft, top: element.offsetHeight/2 + element.offsetTop};
+			this.setState({
+				isElementHovered: true,
+				zoomedCardData: card,
+				zoomedCardPosition: position
+			});
+		},
+
+		onMouseLeave: function(card) {
+			var element = this.refs[card.name].getDOMNode();
+			this.setState({
+				isElementHovered: false,
+				zoomedCardData: {},
+				zoomedCardPosition: {}
+			});
 		},
 
 		render: function() {
@@ -62,9 +90,13 @@ define(["react"], function (React) {
 					<ReactCSSTransitionGroup transitionName="revealed-card">
 						{this.props.cards.map(function(card, index) {
 							var clickHandler = this.onClick.bind(this, index);
-							return <div key={card.name} className="card" onClick={clickHandler}>{card.name}</div>	
+							var mouseOverHandler = this.onMouseOver.bind(this, card);
+							var mouseLeaveHandler = this.onMouseLeave.bind(this, card);
+							return <div key={card.name} ref={card.name} className="card" onClick={clickHandler} onMouseOver={mouseOverHandler} onMouseLeave={mouseLeaveHandler}>{card.name}</div>	
 						}, this)}
 					</ReactCSSTransitionGroup>
+
+					{this.state.isElementHovered && <ZoomedCard data={this.state.zoomedCardData} position={this.state.zoomedCardPosition}></ZoomedCard>}
 				</div>
 			);
 		}
@@ -81,6 +113,14 @@ define(["react"], function (React) {
 					</ReactCSSTransitionGroup>
 				</div>
 
+			);
+		}
+	});
+
+	var ZoomedCard = React.createClass({
+		render: function() {
+			return (
+				<div className="card zoomed" style={this.props.position}>{this.props.data.name}</div>
 			);
 		}
 	});
