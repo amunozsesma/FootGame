@@ -6,8 +6,8 @@ define(["react", "CardController"], function (React, CardController) {
 	var CardComponent = React.createClass({
 		getInitialState: function() {
 			return {
-				cardCount: 70,
-				revealedCards: [{name: "Sprint"}, {name: "OneTwo"}, {name: "Fall Back"}, {name: "polms"}],
+				cardCount: 0,
+				revealedCards: [],
 				actionedCards: []
 			};
 		},
