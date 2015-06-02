@@ -1,4 +1,4 @@
-define(["react"], function (React) {
+define(["react", "CardController"], function (React, CardController) {
 	"use strict";
 
 	var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -10,6 +10,22 @@ define(["react"], function (React) {
 				revealedCards: [{name: "Sprint"}, {name: "OneTwo"}, {name: "Fall Back"}, {name: "polms"}],
 				actionedCards: []
 			};
+		},
+
+		componentWillMount: function() {
+			CardController.on("new-turn", function(cards) {
+				this.onNewTurn(cards);
+			}, this);
+			this.onNewTurn([]);
+		},
+
+		onNewTurn: function(cards) {
+			var cardCount = CardController.getNumberCards();
+			this.setState({
+				cardCount: cardCount,
+				revealedCards: cards,
+				actionedCards: []
+			});
 		},
 
 		onRevealedCardClicked: function(revealedCardIndex) {
