@@ -12,9 +12,23 @@ define(["react"], function (React) {
 			};
 		},
 
-		onRevealedCardCliecked: function(revealedCardIndex) {
-			var revealedCards = this.state.revealedCards.splice(0);
-			var actionedCards = this.state.actionedCards.concat(revealedCards.splice(revealedCardIndex, 1));
+		onRevealedCardClicked: function(revealedCardIndex) {
+			var revealedCards = this.state.revealedCards.slice();
+			var actionedCards = this.state.actionedCards.slice();
+
+			actionedCards = actionedCards.concat(revealedCards.splice(revealedCardIndex, 1));
+
+			this.setState({
+				revealedCards: revealedCards,
+				actionedCards: actionedCards
+			});
+		},
+
+		onActionedCardClosed: function(actionedCardIndex) {
+			var actionedCards = this.state.actionedCards.slice();
+			var revealedCards = this.state.revealedCards.slice();
+
+			revealedCards = revealedCards.concat(actionedCards.splice(actionedCardIndex, 1));
 
 			this.setState({
 				revealedCards: revealedCards,
@@ -26,8 +40,8 @@ define(["react"], function (React) {
 			return (
 				<div>
 					<DeckComponent cardCount={this.state.cardCount} />
-					<RevealedCards cards={this.state.revealedCards} clickAction={this.onRevealedCardCliecked} />
-					<ActionedCards cards={this.state.actionedCards} />
+					<RevealedCards cards={this.state.revealedCards} clickAction={this.onRevealedCardClicked} />
+					<ActionedCards cards={this.state.actionedCards} closeAction={this.onActionedCardClosed} />
 				</div>
 			);
 		}
@@ -54,62 +68,67 @@ define(["react"], function (React) {
 	var RevealedCards = React.createClass({
 		getInitialState: function() {
 			return {
-				isElementHovered: false,
-				zoomedCardData: {},
-				zoomedCardPosition: {}
+				zoomedCardData: null
 			}
 		},
 
 		onClick: function(index) {
+			this.onMouseLeave();
 			this.props.clickAction(index);
 		},
 
 		onMouseOver: function(card) {
 			var element = this.refs[card.name].getDOMNode();
 			
-			var position = {left: element.offsetWidth/2 + element.offsetLeft, top: element.offsetHeight/2 + element.offsetTop};
 			this.setState({
-				isElementHovered: true,
-				zoomedCardData: card,
-				zoomedCardPosition: position
+				zoomedCardData: card
 			});
 		},
 
-		onMouseLeave: function(card) {
-			var element = this.refs[card.name].getDOMNode();
+		onMouseLeave: function(e) {
+			if (e && e.relatedTarget.className && e.relatedTarget.className.indexOf("zoomed") !== -1) {
+				return;
+			}
+
 			this.setState({
-				isElementHovered: false,
-				zoomedCardData: {},
-				zoomedCardPosition: {}
+				zoomedCardData: null
 			});
 		},
 
 		render: function() {
 			return (
 				<div className="revealed-cards-section">
-					<ReactCSSTransitionGroup transitionName="revealed-card">
+					<ReactCSSTransitionGroup transitionName="card">
 						{this.props.cards.map(function(card, index) {
 							var clickHandler = this.onClick.bind(this, index);
 							var mouseOverHandler = this.onMouseOver.bind(this, card);
-							var mouseLeaveHandler = this.onMouseLeave.bind(this, card);
-							return <div key={card.name} ref={card.name} className="card" onClick={clickHandler} onMouseOver={mouseOverHandler} onMouseLeave={mouseLeaveHandler}>{card.name}</div>	
+							return <div key={"revealed_" + card.name} ref={card.name} className="card" onClick={clickHandler} onMouseOver={mouseOverHandler} onMouseLeave={this.onMouseLeave}>{card.name}</div>	
 						}, this)}
 					</ReactCSSTransitionGroup>
-
-					{this.state.isElementHovered && <ZoomedCard data={this.state.zoomedCardData} position={this.state.zoomedCardPosition}></ZoomedCard>}
+					{this.state.zoomedCardData && <ZoomedCard data={this.state.zoomedCardData} position={this.state.zoomedCardPosition} onMouseLeave={this.onMouseLeave}></ZoomedCard>}
 				</div>
 			);
 		}
 	});
 
 	var ActionedCards = React.createClass({
+		onCardClosed: function(index) {
+			this.props.closeAction(index);
+		},
+
 		render: function() {
 			return (
 				<div className="actioned-cards-section">
-					<ReactCSSTransitionGroup transitionName="actioned-card">
+					<ReactCSSTransitionGroup transitionName="card">
 						{this.props.cards.map(function(card, index) {
-							return <div key={card.name} className="card">{card.name}</div>
-						})}
+							var onClosedCardHandler = this.onCardClosed.bind(this, index);
+							return (
+								<div key={"actioned_" + card.name} className="card">
+									<span>{card.name}</span>
+									<div className="close fa fa-times" onClick={onClosedCardHandler}></div>
+								</div>
+								);
+						}, this)}
 					</ReactCSSTransitionGroup>
 				</div>
 
@@ -120,7 +139,7 @@ define(["react"], function (React) {
 	var ZoomedCard = React.createClass({
 		render: function() {
 			return (
-				<div className="card zoomed" style={this.props.position}>{this.props.data.name}</div>
+				<div className="card zoomed" onMouseLeave={this.props.onMouseLeave}>{this.props.data.name}</div>
 			);
 		}
 	});
