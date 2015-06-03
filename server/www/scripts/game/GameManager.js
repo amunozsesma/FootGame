@@ -48,7 +48,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		this.state = state;
 
 		//TODO show rendering in the user area controller for when we have graphics
-		this.userAreaController.loadState(this.state, true);
+		this.userAreaController.loadState(this.state);
 		ConnectionService.send("user-ready");
 		
 	};

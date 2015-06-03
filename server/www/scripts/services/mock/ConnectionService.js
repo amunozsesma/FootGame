@@ -1,11 +1,13 @@
-define(["services/mock/MockStateGenerator", "config"], function(StateGenerator, config) {
+define(["services/mock/MockStateGenerator", "config", "utils/ClientData"], function(StateGenerator, config, ClientData) {
 	"use strict";
 	function ConnectionService () {
 		this.subscribers = {};
-		this.timeout = 30000;
+		this.timeout = 100000;
 		this.intervalId = null;
 
-		this.state = StateGenerator.getInitialState();
+		this.stateGenerator = new StateGenerator();
+
+		this.id = 12345;
 	};
 
 	var events = {
@@ -23,21 +25,30 @@ define(["services/mock/MockStateGenerator", "config"], function(StateGenerator, 
 	}
 
 	ConnectionService.prototype.connect = function(callback) {
+		ClientData.set("userId", this.id);
 		callback();
 	};
 
 	ConnectionService.prototype.send = function(eventName, data) {
 		switch(eventName) {
 			case events.client.NEW_USER:
-				this.subscribers[events.server.NEW_TURN](JSON.stringify(this.state));
+				this.userName = data.name;
+				this.teamName = data.teamName;
+				
+				this.state = this.stateGenerator.getInitialState(this.userName, this.teamName, this.id);
+				this.subscribers[events.server.NEW_TURN](this.state);
 				break;
 			case events.client.USER_READY:
-				this.subscribers[events.server.GAME_START]();
-				startTimeout.call(this, this.timeout);
+				window.setTimeout(function() {
+					this.subscribers[events.server.GAME_START]();
+				}.bind(this), 0);
+				// startTimeout.call(this, this.timeout);
 				break;
 			case events.client.TURN_END:
-				this.state = generateNewState.call(this, this.state, JSON.parse(data));
-				this.subscribers[events.server.NEW_TURN](JSON.stringify(this.state));
+				window.setTimeout(function() {
+					this.state = generateNewState.call(this);
+					this.subscribers[events.server.NEW_TURN](this.state);
+				}.bind(this), 0);
 				break;
 			default:
 				console.log("No actions defined for " + eventName + " in the ConnectionService.");
@@ -49,8 +60,7 @@ define(["services/mock/MockStateGenerator", "config"], function(StateGenerator, 
 	};
 
 	function generateNewState(previousMessage, message) {
-		var stateGenerator = new StateGenerator(previousMessage, message);
-		return stateGenerator.generateState("SIMPLE_CONFLICTS");
+		return this.stateGenerator.getInitialState(this.userName, this.teamName, this.id);
 	};
 
 	function startTimeout(timeout) {
