@@ -1,4 +1,4 @@
-define(["react", "CardController"], function (React, CardController) {
+define(["game/CardController"], function (CardController) {
 	"use strict";
 
 	var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -160,5 +160,5 @@ define(["react", "CardController"], function (React, CardController) {
 		}
 	});
 
-	return CardComponent;
+	return <CardComponent />;
 });

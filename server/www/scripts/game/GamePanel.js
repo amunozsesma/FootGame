@@ -2,9 +2,10 @@ define([
 	"game/components/PitchComponent", 
 	"game/components/ActionsComponent", 
 	"game/components/InfoComponent", 
-	"game/UserAreaController", 
+	"jsx!game/components/CardsComponent", 
+	"game/UserAreaController",
 	"game/GameManager"], 
-function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, GameManager) {
+function(PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAreaController, GameManager) {
 	"use strict";
 
 	function GamePanel() {
@@ -23,17 +24,18 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 		var pitchContainer   = React.createElement("div", {id: "pitch-container"});
 		var actionsContainer = React.createElement("div", {id: "actions-container"});
 		var userArea         = React.createElement("div", {id: "user-area"}, [infoContainer, pitchContainer, actionsContainer]);
-		//TODO card area component added here
-		// var cardArea         = React.createElement("div", {id: "card-area", className: "skeleton red"}, "CARDS");
+		var cardArea         = React.createElement("div", {id: "card-area"});
 
-		return [userArea]; 
+		return [userArea, cardArea]; 
 	};
 
 	GamePanel.prototype.onShow = function() {
 		this.pitchComponent     = new PitchComponent(document.getElementById("pitch-container"), this.userAreaController);
 		this.infoComponent      = new InfoComponent(document.getElementById("info-container"), this.userAreaController);
 		this.actionshComponent  = new ActionsComponent(document.getElementById("actions-container"), this.userAreaController);
-		
+		React.render(CardsComponent, document.getElementById("card-area"));
+
+
 		this.gameManager.start();
 		document.body.addEventListener("keypress", this.keyPressHandler);
 	};
