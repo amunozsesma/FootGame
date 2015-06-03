@@ -3,7 +3,7 @@ define(["libs/Emitter"], function(Emitter) {
 
 	var CardController = function() {
 		//TODO remove 
-		this.allCards = [{name: "Sprint", affectedPlayers: 1}, {name: "Drible", affectedPlayers: 1}, {name: "Fall Back", affectedPlayers: 2}, {name: "Counter Attack", affectedPlayers: 2}];
+		this.allCards = [{name: "Sprint", actionsLeft: 1}, {name: "Drible", actionsLeft: 1}, {name: "Fall Back", actionsLeft: 2}, {name: "Counter Attack", actionsLeft: 2}];
 		this.turnCards = [];
 		window.nt = this.newTurn.bind(this);
 		////////////////////////////////////////////////////

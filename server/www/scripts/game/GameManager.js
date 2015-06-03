@@ -1,4 +1,4 @@
-define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayController"], function(ConnectionService, ClientData, PanelOverlay) {
+define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayController", "game/CardController"], function(ConnectionService, ClientData, PanelOverlay, CardController) {
 	"use strict";
 
 	var GameManager = function(userAreaController) {
@@ -50,6 +50,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		//TODO show rendering in the user area controller for when we have graphics
 		this.userAreaController.loadState(this.state);
 		ConnectionService.send("user-ready");
+		CardController.newTurn();
 		
 	};
 	

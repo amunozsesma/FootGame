@@ -141,6 +141,7 @@ define(["game/CardController"], function (CardController) {
 							return (
 								<div key={"actioned_" + card.name} className="card">
 									<span>{card.name}</span>
+									<div className="actions-left">{card.actionsLeft}</div>
 									<div className="close fa fa-times" onClick={onClosedCardHandler}></div>
 								</div>
 								);
