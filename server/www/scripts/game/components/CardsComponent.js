@@ -1,4 +1,4 @@
-define(["game/CardController"], function (CardController) {
+define(["game/CardController", "utils/Utils"], function (CardController, Utils) {
 	"use strict";
 
 	var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -13,51 +13,17 @@ define(["game/CardController"], function (CardController) {
 		},
 
 		componentWillMount: function() {
-			CardController.on("new-turn", function(cards) {
-				this.onNewTurn(cards);
+			CardController.on("cards-changed", function(state) {
+				this.setState(state);
 			}, this);
-			this.onNewTurn([]);
-		},
-
-		onNewTurn: function(cards) {
-			var cardCount = CardController.getNumberCards();
-			this.setState({
-				cardCount: cardCount,
-				revealedCards: cards,
-				actionedCards: []
-			});
-		},
-
-		onRevealedCardClicked: function(revealedCardIndex) {
-			var revealedCards = this.state.revealedCards.slice();
-			var actionedCards = this.state.actionedCards.slice();
-
-			actionedCards = actionedCards.concat(revealedCards.splice(revealedCardIndex, 1));
-
-			this.setState({
-				revealedCards: revealedCards,
-				actionedCards: actionedCards
-			});
-		},
-
-		onActionedCardClosed: function(actionedCardIndex) {
-			var actionedCards = this.state.actionedCards.slice();
-			var revealedCards = this.state.revealedCards.slice();
-
-			revealedCards = revealedCards.concat(actionedCards.splice(actionedCardIndex, 1));
-
-			this.setState({
-				revealedCards: revealedCards,
-				actionedCards: actionedCards
-			});
 		},
 
 		render: function() {
 			return (
 				<div>
 					<DeckComponent cardCount={this.state.cardCount} />
-					<RevealedCards cards={this.state.revealedCards} clickAction={this.onRevealedCardClicked} />
-					<ActionedCards cards={this.state.actionedCards} closeAction={this.onActionedCardClosed} />
+					<RevealedCards cards={this.state.revealedCards} />
+					<ActionedCards cards={this.state.actionedCards} />
 				</div>
 			);
 		}
@@ -90,7 +56,7 @@ define(["game/CardController"], function (CardController) {
 
 		onClick: function(index) {
 			this.onMouseLeave();
-			this.props.clickAction(index);
+			CardController.revealedCardClicked(index);
 		},
 
 		onMouseOver: function(card) {
@@ -128,8 +94,13 @@ define(["game/CardController"], function (CardController) {
 	});
 
 	var ActionedCards = React.createClass({
-		onCardClosed: function(index) {
-			this.props.closeAction(index);
+		onCardClosed: function(index, e) {
+			e.stopPropagation();
+			CardController.actionedCardClosed(index);
+		},
+
+		onCardClicked: function(index) {
+			CardController.actionedCardClicked(index);
 		},
 
 		render: function() {
@@ -138,8 +109,13 @@ define(["game/CardController"], function (CardController) {
 					<ReactCSSTransitionGroup transitionName="card">
 						{this.props.cards.map(function(card, index) {
 							var onClosedCardHandler = this.onCardClosed.bind(this, index);
+							var onClickedCardHandler = this.onCardClicked.bind(this, index);
+							var className = Utils.reactClassAppender({
+								"disabled": card.actionsLeft === 0
+							}, "card");
+
 							return (
-								<div key={"actioned_" + card.name} className="card">
+								<div key={"actioned_" + card.name} onClick={onClickedCardHandler} className={className}>
 									<span>{card.name}</span>
 									<div className="actions-left">{card.actionsLeft}</div>
 									<div className="close fa fa-times" onClick={onClosedCardHandler}></div>

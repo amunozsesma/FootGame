@@ -50,6 +50,14 @@
 	cursor: pointer;
 }
 
+.card.disabled {
+	color: #D6D6D6;
+}
+
+.card.disabled:hover {
+	cursor: default;
+}
+
 .card-enter {
 	opacity: 0;
 	transition: opacity 0.5s;
@@ -97,6 +105,11 @@
 	background-color: #0066FF;
 	font-weight: bolder;
 	margin: 7px 0 0 80%;
+}
+
+.actioned-cards-section .card.disabled .actions-left {
+	color: white;
+	background-color: #D6D6D6;
 }
 
 .actioned-cards-section .card .close{

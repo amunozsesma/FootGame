@@ -1,4 +1,4 @@
-define(function() {
+define(["game/ActionPosibilitiesProvider"], function(Actions) {
 	"use strict";
 
 	var StateHelper = function(inputMessage, userId) {
@@ -14,6 +14,10 @@ define(function() {
 
 		this.outputState = this.generateOutputState({}, {});
 		this.playersConfig = {};
+		this.dimensions = this.getDimensions();
+
+		this.actions = new Actions(this.userTeam, this.rivalTeam, this.userSide, this.dimensions);
+
 	};
 
 	StateHelper.prototype.generateOutputState = function(playerActions, playerSelectedCells) {
@@ -63,9 +67,19 @@ define(function() {
 			return [];
 		}
 
-		return (this.userSide === "attacking") ? ["Pass", "Shoot", "Move", "Card"] : ["Move", "Press", "Card"];
+		return this.actions.getActions(playerName);
 	};
 	
+	StateHelper.prototype.getActionPosibilities = function(action, playerName) {
+		return this.actions.getPosibilities(action, playerName);
+	};
+	
+	StateHelper.prototype.setCardAction = function(playerName, card) {
+		this.actions.setCard(playerName, card);
+	};
+
+
+
 	StateHelper.prototype.getPlayerPosition = function(playerName) {
 		var player = this.allPlayers[playerName];
 		return player.position;
@@ -92,51 +106,6 @@ define(function() {
 		return player;
 	};
 
-	StateHelper.prototype.getPassPosibilities = function(playerName) {
-		var posibilities = [];
-		var players = this.getUserPlayerPositions();
-		Object.keys(players).forEach(function(player) {
-			if (player !== playerName) {
-				posibilities.push(players[player]);
-			}
-		});	
-
-		return posibilities;
-	};
-
-	StateHelper.prototype.getPressPosibilities = function(playerName) {
-		var posibilities = [];
-		var players = this.getRivalPlayerPositions();
-		Object.keys(players).forEach(function(player) {
-			if (player !== playerName) {
-				posibilities.push(players[player]);
-			}
-		});	
-
-		return posibilities;
-	};
-
-	StateHelper.prototype.getMovePosibilities = function(playerName, selectedCells) {
-		var posibilities = [];
-		var playerPosition = this.getPlayerPosition(playerName);
-		var dimensions = this.getDimensions();
-
-		//TODO get movement from stats, assuming 1 at the moment // REFACTOR
-		for (var i = -1; i <= 1 ; i++) {
-			if (i !== 0) {
-				posibilities.push({"x": playerPosition.x + i, "y": playerPosition.y}); 
-			}
-		}
-		for (var j = -1; j <= 1; j++) {
-			if (j !== 0) {
-				posibilities.push({"x": playerPosition.x, "y": playerPosition.y + j}); 
-			}
-		}
-
-		return posibilities;
-
-	};
-	
 	StateHelper.prototype.playerHasBall = function(playerName) {
 		var playerPosition = this.getPlayerPosition(playerName);
 		var ballPosition = this.getBallPosition();

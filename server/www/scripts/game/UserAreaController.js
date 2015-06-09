@@ -4,6 +4,8 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility},
 	// Proper pitch model
 
+	//TODO this has to be single instance
+
 	var UserAreaController = function() {
 		this.stateHelper = null;
 
@@ -12,6 +14,8 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 
 		this.seletecActions = {};
 		this.cellChosen = {};
+		this.actionSelectedCallback = null;
+		this.cardToBePlayed = null;
 	};
 
 	Emitter.mixInto(UserAreaController);
@@ -23,10 +27,6 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 		this.cellChosen = {};
 
 		this.stateHelper = new StateHelper(message, ClientData.get("userId"));
-		if (!isInitial) {
-			console.log("-- Initial turn");
-			//TODO RESOLVE -> graphics and shit / maybe set resolve mode and then set state
-		}
 
 		this.trigger("player-unselected", this);
 		this.trigger("load-state", this);
@@ -51,7 +51,13 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 
 	UserAreaController.prototype.cellClicked = function(x, y) {
 		if (this.isPlayerInSelectActionState) {
-			setChosenCell.call(this, x, y);
+			setSelectedActionInCell.call(this, x, y);
+			if (this.cardToBePlayed && !this.isPlayerInSelectActionState) {
+				this.stateHelper.setCardAction(this.stateHelper.getPlayerIn(x, y), this.cardToBePlayed);
+				this.actionSelectedCallback();
+				this.cardToBePlayed = null;
+				this.actionSelectedCallback = null;
+			}
 		} else {
 			this.trigger("player-unselected", this);
 			this.selectedPlayer = this.stateHelper.getPlayerIn(x, y);
@@ -66,6 +72,7 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 
 		if (action !== "" && action !== "Card" && action !== "Shoot") {
 			this.isPlayerInSelectActionState = true;
+			this.actionPosibilities = this.stateHelper.getActionPosibilities(action, this.selectedPlayer);
 			this.trigger("action-clicked", this);
 		} else {
 			delete this.cellChosen[this.selectedPlayer];
@@ -74,6 +81,13 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 		this.trigger("action-state-changed", this);
 	};
 
+	UserAreaController.prototype.cardActioned = function(card, callback) {
+		this.cardToBePlayed = card;
+		this.actionSelectedCallback = callback;
+		this.actionPosibilities = this.getUserPlayerPositions();
+		this.isPlayerInSelectActionState = true;
+		this.trigger("action-clicked", this);
+	};
 
 	UserAreaController.prototype.getDimensions = function() {
 		return this.stateHelper.getDimensions();
@@ -120,8 +134,6 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 	};
 
 	UserAreaController.prototype.getActionPosibilities = function() {
-		var action = this.seletecActions[this.selectedPlayer];
-		this.actionPosibilities = this.stateHelper["get" + action + "Posibilities"](this.selectedPlayer, this.cellChosen);
 		return this.actionPosibilities;
 	};
 
@@ -146,7 +158,7 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 		return result;
 	};
 
-	function setChosenCell(x, y) {
+	function setSelectedActionInCell(x, y) {
 		for (var i = 0, len = this.actionPosibilities.length; i < len; i++) {
 			if (this.actionPosibilities[i].x === x && this.actionPosibilities[i].y === y) {
 				this.cellChosen[this.selectedPlayer] = {"x": x, "y": y};
@@ -157,5 +169,5 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 		}
 	};
 
-	return UserAreaController;
+	return new UserAreaController();
 });

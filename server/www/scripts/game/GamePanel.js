@@ -9,8 +9,7 @@ function(PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAr
 	"use strict";
 
 	function GamePanel() {
-		this.userAreaController = new UserAreaController();
-		this.gameManager = new GameManager(this.userAreaController);
+		this.gameManager = new GameManager(UserAreaController);
 
 		this.keyPressHandler = function(event) {
 			if (event.keyCode === 13) {
@@ -30,9 +29,9 @@ function(PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAr
 	};
 
 	GamePanel.prototype.onShow = function() {
-		this.pitchComponent     = new PitchComponent(document.getElementById("pitch-container"), this.userAreaController);
-		this.infoComponent      = new InfoComponent(document.getElementById("info-container"), this.userAreaController);
-		this.actionshComponent  = new ActionsComponent(document.getElementById("actions-container"), this.userAreaController);
+		this.pitchComponent     = new PitchComponent(document.getElementById("pitch-container"), UserAreaController);
+		this.infoComponent      = new InfoComponent(document.getElementById("info-container"), UserAreaController);
+		this.actionshComponent  = new ActionsComponent(document.getElementById("actions-container"), UserAreaController);
 		React.render(CardsComponent, document.getElementById("card-area"));
 
 
