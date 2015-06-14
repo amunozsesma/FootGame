@@ -73,9 +73,11 @@ define(["react", "CardController"], function (React, CardController) {
 
 			return (
 				<div className="deck-section">
-					{deckCards.map(function (card) {
-						return card;
-					})}
+					{
+						deckCards.map(function (card) {
+							return card;
+						})
+					}
 				</div>
 			);
 		}
