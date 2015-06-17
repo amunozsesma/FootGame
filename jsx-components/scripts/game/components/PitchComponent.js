@@ -47,8 +47,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 
 			Controller.on("load-state",			eventHandler.bind(this, stateGenerator.getInitialState)		);
 			Controller.on("player-selected", 	eventHandler.bind(this, stateGenerator.getSelections) 		);
-			Controller.on("show-selections", 	eventHandler.bind(this, stateGenerator.getSelections) 		);
-			Controller.on("show-posibilities", 	eventHandler.bind(this, stateGenerator.getPosibilities) 	);
+			Controller.on("posibility-selected", 	eventHandler.bind(this, stateGenerator.getSelections) 		);
+			Controller.on("action-selected", 	eventHandler.bind(this, stateGenerator.getPosibilities) 	);
 			Controller.on("player-unselected",	eventHandler.bind(this, stateGenerator.getInitialState)		);
 		},
 

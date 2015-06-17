@@ -35,7 +35,7 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 
 	UserAreaController.prototype.posibilityClicked = function(posX, posY) {
 		this.stateHelper.setPosibility(posX, posY);
-		this.trigger("show-selections", this.stateHelper);
+		this.trigger("posibility-selected", this.stateHelper);
 	};
 
 	UserAreaController.prototype.emptyCellClicked = function() {
@@ -50,7 +50,7 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 
 	UserAreaController.prototype.action = function(action) {
 		this.stateHelper.setAction(action);
-		this.trigger("show-posibilities", this.stateHelper);
+		this.trigger("action-selected", this.stateHelper);
 	};
 
 	return new UserAreaController();
