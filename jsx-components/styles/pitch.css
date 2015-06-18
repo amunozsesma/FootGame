@@ -1,18 +1,15 @@
 #pitch-container {
-	margin-top: 74px;
-	height: 478px;
+	height: 475px;
 	width: 100%;
+	padding-top: 25px;
 }
 
 #pitch-container .pitch {
-	position: relative;
 	right: 0;
 	left: 0;
 	margin: auto auto; 
 	height: 380px;
 	width: 650px;
-	top: 50%;
-  	transform: translateY(-50%);
 
 	background-image: url('/images/football_field.png');
 	background-size: 100% 100%;
@@ -41,10 +38,6 @@
 	background-color: #FFC4C4;
 	opacity: 0.5;
 }
-
-/*.pitch .row {
-	margin-left: 0;
-}*/
 
 .pitch .selected {
 	border: 2px solid blue;

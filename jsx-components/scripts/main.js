@@ -12,9 +12,10 @@ require.config({
 
 
 require(["jsx!App"], function(App) {
+	var infoContainer = document.getElementById("info-container");
 	var pitchContainer = document.getElementById("pitch-container");
 	var actionsContainer = document.getElementById("actions-container");
 
-	var app = new App(pitchContainer, actionsContainer);
+	var app = new App(infoContainer, pitchContainer, actionsContainer);
 	app.start();
 });

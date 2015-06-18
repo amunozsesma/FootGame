@@ -4,39 +4,35 @@
 }
 
 #actions-container .actions {
-	position: relative;
 	right: 0;
 	left: 0;
 	width: 690px;
 	height: 120%;
 	margin: 0 auto;
-	top: 0;
+	margin-top: 0;
 	border-radius: 5px 5px 5px 5px;
-	-webkit-transition:top 0.6s;
-    transition:top 0.6s;
+	-webkit-transition: margin-top 0.6s;
+    transition: margin-top 0.6s;
 }
 
 #actions-container .actions.isHidden {
-	top: 200%;
+	margin-top: 200%;
 }
 
 .actions .description-container {
-	position: relative;
 	height: 100%;
 	width: 230px;
 	float: left;
-	margin-top: 20px;
+	padding: 10px;
 }
 
 .actions .name {
-	position: relative;
 	font-size: 16px;
 	height: 20px;
 	text-align: center;
 }
 
 .actions .photo-container {
-	position: relative;
 	height: 100px;
 	width: 100px;
 	margin: 25px 0 0 65px;
@@ -46,7 +42,6 @@
 }
 
 .actions .player-stats-container {
-	position: relative;
 	height: 100%;
 	width: 260px;
 	float: left;
@@ -54,16 +49,13 @@
 }
 
 .actions .buttons-container {
-	position: relative;
 	height: 100%;
 	width: 198px;
 	float: left;
-	margin-top: 15px;
 	padding: 10px;
 }
 
 .stat-container {
-	position: relative;
 	width: 130px;
 	height: 50px;
 	float: left;
@@ -74,13 +66,11 @@
 
 .stat-container .stat-name,
 .stat-container .stat-value  {
-	position: relative;
 	float: left;
 	width: 65px;
 }
 
 .buttons-container .action-button {
-	position: relative; 
 	width: 70px;
 	height: 70px;
 	margin: 10px 10px 0 0;
@@ -89,4 +79,8 @@
 
 .action-button.selected {
 	border-color: blue;
+}
+
+.action-button:hover {
+	cursor: pointer;
 }

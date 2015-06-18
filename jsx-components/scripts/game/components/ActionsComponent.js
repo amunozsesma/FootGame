@@ -5,19 +5,36 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		getInitialState: function() {
 			return {
 				playerName: "aPlayer",
-				stats: [{name: "stat1", value: 1}, {name: "stat2", value: 2}, {name: "stat3", value: 3}, {name: "stat4", value: 4}],
+				stats: [],
 				actions: ["action1", "action2", "action3", "action4"],
-				selectedAction: null
+				selectedAction: null,
+				isHidden: false
 			};
+		},
+
+		setHidden: function(isHidden) {
+			this.setState({isHidden: isHidden});
+		},
+
+		componentWillMount: function() {
+			Controller.on("load-state",			this.setHidden.bind(this, true)  );
+			Controller.on("player-selected",	this.setHidden.bind(this, false) );
+			Controller.on("player-unselected",	this.setHidden.bind(this, true)  );
+			Controller.on("turn-end",			this.setHidden.bind(this, true)  );
 		},
 
 		onButtonClicked: function(actionName) {
 			this.setState({selectedAction: actionName});
+			// Controller.action(actionName);
 		},
 
 		render: function() {
+			var className = Utils.reactClassAppender({
+				"isHidden": this.state.isHidden
+			}, "actions skeleton");
+
 			return (
-				<div className="actions skeleton">
+				<div className={className}>
 					<Description name={this.state.playerName}/>
 					<Stats stats={this.state.stats}/>
 					<Buttons actions={this.state.actions} selected={this.state.selectedAction} clickHandler={this.onButtonClicked}/>
@@ -37,6 +54,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		}
 	});
 
+	//This will probably be replaced by type of player and stamina
 	var Stats = React.createClass({
 		render: function() {
 			var stats = this.props.stats.map(function(stat) {

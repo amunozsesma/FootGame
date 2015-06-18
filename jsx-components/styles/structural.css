@@ -2,13 +2,12 @@
 
 #game-area {
 	position: absolute;
-	margin: 5px 5px 5px 5px;
 	right: 0;
 	left: 0;
 	top: 0;
 	bottom: 0;
-	min-width: 1014px;
-	min-height: 758px;
+	min-width: 1024px;
+	min-height: 768px;
 	padding: 5px;
 
 	overflow: hidden;
@@ -25,4 +24,6 @@
 	width: 70%;
 	height: 100%;
 	padding: 5px;
+
+	overflow: hidden;
 }

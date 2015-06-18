@@ -2,31 +2,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 	"use strict";
 
 	var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
-	var stateGenerator = {
-		getSelections: function(userAreaHelper) {
-			return {
-				actionSelections: userAreaHelper.getCurrentSelections()
-			};
-		},
-
-		getPosibilities: function(userAreaHelper) {
-			return {
-				actionPosibilities: userAreaHelper.getActionPosibilities()
-			};
-		},
-
-		getInitialState: function(userAreaHelper) {
-			return {
-				ballPosition: 	userAreaHelper.getBallPosition(),
-				userPlayers: 	userAreaHelper.getUserPlayerPositions(),
-				rivalPlayers: 	userAreaHelper.getRivalPlayerPositions(),
-				actionPosibilities: null,
-				actionSelections: 	null,
-				selectedCell: 		null
-			};
-		}
-
-	};
 
 	var PitchComponent = React.createClass({
 		getInitialState: function() {
@@ -40,16 +15,36 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			};
 		},
 
-		componentWillMount: function() {
-			var eventHandler = function(userAreaHelper, stateGeneratorFunction) {
-				this.setState(stateGeneratorFunction(userAreaHelper));
-			}.bind(this);
+		setInitialState: function(userAreaHelper) {
+			this.setState({
+				ballPosition: 	userAreaHelper.getBallPosition(),
+				userPlayers: 	userAreaHelper.getUserPlayerPositions(),
+				rivalPlayers: 	userAreaHelper.getRivalPlayerPositions(),
+				actionPosibilities: null,
+				actionSelections: 	null,
+				selectedCell: 		null
+			});
+		},
 
-			Controller.on("load-state",			eventHandler.bind(this, stateGenerator.getInitialState)		);
-			Controller.on("player-selected", 	eventHandler.bind(this, stateGenerator.getSelections) 		);
-			Controller.on("posibility-selected", 	eventHandler.bind(this, stateGenerator.getSelections) 		);
-			Controller.on("action-selected", 	eventHandler.bind(this, stateGenerator.getPosibilities) 	);
-			Controller.on("player-unselected",	eventHandler.bind(this, stateGenerator.getInitialState)		);
+		setShowSelections: function(userAreaHelper) {
+			this.setState({
+				actionSelections: userAreaHelper.getCurrentSelections()
+			});
+		},
+
+		setShowPosibilities: function(userAreaHelper) {
+			this.setState({
+				actionPosibilities: userAreaHelper.getActionPosibilities()
+			});
+		},
+
+		componentWillMount: function() {
+			Controller.on("load-state",			 this.setInitialState	  );
+			Controller.on("player-selected", 	 this.setShowSelections   );
+			Controller.on("posibility-selected", this.setShowSelections   );
+			Controller.on("action-selected", 	 this.setShowPosibilities );
+			Controller.on("player-unselected",	 this.setInitialState	  );
+			Controller.on("turn-end",	 		 this.setInitialState	  );
 		},
 
 		createCellMatrix: function() {
