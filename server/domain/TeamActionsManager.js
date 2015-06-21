@@ -69,6 +69,7 @@ module.exports = function() {
 	};
 
 	function press(playerName, posX, posY) {
+		debugger;
 		var playerInPosition = this.pitch.getPlayerIn(posX, posY);
 		if (!playerInPosition) {
 			console.log("PRESS: '" + playerName + "' trying to press on [" + posX + ", " + posY + "] and no player to press");
@@ -76,7 +77,7 @@ module.exports = function() {
 		}
 
 		var from = this.userBuilder.getPosition(playerName);
-		var to = this.pitch.getPlayerPosition();
+		var to = this.pitch.getPlayerPosition(playerInPosition);
 		var nextPosition = pitchUtils.nextPosition(from, to, 1);
 
 		var stringPosition = JSON.stringify(nextPosition);
