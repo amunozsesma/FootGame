@@ -4,8 +4,18 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 	var InfoComponent = React.createClass({
 		getInitialState: function() {
 			return {
-				score: [{teamName: "Team Name", goals: 0}, {teamName: "Another Team Name", goals: 0}]
+				score: []
 			};
+		},
+
+		setScore: function(data) {
+			this.setState({
+				score: data.message.getTeamScores()
+			});
+		},
+
+		componentWillMount: function() {
+			Controller.on("load-state",	this.setScore);
 		},
 
 		render: function() {

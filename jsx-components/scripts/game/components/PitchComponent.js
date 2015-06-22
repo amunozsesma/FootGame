@@ -6,35 +6,44 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 	var PitchComponent = React.createClass({
 		getInitialState: function() {
 			return {
-				ballPosition: {x: 5, y: 2},
-				userPlayers: [{x:2, y:0}, {x:2, y:2}, {x:2, y:4}],
-				rivalPlayers: [{x: 8, y:0}, {x: 8, y:2}, {x: 8, y:4}],
-				actionPosibilities: [{x: 8, y:0}, {x: 8, y:2}, {x: 8, y:4}],
-				actionSelections: [{x: 3, y: 4}],
+				ballPosition: null,
+				userPlayers: null,
+				rivalPlayers: null,
+				actionPosibilities: null,
+				actionSelections: null,
 				selectedCell: null
 			};
 		},
 
-		setInitialState: function(userAreaHelper) {
+		setInitialState: function(data) {
 			this.setState({
-				ballPosition: 	userAreaHelper.getBallPosition(),
-				userPlayers: 	userAreaHelper.getUserPlayerPositions(),
-				rivalPlayers: 	userAreaHelper.getRivalPlayerPositions(),
+				ballPosition: 	data.message.getBallPosition(),
+				userPlayers: 	data.message.getUserPlayerPositions(),
+				rivalPlayers: 	data.message.getRivalPlayerPositions(),
 				actionPosibilities: null,
 				actionSelections: 	null,
 				selectedCell: 		null
 			});
 		},
 
-		setShowSelections: function(userAreaHelper) {
+		setShowSelections: function(data) {
 			this.setState({
-				actionSelections: userAreaHelper.getCurrentSelections()
+				actionSelections: data.state.getCurrentSelections(),
+				selectedCell: data.state.getSelectedPlayerPosition(),
+				actionPosibilities: null
 			});
 		},
 
-		setShowPosibilities: function(userAreaHelper) {
+		setShowPosibilities: function(data) {
 			this.setState({
-				actionPosibilities: userAreaHelper.getActionPosibilities()
+				actionPosibilities: data.state.getActionPosibilities(),
+				actionSelections: null
+			});
+		},
+
+		setCardPosibilities: function(data) {
+			this.setState({
+				actionPosibilities: data.state.getCardPosibilities()
 			});
 		},
 
@@ -43,7 +52,9 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			Controller.on("player-selected", 	 this.setShowSelections   );
 			Controller.on("posibility-selected", this.setShowSelections   );
 			Controller.on("action-selected", 	 this.setShowPosibilities );
+			Controller.on("action-unselected", 	 this.setInitialState	  );
 			Controller.on("player-unselected",	 this.setInitialState	  );
+			Controller.on("card-selected",	 	 this.setCardPosibilities );
 			Controller.on("turn-end",	 		 this.setInitialState	  );
 		},
 
@@ -90,8 +101,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 							actionPosibility={!!cell.actionPosibility} 
 							actionSelection={!!cell.actionSelection} 
 							cellStyle={cellStyle}
-							isSelected={!!cell.isSelected}
-							selected={this.onCellSelected}/>
+							isSelected={!!cell.isSelected}/>
 					);
 				}
 			}
@@ -99,13 +109,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			return cells;
 		},
 
-		onCellSelected: function(posX, posY) {
-			this.setState({selectedCell: {x: posX, y: posY}})
-		},
-
 		render: function() {
 			var cellMatrix = this.createCellMatrix();
-			
 			this.addProperties(cellMatrix, "userPlayer"			, this.state.userPlayers);
 			this.addProperties(cellMatrix, "rivalPlayer"		, this.state.rivalPlayers);
 			this.addProperties(cellMatrix, "ball"				, [this.state.ballPosition]);
@@ -125,8 +130,12 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 
 	var Cell = React.createClass({
 		onCellClicked: function() {
-			if (!this.props.actionPosibility && (this.props.userPlayer || this.props.rivalPlayer)) {
-				this.props.selected(this.props.posX, this.props.posY);
+			if (this.props.actionPosibility) {
+				Controller.posibilityClicked(this.props.posX, this.props.posY);
+			} else if (this.props.userPlayer || this.props.rivalPlayer) {
+				Controller.playerClicked(this.props.posX, this.props.posY);
+			} else {
+				Controller.emptyCellClicked();
 			}
 		},
 
@@ -158,16 +167,3 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 
 	return PitchComponent;
 });
-
-//Controller modes:
-// - initial (userplayers, rivalplayers, ball)
-// - cell-selection (mark posibilities and handlers on those posibilities)
-// - player-selected (mark player, show selected cells)
-
-// - {initialize: size, teams, scores}
-// - {mode: cell-selection, [posibilities]}
-// - {mode: player-selected, {position, actions, selectedaction, posibilities, name, stats}}
-// - modes are internal pitch component states to prevent clicking in other things
-
-//cell:
-// done by himself --> selected, player (+ child), action-posibility, action-selected, child .ball

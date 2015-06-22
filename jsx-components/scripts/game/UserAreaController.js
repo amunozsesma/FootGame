@@ -1,8 +1,9 @@
-define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitter, StateHelper, ClientData) {
+define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], function(Emitter, State, ClientData, Message) {
 	"use strict";
 
 	var UserAreaController = function() {
-		this.stateHelper = null;
+		this.message = null;
+		this.state = null;
 	};
 
 	Emitter.mixInto(UserAreaController);
@@ -11,46 +12,58 @@ define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitte
 	// State Modification API
 	//loadState
 	UserAreaController.prototype.setInputState = function(message) {
-		this.stateHelper = new StateHelper(message, ClientData.get("userId"));
-		this.stateHelper = {};
-		this.trigger("load-state", this.stateHelper);
+		this.message = new Message(message, ClientData.get("userId"));
+		this.state = new State(this.message);
+		
+		this.trigger("load-state", this.state);
 	};
 
 	//TODO extract to different class or create timer class inside here
 	UserAreaController.prototype.adjustTimeout = function(timeout) {
-		this.trigger("timeout-adjustment", {"timeout":timeout, "overallTimeout":this.stateHelper.getOverallTimeout()});
+		this.trigger("timeout-adjustment", {"timeout":timeout, "overallTimeout":this.state.getOverallTimeout()});
 	}
 
 	UserAreaController.prototype.getOutputState = function() {
-		// return this.stateHelper.generateOutputState(this.seletecActions, this.cellChosen);
-		return this.stateHelper.generateOutputState();
+		// return this.state.generateOutputState(this.seletecActions, this.cellChosen);
+		return this.state.generateOutputState();
 	};
 	
 	// Components API
 
 	// UserAreaController.prototype.onUserClickedTurnEnd = function() {
 	UserAreaController.prototype.endTurn = function() {
-		this.trigger("turn-end", this.stateHelper);
+		this.trigger("turn-end", this.state);
 	};
 
 	UserAreaController.prototype.posibilityClicked = function(posX, posY) {
-		this.stateHelper.setPosibility(posX, posY);
-		this.trigger("posibility-selected", this.stateHelper);
+		this.state.posibilitySelected(posX, posY);
+		this.trigger("posibility-selected", {message: this.message, state: this.state});
 	};
 
 	UserAreaController.prototype.emptyCellClicked = function() {
-		this.stateHelper.clearSelections(posX, posY);
-		this.trigger("player-unselected", this.stateHelper);
+		this.state.playerUnselected();
+		this.trigger("player-unselected", {message: this.message, state: this.state});
 	};
 
 	UserAreaController.prototype.playerClicked = function(posX, posY) {
-		this.stateHelper.selectPlayer(posX, posY);
-		this.trigger("player-selected", this.stateHelper);
+		this.state.playerSelected(posX, posY);
+		this.trigger("player-selected", {message: this.message, state: this.state});
 	};
 
-	UserAreaController.prototype.action = function(action) {
-		this.stateHelper.setAction(action);
-		this.trigger("action-selected", this.stateHelper);
+	UserAreaController.prototype.actionSelected = function(action) {
+		this.state.actionSelected(action);
+		this.trigger("action-selected", {message: this.message, state: this.state});
+	};
+
+	UserAreaController.prototype.actionUnselected = function() {
+		this.state.actionUnselected(action);
+		this.trigger("action-unselected", {message: this.message, state: this.state});
+	};
+
+	UserAreaController.prototype.cardActioned = function(card, callback) {
+		this.state.cardSelected(card);
+		this.on("player-selected", callback);
+		this.trigger("card-selected", {message: this.message, state: this.state});
 	};
 
 	return new UserAreaController();

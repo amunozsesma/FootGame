@@ -12,20 +12,18 @@ define(["react", "CardController"], function (React, CardController) {
 			};
 		},
 
-		componentWillMount: function() {
-			CardController.on("new-turn", function(cards) {
-				this.onNewTurn(cards);
-			}, this);
-			this.onNewTurn([]);
-		},
-
-		onNewTurn: function(cards) {
+		setNewTurn: function(cards) {
 			var cardCount = CardController.getNumberCards();
 			this.setState({
 				cardCount: cardCount,
 				revealedCards: cards,
 				actionedCards: []
 			});
+		},
+		
+		componentWillMount: function() {
+			CardController.on("new-turn", this.setNewTurn);
+			this.setNewTurn([]);
 		},
 
 		onRevealedCardClicked: function(revealedCardIndex) {

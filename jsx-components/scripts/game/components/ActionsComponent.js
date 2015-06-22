@@ -4,28 +4,46 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 	var ActionsComponent = React.createClass({
 		getInitialState: function() {
 			return {
-				playerName: "aPlayer",
+				playerName: "",
 				stats: [],
-				actions: ["action1", "action2", "action3", "action4"],
-				selectedAction: null,
-				isHidden: false
+				actions: [],
+				selectedAction: "",
+				isHidden: true
 			};
 		},
 
-		setHidden: function(isHidden) {
-			this.setState({isHidden: isHidden});
+		setActionsHidden: function(data) {
+			this.setState({
+				isHidden: true
+			});
+		},
+
+		setActionsShown: function(data) {
+			this.setState({
+				isHidden: false, 
+				playerName: data.state.getSelectedPlayer(), 
+				actions: data.state.getPlayerActions(), 
+				selectedAction: data.state.getSelectedAction()
+			});
 		},
 
 		componentWillMount: function() {
-			Controller.on("load-state",			this.setHidden.bind(this, true)  );
-			Controller.on("player-selected",	this.setHidden.bind(this, false) );
-			Controller.on("player-unselected",	this.setHidden.bind(this, true)  );
-			Controller.on("turn-end",			this.setHidden.bind(this, true)  );
+			Controller.on("load-state",			this.setActionsHidden );
+			Controller.on("player-selected",	this.setActionsShown  );
+			Controller.on("player-unselected",	this.setActionsHidden );
+			Controller.on("turn-end",			this.setActionsHidden );
 		},
 
 		onButtonClicked: function(actionName) {
-			this.setState({selectedAction: actionName});
-			// Controller.action(actionName);
+			var selectedAction = "";
+			if (actionName === this.state.actionName) {
+				Controller.actionUnselected();
+			} else {
+				Controller.actionSelected(actionName);
+				selectedAction = actionName;
+			}
+
+			this.setState({selectedAction: selectedAction});
 		},
 
 		render: function() {
@@ -85,7 +103,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				var className = Utils.reactClassAppender({
 					"selected": this.props.selected === action
 				}, "action-button");
-				return <button className={className} onClick={clickHandler}>action</button>
+				return <button className={className} onClick={clickHandler}>{action}</button>
 			}, this);
 
 			return (

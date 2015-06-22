@@ -24,6 +24,14 @@
 	border: 1px solid #9C9C9C;
 }
 
+#pitch-container .pitch .player.selected {
+	border: 2px solid blue;
+}
+
+#pitch-container .pitch .player:hover {
+	cursor: pointer;
+}
+
 #pitch-container .pitch .cell.action-posibility {
 	border: 2px solid red;
 	cursor: pointer;
@@ -37,10 +45,6 @@
 #pitch-container .pitch .action-selected {
 	background-color: #FFC4C4;
 	opacity: 0.5;
-}
-
-.pitch .selected {
-	border: 2px solid blue;
 }
 
 .pitch .ball {
