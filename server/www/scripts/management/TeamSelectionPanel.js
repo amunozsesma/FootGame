@@ -1,4 +1,4 @@
-define(["utils/ClientData", "management/components/LabeledInput"], function(ClientData, LabeledInput){
+define(["react", "utils/ClientData", "management/components/LabeledInput"], function(React, ClientData, LabeledInput){
 	"use strict";
 
 	function TeamSelectionPanel (panelManager) {

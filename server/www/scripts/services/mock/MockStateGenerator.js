@@ -1,4 +1,4 @@
-define(["game/StateHelper"], function(StateHelper){
+define(["game/State"], function(StateHelper){
 	"use strict";
 
 	var MockStateGenerator = function(previousState, finalState) {

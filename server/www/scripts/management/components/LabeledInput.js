@@ -1,4 +1,4 @@
-define(["libs/Emitter"], function(Emitter) {
+define(["react", "libs/Emitter"], function(React, Emitter) {
 	function LabeledInput() {
 	};
 

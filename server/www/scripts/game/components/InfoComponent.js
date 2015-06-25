@@ -1,88 +1,98 @@
-define(function() {
+define(["react", "utils/Utils", "game/UserAreaController"], function (React, Utils, Controller) {
 	"use strict";
 
-	var InfoComponent = function(infoElement, userAreaController) {
-		this.infoElement = infoElement;
-		this.userAreaController = userAreaController;
+	var InfoComponent = React.createClass({
+		getInitialState: function() {
+			return {
+				score: []
+			};
+		},
 
-		init.call(this);
-		this.userAreaController.on("load-state", loadState, this);
-		this.userAreaController.on("timeout-adjustment", adjustTimeout, this);
-		this.userAreaController.on("turn-end", waitForNextTurn, this);
-	};
+		setScore: function(data) {
+			this.setState({
+				score: data.message.getTeamScores()
+			});
+		},
 
-	function init() {
-		var own = this;
+		componentWillMount: function() {
+			Controller.on("load-state",	this.setScore);
+		},
 
-		var infoComponent = React.createClass({
-  			getInitialState: function() {
-    			return {
-    				"userAreaController": own.userAreaController,
-    				"teamScores": {},
-    				"timeout": 0,
-    				"overallTimeout": 1,
-    				"progressBarMessage": "Click when you are ready",
-    				"timeoutStop": false
-    			};
-  			},
-  			render: function() {
-  				var teamScores = this.createTeamScores();
-  				return React.createElement("div", { className: 'info skeleton' }, teamScores);
-  			},
-  			createTeamScores: function() {
-				var teamScores = [];
-				Object.keys(this.state.teamScores).forEach(function(team, index) {
-					var teamContainer = [];
-					var teamName = React.createElement("div", { className: 'team-name' }, team);
-					var teamScore = React.createElement("div", { className: 'team-score' }, this.state.teamScores[team]);
-					
-					if (index === 1) {
-						teamScores.push(React.createElement("div", { className: 'separator' }, "-"));
-						teamContainer = [teamScore, teamName];
-					} else {
-						teamContainer = [teamName, teamScore];
-					}
+		render: function() {
+			var scores = this.state.score.map(function(score) {
+				return (
+					<div className="team-score-container">
+						<div className="team-score-element">{score.teamName}</div>
+						<div className="team-score-element">{score.goals}</div>
+					</div>
+				);
+			});
 
-					var scoreContainer = React.createElement("div", { className: 'score-container' }, teamContainer);
-					var progressBar = React.createElement("div", { className: 'turn-progress-bar ' + ((this.state.timeoutStop) ? "turn-end" : ""), style: {width: (this.state.timeoutStop) ? "100%" : this.state.timeout/this.state.overallTimeout * 100 + "%"}});
-					var message = React.createElement("span", { className: 'progress-bar-message' }, this.state.progressBarMessage);
-					var timeoutContainer = React.createElement("div", { className: 'timeout-container', onClick: this.progressBarClicked }, [progressBar, message]);
-					teamScores.push(scoreContainer, timeoutContainer);
-				}.bind(this)); 
+			return (
+				<div className="info">
+					<div className="score-container skeleton">
+						{scores}
+					</div>
+					<Timeout />
+				</div>
+			);
+		}
+	});
 
-				return teamScores;
-  			},
-  			progressBarClicked: function() {
-  				this.state.userAreaController.onUserClickedTurnEnd();
-  			}
-		});
+	var Timeout = React.createClass({
+		getInitialState: function() {
+			return {
+				timeout: 0,
+				overallTimeout: 1,
+				message: "",
+				complete: false 
+			};
+		},
 
-		var infoElement = React.createElement(infoComponent);
-		this.reactComponent = React.render(infoElement, this.infoElement);
-	};
+		setInitalState: function() {
+			this.setState({
+				timeout: 0,
+				overallTimeout: 1,
+				message: "Click to end your turn",
+				complete: false 	
+			});
+		},
 
-	function loadState(userAreaController) {
-		this.reactComponent.setState({
-			"teamScores": userAreaController.getTeamScores(),
-		});
-	};
+		setTimeout: function(data) {
+			this.setState(data);
+		},
 
-	function adjustTimeout(ttl) {
-		this.reactComponent.setState({
-			"progressBarMessage": "Click when you are ready",
-			"timeoutStop": false,
-			"timeout": ttl.timeout,
-			"overallTimeout": ttl.overallTimeout
-		});	
-	};
+		setTurnEnd: function() {
+			this.setState({
+				message: "Waiting for other player",
+				complete: true
+			});
+		},
 
-	function waitForNextTurn() {
-		this.reactComponent.setState({
-			"progressBarMessage": "Waiting for other player",
-			"timeoutStop": true
-		});
-	};
+		componentWillMount: function() {
+			Controller.on("load-state",			this.setInitalState );
+			Controller.on("timeout-adjustment",	this.setTimeout		);
+			Controller.on("turn-end",			this.setTurnEnd 	);
+		},
 
-	return InfoComponent;
+		onClick: function() {
+			Controller.endTurn();
+		},
 
+		render: function() {
+			var style = {width: (this.state.complete) ? "100%" : this.state.timeout/this.state.overallTimeout * 100 + "%"};
+			var className = Utils.reactClassAppender({
+				"turn-end": this.state.complete
+			}, "turn-progress-bar");
+
+			return (
+				<div className="timeout-container skeleton" onClick={this.onClick}>
+					<div className={className} style={style}></div>
+					<span className="progress-bar-message">{this.state.message}</span>
+				</div>
+			);
+		}
+	});
+
+	return <InfoComponent />;
 });

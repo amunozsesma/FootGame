@@ -1,11 +1,12 @@
 define([
-	"game/components/PitchComponent", 
-	"game/components/ActionsComponent", 
-	"game/components/InfoComponent", 
+	"react",
+	"jsx!game/components/PitchComponent", 
+	"jsx!game/components/ActionsComponent", 
+	"jsx!game/components/InfoComponent", 
 	"jsx!game/components/CardsComponent", 
 	"game/UserAreaController",
 	"game/GameManager"], 
-function(PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAreaController, GameManager) {
+function(React, PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAreaController, GameManager) {
 	"use strict";
 
 	function GamePanel() {
@@ -29,11 +30,10 @@ function(PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAr
 	};
 
 	GamePanel.prototype.onShow = function() {
-		this.pitchComponent     = new PitchComponent(document.getElementById("pitch-container"), UserAreaController);
-		this.infoComponent      = new InfoComponent(document.getElementById("info-container"), UserAreaController);
-		this.actionshComponent  = new ActionsComponent(document.getElementById("actions-container"), UserAreaController);
+		React.render(PitchComponent, document.getElementById("pitch-container"));
+		React.render(InfoComponent, document.getElementById("info-container"));
+		React.render(ActionsComponent, document.getElementById("actions-container"));
 		React.render(CardsComponent, document.getElementById("card-area"));
-
 
 		this.gameManager.start();
 		document.body.addEventListener("keypress", this.keyPressHandler);

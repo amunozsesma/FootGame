@@ -1,43 +1,44 @@
 define(function() {
 	"use strict";
 
-	var ActionPosibilitiesProvider = function(userPlayers, rivalPlayers, side, dimensions) {
-		this.userPlayers = userPlayers;
-		this.rivalPlayers = rivalPlayers;
-		this.dimensions = dimensions;
-		this.side = side;
+	var Actions = function(message) {
+		this.userPlayers = message.getUserTeam();
+		this.rivalPlayers = message.getRivalTeam();
+		this.dimensions = message.getDimensions();
+		this.side = message.getUserSide();
 
 		this.playerCards = {};
 		
 		this.basicActions = {
 			"Pass": playerPositions.bind(this, this.userPlayers),
 			"Press": playerPositions.bind(this, this.rivalPlayers),
-			"Move": adyacentPosition.bind(this)
+			"Move": adyacentPosition.bind(this),
+			"Shoot": function() {return [];}
 		}
 
 		this.actions = {};
 		Object.keys(this.userPlayers).forEach(function(playerName) {
-			this.actions[playerName] = ActionPosibilitiesProvider.DEFAULT_ACTIONS[this.side].slice();
+			this.actions[playerName] = Actions.DEFAULT_ACTIONS[this.side].slice();
 		}, this);
 	};
 
-	ActionPosibilitiesProvider.DEFAULT_ACTIONS = {
+	Actions.DEFAULT_ACTIONS = {
 		"attacking": ["Pass", "Shoot", "Move", "Card"],
 		"defending": ["Move", "Press", "Card"]
 	}
 
-	ActionPosibilitiesProvider.prototype.getPosibilities = function(action, playerName) {
+	Actions.prototype.getPosibilities = function(action, playerName) {
 		var playableAction = (this.playerCards[playerName]) ? this.playerCards[playerName].getActionToEnhance() : action;
 		//TODO get enhanced parameters
 
 		return this.basicActions[playableAction](playerName);
 	};
 
-	ActionPosibilitiesProvider.prototype.getActions = function(playerName) {
+	Actions.prototype.getActions = function(playerName) {
 		return this.actions[playerName];
 	};
 
-	ActionPosibilitiesProvider.prototype.setCard = function(playerName, card) {
+	Actions.prototype.setCard = function(playerName, card) {
 		this.playerCards[playerName] = card;
 		var actionToEnhance = card.getActionToEnhance();
 		var cardAction = card.getActionName();
@@ -62,15 +63,18 @@ define(function() {
 		var distance = distance || 1;
 		var posibilities = [];
 		var playerPosition = this.userPlayers[playerName].position;
+		var posX, posY;
 
 		for (var i = -distance; i <= distance ; i++) {
-			if (i !== 0) {
-				posibilities.push({"x": playerPosition.x + i, "y": playerPosition.y}); 
+			posX = playerPosition.x + i;
+			if (i !== 0 && posX < this.dimensions.columns && posX >= 0) {
+				posibilities.push({"x": posX, "y": playerPosition.y}); 
 			}
 		}
 		for (var j = -distance; j <= distance; j++) {
-			if (j !== 0) {
-				posibilities.push({"x": playerPosition.x, "y": playerPosition.y + j}); 
+			posY = playerPosition.y + j;
+			if (j !== 0 && posY < this.dimensions.rows && posY >= 0) {
+				posibilities.push({"x": playerPosition.x, "y": posY}); 
 			}
 		}
 
@@ -78,5 +82,5 @@ define(function() {
 
 	};
 
-	return ActionPosibilitiesProvider;
+	return Actions;
 });

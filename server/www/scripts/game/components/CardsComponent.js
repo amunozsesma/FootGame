@@ -1,4 +1,4 @@
-define(["game/CardController", "utils/Utils"], function (CardController, Utils) {
+define(["react", "game/CardController", "utils/Utils"], function (React, CardController, Utils) {
 	"use strict";
 
 	var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
@@ -13,11 +13,9 @@ define(["game/CardController", "utils/Utils"], function (CardController, Utils) 
 		},
 
 		componentWillMount: function() {
-			CardController.on("cards-changed", function(state) {
-				this.setState(state);
-			}, this);
+			CardController.on("cards-changed", function(state) {this.setState(state)}.bind(this));
 		},
-
+ 
 		render: function() {
 			return (
 				<div>

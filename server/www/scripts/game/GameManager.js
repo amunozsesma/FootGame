@@ -48,7 +48,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		this.state = state;
 
 		//TODO show rendering in the user area controller for when we have graphics
-		this.userAreaController.loadState(this.state);
+		this.userAreaController.setInputState(this.state);
 		ConnectionService.send("user-ready");
 		CardController.newTurn();
 		
@@ -59,7 +59,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 	};
 
 	function endTurn() {
-		var outputState = this.userAreaController.getTurnEndResult();
+		var outputState = this.userAreaController.getOutputState();
 		this.listenForTimeoutAdjust = false;
 		ConnectionService.send("turn-end", outputState);
 	};

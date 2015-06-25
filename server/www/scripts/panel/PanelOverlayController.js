@@ -1,4 +1,4 @@
-define(function() {
+define(["react"], function(React) {
 	"use strict";
 	function PanelOverlaycontroller () {
 		this.container = document.getElementById("overlay-container");
