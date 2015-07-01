@@ -32,14 +32,7 @@ define(["game/Actions"], function(Actions) {
 	/** State modification API */
 
 	State.prototype.playerSelected = function(posX, posY) {
-		var playerName = this.message.getPlayerIn(posX, posY);
-		
-		if (this.selectedCard) {
-			this.actions.setCard(playerName, this.selectedCard);
-			this.selectedCard = null;
-		} else {
-			this.selectedPlayer = playerName;
-		}
+		this.selectedPlayer = this.message.getPlayerIn(posX, posY);
 	};
 
 	State.prototype.playerUnselected = function() {
@@ -51,8 +44,14 @@ define(["game/Actions"], function(Actions) {
 			return;
 		}
 
-		this.state[this.selectedPlayer].x = posX;
-		this.state[this.selectedPlayer].y = posY;
+		if (this.selectedCard) {
+			var playerName = this.message.getPlayerIn(posX, posY);
+			this.actions.setCard(playerName, this.selectedCard);
+			this.selectedCard = null;
+		} else {
+			this.state[this.selectedPlayer].x = posX;
+			this.state[this.selectedPlayer].y = posY;
+		}
 	};
 
 	State.prototype.actionUnselected = function() {

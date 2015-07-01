@@ -27,16 +27,23 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			});
 		},
 
+		setPlayerActions: function(data) {
+			this.setState({
+				actions: data.state.getPlayerActions()
+			});
+		},
+
 		componentWillMount: function() {
-			Controller.on("load-state",			this.setActionsHidden );
-			Controller.on("player-selected",	this.setActionsShown  );
-			Controller.on("player-unselected",	this.setActionsHidden );
-			Controller.on("turn-end",			this.setActionsHidden );
+			Controller.on("load-state",			 this.setActionsHidden );
+			Controller.on("player-selected",	 this.setActionsShown  );
+			Controller.on("player-unselected",	 this.setActionsHidden );
+			Controller.on("posibility-selected", this.setPlayerActions );
+			Controller.on("turn-end",			 this.setActionsHidden );
 		},
 
 		onButtonClicked: function(actionName) {
 			var selectedAction = "";
-			if (actionName === this.state.actionName) {
+			if (actionName === this.state.selectedAction) {
 				Controller.actionUnselected();
 			} else {
 				Controller.actionSelected(actionName);

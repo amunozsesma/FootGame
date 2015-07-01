@@ -4,6 +4,8 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 	var UserAreaController = function() {
 		this.message = null;
 		this.state = null;
+
+		this.playerSelectedHandler = null;
 	};
 
 	Emitter.mixInto(UserAreaController);
@@ -53,21 +55,22 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 	};
 
 	UserAreaController.prototype.actionUnselected = function() {
-		this.state.actionUnselected(action);
+		this.state.actionUnselected();
 		this.trigger("action-unselected", {message: this.message, state: this.state});
 	};
 
 	UserAreaController.prototype.cardActioned = function(card, callback) {
 		this.state.cardSelected(card);
 
-		var playerSelectedHandler = onPlayerSelected.bind(this, callback, playerSelectedHandler);
-		this.on("posibility-selected", playerSelectedHandler);
+		this.playerSelectedHandler = onPlayerSelected.bind(this, callback);
+		this.on("posibility-selected", this.playerSelectedHandler);
 		this.trigger("card-selected", {message: this.message, state: this.state});
 	};
 
-	function onPlayerSelected(callback, handler) {
+	function onPlayerSelected(callback) {
 		callback();
-		this.off("posibility-selected", handler);
+		this.off("posibility-selected", this.playerSelectedHandler);
+		this.playerSelectedHandler = null; 
 	};
 
 	return new UserAreaController();
