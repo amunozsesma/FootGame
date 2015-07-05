@@ -22,6 +22,7 @@ define(["game/Actions"], function(Actions) {
 		Object.keys(players).forEach(function(playerName) {
 			state[playerName] = {};
 			state[playerName].action = "";
+			state[playerName].card = null;
 			state[playerName].x = null; 
 			state[playerName].y = null;
 		});
@@ -40,15 +41,13 @@ define(["game/Actions"], function(Actions) {
 	};
 	
 	State.prototype.posibilitySelected = function(posX, posY) {
-		if (this.selectedPlayer === "") {
-			return;
-		}
-
+		// Takes into consideration if a card has been selected, maybe refactor
 		if (this.selectedCard) {
 			var playerName = this.message.getPlayerIn(posX, posY);
+			this.state[playerName].card = this.selectedCard.clone();
 			this.actions.setCard(playerName, this.selectedCard);
 			this.selectedCard = null;
-		} else {
+		} else if (this.selectedPlayer !== ""){
 			this.state[this.selectedPlayer].x = posX;
 			this.state[this.selectedPlayer].y = posY;
 		}
@@ -127,6 +126,25 @@ define(["game/Actions"], function(Actions) {
 		}
 
 		return this.state[this.selectedPlayer].action;
+	};
+
+	State.prototype.getActionedCards = function() {
+		var actionedCards = [];
+		Object.keys(this.state).forEach(function(playerName) {
+			if (this.state[playerName].card) {
+				actionedCards.push(this.message.getPlayerPosition(playerName));
+			}
+		}, this);
+
+		return actionedCards;
+	};
+
+	State.prototype.isCardActioned = function() {
+		if (this.selectedPlayer === "") {
+			return "";
+		}
+
+		return (!!this.state[this.selectedPlayer].card);
 	};
 
 	return State;

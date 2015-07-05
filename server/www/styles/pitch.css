@@ -28,6 +28,10 @@
 	border: 2px solid blue;
 }
 
+#pitch-container .pitch .player.card-actioned {
+	border: 2px solid #f6ff00;
+}
+
 #pitch-container .pitch .player:hover {
 	cursor: pointer;
 }
@@ -41,6 +45,7 @@
 	background-color: #FFC4C4;
 	opacity: 0.5;
 }
+
 
 #pitch-container .pitch .action-selected {
 	background-color: #FFC4C4;

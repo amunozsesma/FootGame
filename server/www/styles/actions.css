@@ -84,3 +84,7 @@
 .action-button:hover {
 	cursor: pointer;
 }
+
+.action-button.card-actioned {
+	border-color: #f6ff00;
+}

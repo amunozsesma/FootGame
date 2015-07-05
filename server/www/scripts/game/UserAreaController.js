@@ -69,6 +69,7 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 
 	function onPlayerSelected(callback) {
 		callback();
+		this.trigger("card-actioned", {message: this.message, state: this.state});
 		this.off("posibility-selected", this.playerSelectedHandler);
 		this.playerSelectedHandler = null; 
 	};
