@@ -1,5 +1,5 @@
 #pitch-container {
-	height: 475px;
+	height: 405px;
 	width: 100%;
 	padding-top: 25px;
 }
@@ -26,10 +26,6 @@
 
 #pitch-container .pitch .player.selected {
 	border: 2px solid blue;
-}
-
-#pitch-container .pitch .player.card-actioned {
-	border: 2px solid #f6ff00;
 }
 
 #pitch-container .pitch .player:hover {

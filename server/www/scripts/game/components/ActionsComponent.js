@@ -5,10 +5,9 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		getInitialState: function() {
 			return {
 				playerName: "",
-				stats: [],
 				actions: [],
 				selectedAction: "",
-				cardActioned: false,
+				card: null,
 				isHidden: true
 			};
 		},
@@ -25,7 +24,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				playerName: data.state.getSelectedPlayer(), 
 				actions: data.state.getPlayerActions(), 
 				selectedAction: data.state.getSelectedAction(),
-				cardActioned: data.state.isCardActioned()
+				card: data.state.getCard()
 			});
 		},
 
@@ -35,9 +34,16 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			});
 		},
 
+		setCardActioned: function(data) {
+			this.setState({
+				card: data.state.getCard()
+			});
+		},
+
 		componentWillMount: function() {
 			Controller.on("load-state",			 this.setActionsHidden );
 			Controller.on("player-selected",	 this.setActionsShown  );
+			Controller.on("card-actioned",	 	 this.setCardActioned  );
 			Controller.on("player-unselected",	 this.setActionsHidden );
 			Controller.on("posibility-selected", this.setPlayerActions );
 			Controller.on("turn-end",			 this.setActionsHidden );
@@ -63,8 +69,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			return (
 				<div className={className}>
 					<Description name={this.state.playerName}/>
-					<Stats stats={this.state.stats}/>
-					<Buttons actions={this.state.actions} selected={this.state.selectedAction} cardActioned={this.state.cardActioned} clickHandler={this.onButtonClicked}/>
+					<Card card={this.state.card}/>
+					<Buttons actions={this.state.actions} selected={this.state.selectedAction} clickHandler={this.onButtonClicked}/>
 				</div>
 			);
 		}
@@ -81,21 +87,11 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		}
 	});
 
-	//This will probably be replaced by type of player and stamina
-	var Stats = React.createClass({
+	var Card = React.createClass({
 		render: function() {
-			var stats = this.props.stats.map(function(stat) {
-				return (
-					<div className="stat-container">
-						<div className="stat-name">{stat.name}</div>
-						<div className="stat-value">{stat.value}</div>
-					</div>
-				)
-			});
-
 			return (
-				<div className="player-stats-container">
-					{stats}
+				<div className="player-card-container">
+					{(this.props.card) ? <div className="card">{this.props.card.name}</div> : ""}					
 				</div>
 			);
 		}
@@ -111,7 +107,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				var clickHandler = this.onButtonClicked.bind(this, action);
 				var className = Utils.reactClassAppender({
 					"selected": this.props.selected === action,
-					"card-actioned": this.props.cardActioned && (action === "Card")
 				}, "action-button");
 				return <button className={className} onClick={clickHandler}>{action}</button>
 			}, this);

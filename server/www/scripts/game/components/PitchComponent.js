@@ -53,12 +53,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			});
 		},
 
-		setActionedCards: function(data) {
-			this.setState({
-				actionedCards: data.state.getActionedCards()
-			});
-		},
-
 		componentWillMount: function() {
 			Controller.on("load-state",			 this.setInitialState	  );
 			Controller.on("player-selected", 	 this.setShowSelections   );
@@ -67,7 +61,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			Controller.on("action-unselected", 	 this.setInitialState	  );
 			Controller.on("player-unselected",	 this.setInitialState	  );
 			Controller.on("card-selected",	 	 this.setCardPosibilities );
-			Controller.on("card-actioned",	 	 this.setActionedCards	  );
 			Controller.on("turn-end",	 		 this.setInitialState	  );
 		},
 
@@ -113,7 +106,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 							ball={!!cell.ball} 
 							actionPosibility={!!cell.actionPosibility} 
 							actionSelection={!!cell.actionSelection} 
-							actionedCards={!!cell.actionedCards}
 							cellStyle={cellStyle}
 							isSelected={!!cell.isSelected}
 							isEmptyCellClickabel={!this.state.isSelecting}/>
@@ -131,7 +123,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			this.addProperties(cellMatrix, "ball"				, [this.state.ballPosition]);
 			this.addProperties(cellMatrix, "actionPosibility"	, this.state.actionPosibilities);
 			this.addProperties(cellMatrix, "actionSelection"	, this.state.actionSelections);
-			this.addProperties(cellMatrix, "actionedCards"		, this.state.actionedCards);
 			this.addProperties(cellMatrix, "isSelected"			, [this.state.selectedCell]);
 
 			var cells = this.createCellArray(cellMatrix);
@@ -169,7 +160,6 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			var className = Utils.reactClassAppender({
 				"action-selected": this.props.actionSelection,
 				"action-posibility": this.props.actionPosibility,
-				"card-actioned": this.props.actionedCards,
 				"player": this.props.userPlayer || this.props.rivalPlayer,
 				"selected": this.props.isSelected
 			}, "cell skeleton");

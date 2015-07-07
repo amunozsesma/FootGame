@@ -41,11 +41,17 @@
     background-repeat: no-repeat;
 }
 
-.actions .player-stats-container {
+.actions .player-card-container {
 	height: 100%;
 	width: 260px;
 	float: left;
-	margin-top: 60px;
+	padding: 10px;
+}
+
+.actions .player-card-container .card{
+	cursor: default;
+	width: 80%;
+	margin-top: 10px;
 }
 
 .actions .buttons-container {
@@ -53,21 +59,6 @@
 	width: 198px;
 	float: left;
 	padding: 10px;
-}
-
-.stat-container {
-	width: 130px;
-	height: 50px;
-	float: left;
-	padding-top: 10px;
-
-	font-size: 12px;
-}
-
-.stat-container .stat-name,
-.stat-container .stat-value  {
-	float: left;
-	width: 65px;
 }
 
 .buttons-container .action-button {

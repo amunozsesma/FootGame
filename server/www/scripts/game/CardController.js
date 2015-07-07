@@ -4,10 +4,7 @@ define(["libs/Emitter", "utils/Utils", "game/Card", "game/UserAreaController"], 
 	var CardController = function() {
 		//TODO remove 
 		this.allCards = [
-			new Card("Sprint", {initialActions: 1, actionName: "Sprint", actionToEnhance: "Move"}), 
-			new Card("Drible", {initialActions: 1, actionName: "Drible", actionToEnhance: "Move"}), 
-			new Card("Fall Back", {initialActions: 2, actionName: "Sprint", actionToEnhance: "Move"}), 
-			new Card("Counter Attack", {initialActions: 2, actionName: "Sprint", actionToEnhance: "Move"})
+			new Card("Sprint", {initialActions: 2, actionName: "Sprint", actionToEnhance: "Move"}), 
 		];
 		this.turnCards = [];
 		////////////////////////////////////////////////////

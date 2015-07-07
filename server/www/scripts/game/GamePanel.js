@@ -2,11 +2,12 @@ define([
 	"react",
 	"jsx!game/components/PitchComponent", 
 	"jsx!game/components/ActionsComponent", 
+	"jsx!game/components/CardInfoComponent",
 	"jsx!game/components/InfoComponent", 
 	"jsx!game/components/CardsComponent", 
 	"game/UserAreaController",
 	"game/GameManager"], 
-function(React, PitchComponent, ActionsComponent, InfoComponent, CardsComponent, UserAreaController, GameManager) {
+function(React, PitchComponent, ActionsComponent, CardInfoComponent, InfoComponent, CardsComponent, UserAreaController, GameManager) {
 	"use strict";
 
 	function GamePanel() {
@@ -20,11 +21,12 @@ function(React, PitchComponent, ActionsComponent, InfoComponent, CardsComponent,
 	};
 
 	GamePanel.prototype.getElement = function() {
-		var infoContainer    = React.createElement("div", {id: "info-container"});
-		var pitchContainer   = React.createElement("div", {id: "pitch-container"});
-		var actionsContainer = React.createElement("div", {id: "actions-container"});
-		var userArea         = React.createElement("div", {id: "user-area"}, [infoContainer, pitchContainer, actionsContainer]);
-		var cardArea         = React.createElement("div", {id: "card-area"});
+		var infoContainer     = React.createElement("div", {id: "info-container"});
+		var pitchContainer    = React.createElement("div", {id: "pitch-container"});
+		var actionsContainer  = React.createElement("div", {id: "actions-container"});
+		var cardInfoContainer = React.createElement("div", {id: "cardinfo-container"});
+		var userArea          = React.createElement("div", {id: "user-area"}, [infoContainer, pitchContainer, cardInfoContainer, actionsContainer]);
+		var cardArea          = React.createElement("div", {id: "card-area"});
 
 		return [userArea, cardArea]; 
 	};
@@ -33,6 +35,7 @@ function(React, PitchComponent, ActionsComponent, InfoComponent, CardsComponent,
 		React.render(PitchComponent, document.getElementById("pitch-container"));
 		React.render(InfoComponent, document.getElementById("info-container"));
 		React.render(ActionsComponent, document.getElementById("actions-container"));
+		React.render(CardInfoComponent, document.getElementById("cardinfo-container"));
 		React.render(CardsComponent, document.getElementById("card-area"));
 
 		this.gameManager.start();

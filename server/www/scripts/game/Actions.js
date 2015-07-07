@@ -23,8 +23,8 @@ define(function() {
 	};
 
 	Actions.DEFAULT_ACTIONS = {
-		"attacking": ["Pass", "Shoot", "Move", "Card"],
-		"defending": ["Move", "Press", "Card"]
+		"attacking": ["Pass", "Shoot", "Move"],
+		"defending": ["Move", "Press"]
 	}
 
 	Actions.prototype.getPosibilities = function(action, playerName) {

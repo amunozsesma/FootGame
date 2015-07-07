@@ -139,12 +139,25 @@ define(["game/Actions"], function(Actions) {
 		return actionedCards;
 	};
 
-	State.prototype.isCardActioned = function() {
-		if (this.selectedPlayer === "") {
-			return "";
+	State.prototype.getCardsPlayedByPlayers = function() {
+		var cardsPlayed = [];
+
+		Object.keys(this.state).forEach(function(playerName) {
+			var card = this.state[playerName].card;
+			if (card) {
+				cardsPlayed.push({cardName: card.name, playerName: playerName});
+			}
+		}, this);
+
+		return cardsPlayed;
+	};
+
+	State.prototype.getCard = function() {
+		if (this.selectedPlayer === "" || !this.state[this.selectedPlayer]) {
+			return null;
 		}
 
-		return (!!this.state[this.selectedPlayer].card);
+		return this.state[this.selectedPlayer].card;
 	};
 
 	return State;
