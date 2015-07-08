@@ -1,13 +1,14 @@
-define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayController", "game/CardController"], function(ConnectionService, ClientData, PanelOverlay, CardController) {
+define(
+	["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayController", "game/UserAreaController", "game/CardController"], 
+	function(ConnectionService, ClientData, PanelOverlay, UserAreaController, CardController) {
 	"use strict";
 
 	var GameManager = function(userAreaController) {
-		this.userAreaController = userAreaController;
 		this.userTeams = {};
 		this.turnTimeout = null;
 		this.listenForTimeoutAdjust = false;
 		
-		this.userAreaController.on("turn-end", this.onTurnEndedByUser, this);
+		UserAreaController.on("turn-end", this.onTurnEndedByUser, this);
 
 		this.callbacks = {
 			startTurn: startTurn.bind(this),
@@ -48,7 +49,7 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 		this.state = state;
 
 		//TODO show rendering in the user area controller for when we have graphics
-		this.userAreaController.setInputState(this.state);
+		UserAreaController.setInputState(this.state);
 		ConnectionService.send("user-ready");
 		CardController.newTurn();
 		
@@ -59,14 +60,14 @@ define(["services/ConnectionService", "utils/ClientData", "panel/PanelOverlayCon
 	};
 
 	function endTurn() {
-		var outputState = this.userAreaController.getOutputState();
+		var outputState = UserAreaController.getOutputState();
 		this.listenForTimeoutAdjust = false;
 		ConnectionService.send("turn-end", outputState);
 	};
 
 	function adjustTimeout(timeout) {
 		if (this.listenForTimeoutAdjust) {
-			this.userAreaController.adjustTimeout(timeout);
+			UserAreaController.adjustTimeout(timeout);
 		}
 
 	};

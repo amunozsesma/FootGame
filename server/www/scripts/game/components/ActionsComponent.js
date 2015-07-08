@@ -34,7 +34,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			});
 		},
 
-		setCardActioned: function(data) {
+		setCard: function(data) {
 			this.setState({
 				card: data.state.getCard()
 			});
@@ -43,7 +43,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		componentWillMount: function() {
 			Controller.on("load-state",			 this.setActionsHidden );
 			Controller.on("player-selected",	 this.setActionsShown  );
-			Controller.on("card-actioned",	 	 this.setCardActioned  );
+			Controller.on("card-actioned",	 	 this.setCard  		   );
+			Controller.on("card-deselected",	 this.setCard  		   );
 			Controller.on("player-unselected",	 this.setActionsHidden );
 			Controller.on("posibility-selected", this.setPlayerActions );
 			Controller.on("turn-end",			 this.setActionsHidden );
@@ -52,7 +53,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		onButtonClicked: function(actionName) {
 			var selectedAction = "";
 			if (actionName === this.state.selectedAction) {
-				Controller.actionUnselected();
+				Controller.actionDeselected();
 			} else {
 				Controller.actionSelected(actionName);
 				selectedAction = actionName;

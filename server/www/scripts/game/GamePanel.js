@@ -5,13 +5,12 @@ define([
 	"jsx!game/components/CardInfoComponent",
 	"jsx!game/components/InfoComponent", 
 	"jsx!game/components/CardsComponent", 
-	"game/UserAreaController",
 	"game/GameManager"], 
-function(React, PitchComponent, ActionsComponent, CardInfoComponent, InfoComponent, CardsComponent, UserAreaController, GameManager) {
+function(React, PitchComponent, ActionsComponent, CardInfoComponent, InfoComponent, CardsComponent, GameManager) {
 	"use strict";
 
 	function GamePanel() {
-		this.gameManager = new GameManager(UserAreaController);
+		this.gameManager = new GameManager();
 
 		this.keyPressHandler = function(event) {
 			if (event.keyCode === 13) {

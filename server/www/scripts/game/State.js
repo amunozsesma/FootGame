@@ -36,7 +36,7 @@ define(["game/Actions"], function(Actions) {
 		this.selectedPlayer = this.message.getPlayerIn(posX, posY);
 	};
 
-	State.prototype.playerUnselected = function() {
+	State.prototype.playerDeselected = function() {
 		this.selectedPlayer = "";
 	};
 	
@@ -53,7 +53,7 @@ define(["game/Actions"], function(Actions) {
 		}
 	};
 
-	State.prototype.actionUnselected = function() {
+	State.prototype.actionDeselected = function() {
 		if (this.selectedPlayer === "") {
 			return;
 		}
@@ -75,6 +75,15 @@ define(["game/Actions"], function(Actions) {
 		this.selectedCard = card;
 	};
 
+	State.prototype.cardDeselected = function(card) {
+		this.selectedCard = null;
+		Object.keys(this.state).forEach(function(playerName) {
+			if (this.state[playerName].card && card.equals(this.state[playerName].card)) {
+				this.state[playerName].card = null;
+			}
+		}, this);
+	};
+	
 	/** State getters */
 	
 	State.prototype.getSelectedPlayer = function() {
@@ -145,7 +154,7 @@ define(["game/Actions"], function(Actions) {
 		Object.keys(this.state).forEach(function(playerName) {
 			var card = this.state[playerName].card;
 			if (card) {
-				cardsPlayed.push({cardName: card.name, playerName: playerName});
+				cardsPlayed.push({card: card, playerName: playerName});
 			}
 		}, this);
 

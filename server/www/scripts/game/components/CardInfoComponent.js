@@ -14,23 +14,24 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			});
 		},
 
-		setCardPlayed: function(data) {
+		setCards: function(data) {
 			this.setState({
 				cardsPlayed: data.state.getCardsPlayedByPlayers()	
 			});	
 		},
 
 		componentWillMount: function() {
-			Controller.on("load-state",		this.setInitialState);
-			Controller.on("card-actioned",	this.setCardPlayed	);
+			Controller.on("load-state",		 this.setInitialState);
+			Controller.on("card-actioned",	 this.setCards		 );
+			Controller.on("card-deselected", this.setCards		 );
 		},
 
 		render: function() {
 			var cardsPlayed = this.state.cardsPlayed.map(function(cardPlayed) {
 				return (
-					<div className="card-playerd-container skeleton">{cardPlayed.playerName + " - " + cardPlayed.cardName}</div>
+					<div className="card-playerd-container skeleton" >{cardPlayed.playerName + " - " + cardPlayed.card.name}</div>
 				);
-			});
+			}, this);
 
 			return (
 				<div>

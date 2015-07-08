@@ -50,7 +50,7 @@ define(["libs/Emitter", "utils/Utils", "game/Card", "game/UserAreaController"], 
 		var card = this.actionedCards.splice(actionedCardIndex, 1)[0];
 		card.actionsLeft = findCard(card, this.turnCards).actionsLeft;
 
-		//UserAreaController.cardActionDeselected(card);
+		UserAreaController.cardDeselected(card);
 
 		this.revealedCards = this.revealedCards.concat(card);
 

@@ -40,7 +40,7 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 	};
 
 	UserAreaController.prototype.emptyCellClicked = function() {
-		this.state.playerUnselected();
+		this.state.playerDeselected();
 		this.trigger("player-unselected", {message: this.message, state: this.state});
 	};
 
@@ -54,9 +54,14 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 		this.trigger("action-selected", {message: this.message, state: this.state});
 	};
 
-	UserAreaController.prototype.actionUnselected = function() {
-		this.state.actionUnselected();
+	UserAreaController.prototype.actionDeselected = function() {
+		this.state.actionDeselected();
 		this.trigger("action-unselected", {message: this.message, state: this.state});
+	};
+
+	UserAreaController.prototype.cardDeselected = function(card) {
+		this.state.cardDeselected(card);
+		this.trigger("card-deselected", {message: this.message, state: this.state});
 	};
 
 	UserAreaController.prototype.cardActioned = function(card, callback) {
