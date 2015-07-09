@@ -6,6 +6,7 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 		this.state = null;
 
 		this.playerSelectedHandler = null;
+		this.isCardActioned = false;
 	};
 
 	Emitter.mixInto(UserAreaController);
@@ -35,13 +36,16 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 	};
 
 	UserAreaController.prototype.posibilityClicked = function(posX, posY) {
-		this.state.posibilitySelected(posX, posY);
-		this.trigger("posibility-selected", {message: this.message, state: this.state});
+		if (this.state.posibilitySelected(posX, posY)) {
+			this.trigger("posibility-selected", {message: this.message, state: this.state});
+		}
 	};
 
 	UserAreaController.prototype.emptyCellClicked = function() {
-		this.state.playerDeselected();
-		this.trigger("player-unselected", {message: this.message, state: this.state});
+		if (!this.isCardActioned) {
+			this.state.playerDeselected();
+			this.trigger("player-unselected", {message: this.message, state: this.state});
+		} 
 	};
 
 	UserAreaController.prototype.playerClicked = function(posX, posY) {
@@ -62,21 +66,28 @@ define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], funct
 	UserAreaController.prototype.cardDeselected = function(card) {
 		this.state.cardDeselected(card);
 		this.trigger("card-deselected", {message: this.message, state: this.state});
+
+		if (this.playerSelectedHandler) {
+			this.off("posibility-selected", this.playerSelectedHandler);
+			this.playerSelectedHandler = null;	
+		}
 	};
 
 	UserAreaController.prototype.cardActioned = function(card, callback) {
-		this.state.cardSelected(card);
-
-		this.playerSelectedHandler = onPlayerSelected.bind(this, callback);
-		this.on("posibility-selected", this.playerSelectedHandler);
-		this.trigger("card-selected", {message: this.message, state: this.state});
+		if (this.state.cardSelected(card)) {
+			this.isCardActioned = true;
+			this.playerSelectedHandler = onPlayerSelected.bind(this, callback);
+			this.on("posibility-selected", this.playerSelectedHandler);
+			this.trigger("card-selected", {message: this.message, state: this.state});
+		}
 	};
 
 	function onPlayerSelected(callback) {
 		callback();
 		this.trigger("card-actioned", {message: this.message, state: this.state});
 		this.off("posibility-selected", this.playerSelectedHandler);
-		this.playerSelectedHandler = null; 
+		this.playerSelectedHandler = null;
+		this.isCardActioned = false;
 	};
 
 	return new UserAreaController();

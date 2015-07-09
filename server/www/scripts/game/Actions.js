@@ -38,13 +38,31 @@ define(function() {
 		return this.actions[playerName];
 	};
 
+	/** @returns true if card was set, false if it was not */
 	Actions.prototype.setCard = function(playerName, card) {
+		if (this.playerCards[playerName]) {
+			return false;
+		}
+
 		this.playerCards[playerName] = card;
 		var actionToEnhance = card.getActionToEnhance();
 		var cardAction = card.getActionName();
 		var actionIndex = this.actions[playerName].indexOf(actionToEnhance);
 
 		this.actions[playerName].splice(actionIndex, 1, cardAction);
+		return true;
+	};
+
+	Actions.prototype.deselectCard = function(playerName, card) {
+		this.playerCards[playerName] = null;
+		var actionToEnhance = card.getActionToEnhance();
+		var cardAction = card.getActionName();
+
+		var actionIndex = this.actions[playerName].indexOf(cardAction);
+		this.actions[playerName].splice(actionIndex, 1, actionToEnhance);
+	};
+
+	Actions.prototype.removeCard = function(playerName) {
 	};
 
 	function playerPositions(players, playerName) {

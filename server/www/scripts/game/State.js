@@ -40,17 +40,25 @@ define(["game/Actions"], function(Actions) {
 		this.selectedPlayer = "";
 	};
 	
+	/** @return true if possibility was succesfully selected */
 	State.prototype.posibilitySelected = function(posX, posY) {
+		var isPosibilitySelected = true;
+
 		// Takes into consideration if a card has been selected, maybe refactor
 		if (this.selectedCard) {
 			var playerName = this.message.getPlayerIn(posX, posY);
-			this.state[playerName].card = this.selectedCard.clone();
-			this.actions.setCard(playerName, this.selectedCard);
-			this.selectedCard = null;
+			if (this.actions.setCard(playerName, this.selectedCard)) {
+				this.state[playerName].card = this.selectedCard.clone();
+				this.selectedCard = null;
+			} else {
+				isPosibilitySelected = false;				
+			}
 		} else if (this.selectedPlayer !== ""){
 			this.state[this.selectedPlayer].x = posX;
 			this.state[this.selectedPlayer].y = posY;
 		}
+
+		return isPosibilitySelected;
 	};
 
 	State.prototype.actionDeselected = function() {
@@ -71,8 +79,16 @@ define(["game/Actions"], function(Actions) {
 		this.state[this.selectedPlayer].action = action;
 	};
 
+	/** @return true if new card has been selected (this is, if there was no card previously selected) */
 	State.prototype.cardSelected = function(card) {
-		this.selectedCard = card;
+		var isCardSelected = false;
+
+		if (!this.selectedCard) {
+			this.selectedCard = card;
+			isCardSelected = true;
+		}
+
+		return isCardSelected;
 	};
 
 	State.prototype.cardDeselected = function(card) {
@@ -80,6 +96,7 @@ define(["game/Actions"], function(Actions) {
 		Object.keys(this.state).forEach(function(playerName) {
 			if (this.state[playerName].card && card.equals(this.state[playerName].card)) {
 				this.state[playerName].card = null;
+				this.actions.deselectCard(playerName, card);
 			}
 		}, this);
 	};
