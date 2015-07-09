@@ -92,7 +92,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		render: function() {
 			return (
 				<div className="player-card-container">
-					{(this.props.card) ? <div className="card">{this.props.card.name}</div> : ""}					
+					{(this.props.card) ? <div className="card"><div className="title">{this.props.card.name}</div><div className="description">{this.props.card.description}</div></div> : ""}					
 				</div>
 			);
 		}

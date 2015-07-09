@@ -82,7 +82,11 @@ define(["react", "game/CardController", "utils/Utils"], function (React, CardCon
 						{this.props.cards.map(function(card, index) {
 							var clickHandler = this.onClick.bind(this, index);
 							var mouseOverHandler = this.onMouseOver.bind(this, card);
-							return <div key={"revealed_" + card.name} ref={card.name} className="card" onClick={clickHandler} onMouseOver={mouseOverHandler} onMouseLeave={this.onMouseLeave}>{card.name}</div>	
+							return (
+								<div key={"revealed_" + card.name} ref={card.name} className="card" onClick={clickHandler} onMouseOver={mouseOverHandler} onMouseLeave={this.onMouseLeave}>
+									<div className="title">{card.name}</div>
+								</div>
+							);	
 						}, this)}
 					</ReactCSSTransitionGroup>
 					{this.state.zoomedCardData && <ZoomedCard data={this.state.zoomedCardData} position={this.state.zoomedCardPosition} onMouseLeave={this.onMouseLeave}></ZoomedCard>}
@@ -130,7 +134,10 @@ define(["react", "game/CardController", "utils/Utils"], function (React, CardCon
 	var ZoomedCard = React.createClass({
 		render: function() {
 			return (
-				<div className="card zoomed" onMouseLeave={this.props.onMouseLeave}>{this.props.data.name}</div>
+				<div className="card zoomed" onMouseLeave={this.props.onMouseLeave}>
+					<div className="title">{this.props.data.name}</div>
+					<div className="description">{this.props.data.description}</div>
+				</div>
 			);
 		}
 	});

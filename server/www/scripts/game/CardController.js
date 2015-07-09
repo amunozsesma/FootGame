@@ -4,7 +4,16 @@ define(["libs/Emitter", "utils/Utils", "game/Card", "game/UserAreaController"], 
 	var CardController = function() {
 		//TODO remove 
 		this.allCards = [
-			new Card("Sprint", {initialActions: 2, actionName: "Sprint", actionToEnhance: "Move"}), 
+			new Card("Sprint", {
+				initialActions: 2, 
+				actionName: "Sprint", 
+				actionToEnhance: "Move", 
+				description: "Use this card to move 3 cells.",
+				attributes: {
+					moveDistance: 3,
+					shootDistance: 0
+				}
+			}), 
 		];
 		this.turnCards = [];
 		////////////////////////////////////////////////////
