@@ -27,6 +27,5 @@ define(function() {
 		return result.trim();
 	};
 
-
 	return Utils;
 }); 

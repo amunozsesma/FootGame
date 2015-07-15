@@ -9,10 +9,8 @@ define(["libs/Emitter", "utils/Utils", "game/Card", "game/UserAreaController"], 
 				actionName: "Sprint", 
 				actionToEnhance: "Move", 
 				description: "Use this card to move 3 cells.",
-				attributes: {
-					moveDistance: 3,
-					shootDistance: 0
-				}
+				resolutionStrategy: "adyacent",
+				resolutionParams: 2
 			}), 
 		];
 		this.turnCards = [];

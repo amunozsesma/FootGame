@@ -33,7 +33,7 @@
 }
 
 #pitch-container .pitch .cell.action-posibility {
-	border: 2px solid red;
+	border: 2px solid #FF3333;
 	cursor: pointer;
 }
 

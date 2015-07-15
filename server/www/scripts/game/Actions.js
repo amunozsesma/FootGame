@@ -9,16 +9,23 @@ define(function() {
 
 		this.playerCards = {};
 		
-		this.basicActions = {
-			"Pass": playerPositions.bind(this, this.userPlayers),
-			"Press": playerPositions.bind(this, this.rivalPlayers),
-			"Move": adyacentPosition.bind(this),
-			"Shoot": function() {return [];}
+		this.poibilityResolutionStrategies = {
+			adyacent: adyacentPosition.bind(this),
+			ownPlayers: playerPositions.bind(this, this.userPlayers),
+			rivalPlayers: playerPositions.bind(this, this.rivalPlayers),
+			none: noPosibilities
 		}
 
-		this.actions = {};
+		this.actions = {
+			Pass: {resolutionStrategy: "ownPlayers", resolutionParams: null},
+			Press: {resolutionStrategy: "rivalPlayers", resolutionParams: null},
+			Move: {resolutionStrategy: "adyacent", resolutionParams: 1},
+			Shoot: {resolutionStrategy: "none", resolutionParams: null}
+		}
+
+		this.playerActions = {};
 		Object.keys(this.userPlayers).forEach(function(playerName) {
-			this.actions[playerName] = Actions.DEFAULT_ACTIONS[this.side].slice();
+			this.playerActions[playerName] = Actions.DEFAULT_ACTIONS[this.side].slice();
 		}, this);
 	};
 
@@ -28,14 +35,12 @@ define(function() {
 	}
 
 	Actions.prototype.getPosibilities = function(action, playerName) {
-		var playableAction = (this.playerCards[playerName]) ? this.playerCards[playerName].getActionToEnhance() : action;
-		//TODO get enhanced parameters
-
-		return this.basicActions[playableAction](playerName);
+		var source = (this.playerCards[playerName]) ? this.playerCards[playerName] : this.actions[action];
+		return this.poibilityResolutionStrategies[source.resolutionStrategy](playerName, source.resolutionParams);
 	};
 
 	Actions.prototype.getActions = function(playerName) {
-		return this.actions[playerName];
+		return this.playerActions[playerName];
 	};
 
 	/** @returns true if card was set, false if it was not */
@@ -45,21 +50,21 @@ define(function() {
 		}
 
 		this.playerCards[playerName] = card;
-		var actionToEnhance = card.getActionToEnhance();
-		var cardAction = card.getActionName();
-		var actionIndex = this.actions[playerName].indexOf(actionToEnhance);
+		var actionToEnhance = card.actionToEnhance;
+		var cardAction = card.actionName;
+		var actionIndex = this.playerActions[playerName].indexOf(actionToEnhance);
 
-		this.actions[playerName].splice(actionIndex, 1, cardAction);
+		this.playerActions[playerName].splice(actionIndex, 1, cardAction);
 		return true;
 	};
 
 	Actions.prototype.deselectCard = function(playerName, card) {
 		this.playerCards[playerName] = null;
-		var actionToEnhance = card.getActionToEnhance();
-		var cardAction = card.getActionName();
+		var actionToEnhance = card.actionToEnhance;
+		var cardAction = card.actionName;
 
-		var actionIndex = this.actions[playerName].indexOf(cardAction);
-		this.actions[playerName].splice(actionIndex, 1, actionToEnhance);
+		var actionIndex = this.playerActions[playerName].indexOf(cardAction);
+		this.playerActions[playerName].splice(actionIndex, 1, actionToEnhance);
 	};
 
 	Actions.prototype.removeCard = function(playerName) {
@@ -83,21 +88,45 @@ define(function() {
 		var playerPosition = this.userPlayers[playerName].position;
 		var posX, posY;
 
-		for (var i = -distance; i <= distance ; i++) {
-			posX = playerPosition.x + i;
-			if (i !== 0 && posX < this.dimensions.columns && posX >= 0) {
-				posibilities.push({"x": posX, "y": playerPosition.y}); 
+		posibilities.push(playerPosition);
+		for (var i = 0; i < distance; i++) {
+			for (var j = 0, len = posibilities.length; j < len; j++) {
+				adyacentFromPosition.call(this, posibilities[j], posibilities);
 			}
-		}
-		for (var j = -distance; j <= distance; j++) {
-			posY = playerPosition.y + j;
-			if (j !== 0 && posY < this.dimensions.rows && posY >= 0) {
-				posibilities.push({"x": playerPosition.x, "y": posY}); 
-			}
-		}
+		} 
+		posibilities.splice(0, 1);
 
 		return posibilities;
+	};
 
+	function adyacentFromPosition(position, selected) {
+		insertIfPossible.call(this, {x: position.x + 1, y: position.y}, selected);
+		insertIfPossible.call(this, {x: position.x - 1, y: position.y}, selected);
+		insertIfPossible.call(this, {x: position.x, y: position.y + 1}, selected);
+		insertIfPossible.call(this, {x: position.x, y: position.y - 1}, selected);
+	};
+
+	function insertIfPossible(position, selected) {
+		if (position.x < this.dimensions.columns && position.x >= 0 && 
+			position.y < this.dimensions.rows && position.y >= 0 && 
+			!within(position, selected) ) {
+			selected.push(position);
+		}
+	};
+
+	function within(position, selected) {
+		var result = false;
+		for (var i = 0, len = selected.length; i < len; i++) {
+			if(position.x === selected[i].x && position.y === selected[i].y) {
+				result = true;
+				break;
+			}
+		}
+		return result;
+	}
+
+	function noPosibilities() {
+		return [];
 	};
 
 	return Actions;
