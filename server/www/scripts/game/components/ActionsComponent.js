@@ -8,7 +8,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				actions: [],
 				selectedAction: "",
 				card: null,
-				isHidden: true
+				isHidden: true,
+				actionsDisabled: false
 			};
 		},
 
@@ -24,7 +25,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				playerName: data.state.getSelectedPlayer(), 
 				actions: data.state.getPlayerActions(), 
 				selectedAction: data.state.getSelectedAction(),
-				card: data.state.getCard()
+				card: data.state.getCard(),
+				actionsDisabled: false
 			});
 		},
 
@@ -36,18 +38,26 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 
 		setCard: function(data) {
 			this.setState({
-				card: data.state.getCard()
+				card: data.state.getCard(),
+				actionsDisabled: false
 			});
 		},
 
+		setActionsDisabled: function() {
+			this.setState({
+				actionsDisabled: true
+			});	
+		},
+
 		componentWillMount: function() {
-			Controller.on("load-state",			 this.setActionsHidden );
-			Controller.on("player-selected",	 this.setActionsShown  );
-			Controller.on("card-actioned",	 	 this.setCard  		   );
-			Controller.on("card-deselected",	 this.setCard  		   );
-			Controller.on("player-unselected",	 this.setActionsHidden );
-			Controller.on("posibility-selected", this.setPlayerActions );
-			Controller.on("turn-end",			 this.setActionsHidden );
+			Controller.on("load-state",			 this.setActionsHidden   );
+			Controller.on("player-selected",	 this.setActionsShown    );
+			Controller.on("card-selected",	 	 this.setActionsDisabled );
+			Controller.on("card-actioned",	 	 this.setCard  		     );
+			Controller.on("card-deselected",	 this.setCard  		     );
+			Controller.on("player-unselected",	 this.setActionsHidden   );
+			Controller.on("posibility-selected", this.setPlayerActions   );
+			Controller.on("turn-end",			 this.setActionsHidden   );
 		},
 
 		onButtonClicked: function(actionName) {
@@ -71,7 +81,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				<div className={className}>
 					<Description name={this.state.playerName}/>
 					<Card card={this.state.card}/>
-					<Buttons actions={this.state.actions} selected={this.state.selectedAction} clickHandler={this.onButtonClicked}/>
+					<Buttons actions={this.state.actions} selected={this.state.selectedAction} disabled={this.state.actionsDisabled} clickHandler={this.onButtonClicked}/>
 				</div>
 			);
 		}
@@ -100,7 +110,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 
 	var Buttons = React.createClass({
 		onButtonClicked: function(action) {
-			this.props.clickHandler(action);
+			!this.props.disabled && this.props.clickHandler(action);
 		},
 
 		render: function() {
@@ -108,6 +118,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 				var clickHandler = this.onButtonClicked.bind(this, action);
 				var className = Utils.reactClassAppender({
 					"selected": this.props.selected === action,
+					"disabled": this.props.disabled
 				}, "action-button");
 				return <button className={className} onClick={clickHandler}>{action}</button>
 			}, this);

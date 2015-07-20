@@ -53,6 +53,10 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			});
 		},
 
+		// setActionPosibilitiesUnselected: function() {
+
+		// },
+
 		componentWillMount: function() {
 			Controller.on("load-state",			 this.setInitialState	  );
 			Controller.on("player-selected", 	 this.setShowSelections   );
@@ -61,6 +65,8 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 			Controller.on("action-unselected", 	 this.setInitialState	  );
 			Controller.on("player-unselected",	 this.setInitialState	  );
 			Controller.on("card-selected",	 	 this.setCardPosibilities );
+			Controller.on("card-actioned",	 	 this.setShowSelections   );
+			Controller.on("card-deselected", 	 this.setShowSelections	  );
 			Controller.on("turn-end",	 		 this.setInitialState	  );
 		},
 
@@ -82,6 +88,7 @@ define(["react", "utils/Utils", "game/UserAreaController"], function (React, Uti
 		addProperties: function(cellMatrix, propertyName, positions) {
 			if (positions && positions[0]) {
 				positions.forEach(function(position) {
+					
 					cellMatrix[position.x][position.y][propertyName] = true;
 				});
 			}
