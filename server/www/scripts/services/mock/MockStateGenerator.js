@@ -1,4 +1,4 @@
-define(["game/StateHelper"], function(StateHelper){
+define(["game/State"], function(StateHelper){
 	"use strict";
 
 	var MockStateGenerator = function(previousState, finalState) {
@@ -11,6 +11,8 @@ define(["game/StateHelper"], function(StateHelper){
 		};
 
 
+		this.side = 0;
+		this.sides = ["defending", "attacking"]; 
 		this.outputState = {};
 	};
 
@@ -28,100 +30,52 @@ define(["game/StateHelper"], function(StateHelper){
 
 	};
 
-	MockStateGenerator.getInitialState = function() {
-		// game: {
-	// 	ball: {
-	// 		position: {x:, y:}
-	// 	},
-	// 	config: {
-	// 		numColumns:, numPlayers:, numRows:
-	// 	},
-	// 	users: [
-	// 		{
-	// 			id:,
-	// 			team: {
-	// 				players:[
-	// 					{
-	// 						name:,
-	// 						position: {
-	// 							x: , y:
-	// 						},
-	// 						stats: {
-	// 							attack:, defence:, speed:, strength:
-	// 						}
-	// 					},
-	// 					...
-	// 				]
-	// 			},
-	//			side:,
-	// 		},
-	// 		...
-	// 	]
-	// }
+	MockStateGenerator.prototype.getInitialState = function(userName, teamName, id) {
+		var userSide = this.sides[this.side];
+		var rivalSide = this.sides[Math.abs(this.side - 1)];
 
-
-	var mockMessage = {
-			"config": {
-				"players":3,
-				"rows":5,
-				"columns": 10,
-				"user":"alvarito",
-				"userTeam": "A.D. Twerkin",
-				"rivalTeam": "Culo Gordo F.C.",
-				"teams": {
-					"A.D. Twerkin": {
-						"TwerkinPlayer1": {
-							"stats": {"ATTACK": 2, "DEFENCE": 3, "PASS": 3, "STRENGTH": 5},
-							"img":"images/twerking1.jpg"
+		var mockMessage = {
+			"game": {
+				"config": {"numPlayers":3,"numRows":5,"numColumns":10,"overallTimeout":30000},
+				"ball": {"x":9,"y":4},
+				"score":{"User":0,"Rival":0},
+				"users":
+				[
+					{
+						"id":id,
+						"name":userName,
+						"team":
+						{
+							"name":teamName,
+							"players":[
+								{"name": userName + "_Player_0","position":{"x":2,"y":0},"stats":{"attack":5,"defense":5,"speed":5,"strength":5}},
+								{"name": userName + "_Player_1","position":{"x":2,"y":2},"stats":{"attack":5,"defense":5,"speed":5,"strength":5}},
+								{"name": userName + "_Player_2","position":{"x":2,"y":4},"stats":{"attack":5,"defense":5,"speed":5,"strength":5}}
+							]
 						},
-						"TwerkinPlayer2": {
-							"stats": {"ATTACK": 4, "DEFENCE": 1, "PASS": 5, "STRENGTH": 2}, 
-							"img":"images/twerking2.jpg"
-						},
-						"TwerkinPlayer3": {
-							"stats": {"ATTACK": 7, "DEFENCE": 1, "PASS": 9, "STRENGTH": 7}, 
-							"img":"images/twerking3.jpg"
-						}
+						"teamName":teamName,
+						"side": userSide
 					},
-					"Culo Gordo F.C.": {
-						"CuloGordoPlayer1": {
-							"stats": {"ATTACK": 3, "DEFENCE": 3, "PASS": 2, "STRENGTH": 8},
-							"img":"images/culogordo1.jpg"
+					{
+						"id":"B4YdveSrS3hk2BANAAAA",
+						"name":"Mock User",
+						"team":
+						{
+							"name":"Mock Rival",
+							"players":[
+								{"name":"pp_Player_0","position":{"x":7,"y":0},"stats":{"attack":5,"defense":5,"speed":5,"strength":5}},
+								{"name":"pp_Player_1","position":{"x":7,"y":2},"stats":{"attack":5,"defense":5,"speed":5,"strength":5}},
+								{"name":"pp_Player_2","position":{"x":7,"y":4},"stats":{"attack":5,"defense":5,"speed":5,"strength":5}}
+							]
 						},
-						"CuloGordoPlayer2": {
-							"stats": {"ATTACK": 2, "DEFENCE": 8, "PASS": 3, "STRENGTH": 4},
-							"img":"images/culogordo2.jpg"
-						},
-						"CuloGordoPlayer3": {
-							"stats": {"ATTACK": 7, "DEFENCE": 7, "PASS": 5, "STRENGTH": 9},
-							"img":"images/culogordo3.jpg"
-						}
+						"teamName":"Mock Rival",
+						"side": rivalSide
 					}
-				},
-				"actions": {
-					"attacking": ["Move", "Pass", "Shoot", "Card"],
-					"defending": ["Move", "Press", "Card"]
-				},
-				"overallTimeout":30000
-			},
-			"state": {
-				"players": {
-					"TwerkinPlayer1": {"x":3, "y":0, "action":""},
-					"TwerkinPlayer2": {"x":3, "y":2, "action":""},
-					"TwerkinPlayer3": {"x":3, "y":4, "action":""},
-					"CuloGordoPlayer1": {"x":4, "y":0, "action":""},
-					"CuloGordoPlayer2": {"x":4, "y":2, "action":""},
-					"CuloGordoPlayer3": {"x":4, "y":4, "action":""}
-				},
-				"side":"attacking",
-				"ball": {"x":3,"y":2},
-				"scores": {
-					"A.D. Twerkin": 0,
-					"Culo Gordo F.C.": 1
-				}
+				]
 			}
 		}
 
+		this.side = Math.abs(this.side - 1);
 		return mockMessage;
 	};
 

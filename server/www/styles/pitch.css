@@ -1,0 +1,84 @@
+#pitch-container {
+	height: 405px;
+	width: 100%;
+	padding-top: 25px;
+}
+
+#pitch-container .pitch {
+	right: 0;
+	left: 0;
+	margin: auto auto; 
+	height: 380px;
+	width: 650px;
+
+	background-image: url('/images/football_field.png');
+	background-size: 100% 100%;
+}
+
+#pitch-container .pitch .cell{
+	float: left;
+}
+
+#pitch-container .pitch .player {
+	cursor: default;
+	border: 1px solid #9C9C9C;
+}
+
+#pitch-container .pitch .player.selected {
+	border: 2px solid blue;
+}
+
+#pitch-container .pitch .player:hover {
+	cursor: pointer;
+}
+
+#pitch-container .pitch .cell.action-posibility {
+	border: 2px solid #FF3333;
+	cursor: pointer;
+}
+
+#pitch-container .pitch .cell.action-posibility:hover {
+	background-color: #FFC4C4;
+	opacity: 0.5;
+}
+
+
+#pitch-container .pitch .action-selected {
+	background-color: #FFC4C4;
+	opacity: 0.5;
+}
+
+.pitch .ball {
+	position: relative;
+	width: 20px;
+	height: 20px;
+	margin: 0 auto;
+
+	background-image: url('/images/soccer_ball.png');
+	background-size: 100% 100%;
+}
+
+.player {
+	cursor: pointer;
+}
+
+.player:hover {
+	border: 2px solid blue;
+}
+
+/*Get rid of mine and do it pero color*/
+.pitch .player .mine {
+	width: 100%;
+	margin: 5px auto;
+	font-size: 33px !important;
+	text-align: center;
+	color: #855400;
+}
+
+.pitch .player .rival {
+	width: 100%;
+	margin: 5px auto;
+	font-size: 33px !important;
+	text-align: center;
+	color: #00A186;
+}

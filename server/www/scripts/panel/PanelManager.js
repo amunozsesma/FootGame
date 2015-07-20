@@ -1,4 +1,4 @@
-define(["config"], function(config) {
+define(["react", "config"], function(React, config) {
 	function PanelManager(panelContainer) {
 		this.loadedPanels = {};
 		this.panelElements = {};

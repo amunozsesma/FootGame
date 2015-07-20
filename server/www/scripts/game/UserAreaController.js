@@ -1,161 +1,94 @@
-define(["libs/Emitter", "game/StateHelper", "utils/ClientData"], function(Emitter, StateHelper, ClientData) {
+define(["libs/Emitter", "game/State", "utils/ClientData", "game/Message"], function(Emitter, State, ClientData, Message) {
 	"use strict";
 
-	//TODO REFACTOR, invert control -> create cell array: cell[x][y] = {hasPlayer, hasBall, isPlayerSelected, isPosibility, isSelectedPosibility},
-	// Proper pitch model
-
 	var UserAreaController = function() {
-		this.stateHelper = null;
+		this.message = null;
+		this.state = null;
 
-		this.selectedPlayer = "";
-		this.isPlayerInSelectActionState = false;
-
-		this.seletecActions = {};
-		this.cellChosen = {};
+		this.playerSelectedHandler = null;
+		this.isCardActioned = false;
 	};
 
 	Emitter.mixInto(UserAreaController);
 
-	UserAreaController.prototype.loadState = function(message, isInitial) {
-		this.selectedPlayer = "";
-		this.isPlayerInSelectActionState = false;
-		this.seletecActions = {};
-		this.cellChosen = {};
 
-		this.stateHelper = new StateHelper(message, ClientData.get("userId"));
-		if (!isInitial) {
-			console.log("-- Initial turn");
-			//TODO RESOLVE -> graphics and shit / maybe set resolve mode and then set state
-		}
-
-		this.trigger("player-unselected", this);
-		this.trigger("load-state", this);
+	// State Modification API
+	UserAreaController.prototype.setInputState = function(message) {
+		this.message = new Message(message, ClientData.get("userId"));
+		this.state = new State(this.message);
+		
+		this.trigger("load-state", this.state);
 	};
 
+	//TODO extract to different class or create timer class inside here
 	UserAreaController.prototype.adjustTimeout = function(timeout) {
-		this.trigger("timeout-adjustment", {"timeout":timeout, "overallTimeout":this.stateHelper.getOverallTimeout()});
+		this.trigger("timeout-adjustment", {"timeout":timeout, "overallTimeout":this.message.getOverallTimeout()});
 	}
 
-	UserAreaController.prototype.onTimeoutExpired = function() {
-		this.trigger("turn-end");
+	UserAreaController.prototype.getOutputState = function() {
+		return this.state.getOutput();
+	};
+	
+	// Components API
+
+	UserAreaController.prototype.endTurn = function() {
+		this.trigger("turn-end", this.state);
 	};
 
-	UserAreaController.prototype.onUserClickedTurnEnd = function() {
-		this.trigger("turn-end");
-	};
-
-	UserAreaController.prototype.getTurnEndResult = function() {
-		var outputState = this.stateHelper.generateOutputState(this.seletecActions, this.cellChosen);
-		return outputState;
-	};
-
-	UserAreaController.prototype.cellClicked = function(x, y) {
-		if (this.isPlayerInSelectActionState) {
-			setChosenCell.call(this, x, y);
-		} else {
-			this.trigger("player-unselected", this);
-			this.selectedPlayer = this.stateHelper.getPlayerIn(x, y);
-			if (this.selectedPlayer) {
-				this.trigger("player-selected", this);
-			}
+	UserAreaController.prototype.posibilityClicked = function(posX, posY) {
+		if (this.state.posibilitySelected(posX, posY)) {
+			this.trigger("posibility-selected", {message: this.message, state: this.state});
 		}
 	};
 
-	UserAreaController.prototype.actionClicked = function(action) {
-		this.seletecActions[this.selectedPlayer] = action;
-
-		if (action !== "" && action !== "Card" && action !== "Shoot") {
-			this.isPlayerInSelectActionState = true;
-			this.trigger("action-clicked", this);
-		} else {
-			delete this.cellChosen[this.selectedPlayer];
-			this.isPlayerInSelectActionState = false;
-		}
-		this.trigger("action-state-changed", this);
+	UserAreaController.prototype.emptyCellClicked = function() {
+		if (!this.isCardActioned) {
+			this.state.playerDeselected();
+			this.trigger("player-unselected", {message: this.message, state: this.state});
+		} 
 	};
 
-
-	UserAreaController.prototype.getDimensions = function() {
-		return this.stateHelper.getDimensions();
+	UserAreaController.prototype.playerClicked = function(posX, posY) {
+		this.state.playerSelected(posX, posY);
+		this.trigger("player-selected", {message: this.message, state: this.state});
 	};
 
-	UserAreaController.prototype.getUserPlayerPositions = function() {
-		return this.stateHelper.getUserPlayerPositions();
+	UserAreaController.prototype.actionSelected = function(action) {
+		this.state.actionSelected(action);
+		this.trigger("action-selected", {message: this.message, state: this.state});
 	};
 
-	UserAreaController.prototype.getRivalPlayerPositions = function() {
-		return this.stateHelper.getRivalPlayerPositions();
+	UserAreaController.prototype.actionDeselected = function() {
+		this.state.actionDeselected();
+		this.trigger("action-unselected", {message: this.message, state: this.state});
 	};
 
-	UserAreaController.prototype.getSelectedPlayer = function() {
-		return this.selectedPlayer;
-	};
+	UserAreaController.prototype.cardDeselected = function(card) {
+		this.state.cardDeselected(card);
+		this.trigger("card-deselected", {message: this.message, state: this.state});
 
-	UserAreaController.prototype.getBallPosition = function() {
-		return this.stateHelper.getBallPosition();
-	};
-
-	UserAreaController.prototype.getPlayerImage = function() {
-		return (this.stateHelper) ? this.stateHelper.getPlayerImage(this.selectedPlayer) : "";
-	};
-
-	UserAreaController.prototype.getPlayerStats = function() {
-		return this.stateHelper.getPlayerStats(this.selectedPlayer);
-	};
-
-	UserAreaController.prototype.getPlayerActions = function() {
-		return this.stateHelper.getPlayerActions(this.selectedPlayer);
-	};
-
-	UserAreaController.prototype.getSelectedAction = function() {
-		return (this.seletecActions[this.selectedPlayer]) ? this.seletecActions[this.selectedPlayer] : "";
-	};
-
-	UserAreaController.prototype.getTeamScores = function() {
-		return this.stateHelper.getTeamScores();
-	};
-
-	UserAreaController.prototype.getSelectedPlayerPosition = function() {
-		return this.stateHelper.getPlayerPosition(this.selectedPlayer);
-	};
-
-	UserAreaController.prototype.getActionPosibilities = function() {
-		var action = this.seletecActions[this.selectedPlayer];
-		this.actionPosibilities = this.stateHelper["get" + action + "Posibilities"](this.selectedPlayer, this.cellChosen);
-		return this.actionPosibilities;
-	};
-
-	UserAreaController.prototype.getSelectActionState = function() {
-		return this.isPlayerInSelectActionState; 
-	};
-
-	UserAreaController.prototype.getSelectedActionPosition = function() {
-		return (this.cellChosen[this.selectedPlayer]) ? this.cellChosen[this.selectedPlayer] : null; 
-	};
-
-	UserAreaController.prototype.canPerform = function(action) {
-		var result = true;
-		if (!this.selectedPlayer) {
-			return false;
-		}
-
-		if (action === "Pass" || action === "Shoot") {
-			result = this.stateHelper.playerHasBall(this.selectedPlayer);
-		}
-
-		return result;
-	};
-
-	function setChosenCell(x, y) {
-		for (var i = 0, len = this.actionPosibilities.length; i < len; i++) {
-			if (this.actionPosibilities[i].x === x && this.actionPosibilities[i].y === y) {
-				this.cellChosen[this.selectedPlayer] = {"x": x, "y": y};
-				this.isPlayerInSelectActionState = false;
-				this.trigger("action-state-changed", this);
-				break;
-			}
+		if (this.playerSelectedHandler) {
+			this.off("posibility-selected", this.playerSelectedHandler);
+			this.playerSelectedHandler = null;	
 		}
 	};
 
-	return UserAreaController;
+	UserAreaController.prototype.cardActioned = function(card, callback) {
+		if (this.state.cardSelected(card)) {
+			this.isCardActioned = true;
+			this.playerSelectedHandler = onPlayerSelected.bind(this, callback);
+			this.on("posibility-selected", this.playerSelectedHandler);
+			this.trigger("card-selected", {message: this.message, state: this.state});
+		}
+	};
+
+	function onPlayerSelected(callback) {
+		callback();
+		this.trigger("card-actioned", {message: this.message, state: this.state});
+		this.off("posibility-selected", this.playerSelectedHandler);
+		this.playerSelectedHandler = null;
+		this.isCardActioned = false;
+	};
+
+	return new UserAreaController();
 });

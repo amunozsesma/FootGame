@@ -1,152 +1,176 @@
-define(function() {
+define(["react", "utils/Utils", "game/UserAreaController"], function (React, Utils, Controller) {
 	"use strict";
 
-	var PitchComponent = function(pitchElement, userAreaController) {
-		this.pitchElement = pitchElement;
-		this.userAreaController = userAreaController;
+	var ReactCSSTransitionGroup = React.addons.CSSTransitionGroup;
 
-		init.call(this);
-		this.userAreaController.on("load-state", loadState, this);
-		this.userAreaController.on("player-selected", selectPlayer, this);
-		this.userAreaController.on("player-unselected", unselectPlayer, this);
-		this.userAreaController.on("action-clicked", onActionSelected, this);
-		this.userAreaController.on("action-state-changed", onActionStateChanged, this);
-	};
+	var PitchComponent = React.createClass({
+		getInitialState: function() {
+			return {
+				ballPosition: null,
+				userPlayers: null,
+				rivalPlayers: null,
+				actionPosibilities: null,
+				actionSelections: null,
+				actionedCards: null,
+				selectedCell: null,
+				isSelecting: false
+			};
+		},
 
-	function init() {
-		var own = this;
+		setInitialState: function(data) {
+			this.setState({
+				ballPosition: 	data.message.getBallPosition(),
+				userPlayers: 	data.message.getUserPlayerPositions(),
+				rivalPlayers: 	data.message.getRivalPlayerPositions(),
+				actionPosibilities: null,
+				actionSelections: 	null,
+				selectedCell: 		null,
+				isSelecting: false
+			});
+		},
 
-		var pitchComponent = React.createClass({
-			getInitialState: function() {
-				return {
-					"userAreaController": own.userAreaController, //pitch
-					"dimensions": {"columns": 1, "rows": 1},      //pitch
-					"userPlayers": null,                            //pitch
-					"selectActionState": false,                   //pitch
-					"rivalPlayers": null,                           //pitch
-					"selectedPlayerPosition": null,
-					"posibleActions": [],
-					"selectedActionPosition": null,
-					"ballPosition": null
-				};
-			},
-			render: function() {
-				var rowElements = this.loadField();
-				var className = "pitch" + ((this.state.selectActionState) ? " slected-action-state" : "");
-				className += (this.state.selectedPlayerPosition) ? " player-selected" : "";
-				return React.createElement("div", { className: className }, rowElements);
-			},
-			cellClicked: function(x, y) {
-				this.state.userAreaController.cellClicked(x, y);
-			},
-			loadField: function() {
-				var rows = this.state.dimensions.rows;
-				var columns = this.state.dimensions.columns;
-				var rowElements = [];
-				var columnElements = [];
-				for (var i = 0; i < rows; i++) {
-					columnElements = [];
-					for (var j = 0; j < columns; j++) {
-						var cell = this.createCell(j, i);
-						columnElements.push(cell);
-					} 
-					rowElements.push(React.createElement("div", { className: 'row', style: {width: "100%", height:100/rows + "%" } }, columnElements));
-				}
+		setShowSelections: function(data) {
+			this.setState({
+				actionSelections: data.state.getCurrentSelections(),
+				selectedCell: data.state.getSelectedPlayerPosition(),
+				actionPosibilities: null,
+				isSelecting: false
+			});
+		},
 
-				return rowElements;
-			},
-			createCell: function(x, y) {
-				var rows = this.state.dimensions.rows;
-				var columns = this.state.dimensions.columns;
-				var player = this.createPlayerIfNeeded(x, y);
-				var className = "cell skeleton";
-				className += (player) ? " player" : "";
-				className += (this.state.selectedPlayerPosition && this.state.selectedPlayerPosition.x === x && this.state.selectedPlayerPosition.y === y) ? " selected" : "";
-				className += (this.state.selectActionState && this.isPosibilityCell(x, y)) ? " action-posibility" : "";
-				className += (this.state.selectedActionPosition && this.state.selectedActionPosition.x === x && this.state.selectedActionPosition.y === y) ? " action-selected" : "";
+		setShowPosibilities: function(data) {
+			this.setState({
+				actionPosibilities: data.state.getActionPosibilities(),
+				selectedCell: null,
+				actionSelections: null,
+				isSelecting: true
+			});
+		},
 
-				var sons = [player];
-				if (this.state.ballPosition && this.state.ballPosition.x === x && this.state.ballPosition.y === y) {
-					sons.push(React.createElement("div", {className: "ball"}));
-				}
-				return React.createElement("div", { onClick:this.cellClicked.bind(this, x, y), className: className, style: {width: 100/columns + "%", height:"100%", float: "left"} }, sons);
-			},
-			createPlayerIfNeeded: function(x, y) {
-				var player = null;
-				if (this.state.userPlayers && this.state.rivalPlayers) {
-					player = this.loadPlayer(this.state.userPlayers, x, y, 'mine fa fa-child');
-					if (!player) {
-						player = this.loadPlayer(this.state.rivalPlayers, x, y, 'rival fa fa-child');
-					}
-				}
+		setCardPosibilities: function(data) {
+			this.setState({
+				actionPosibilities: data.state.getCardPosibilities()
+			});
+		},
 
-				return player;
-			},
-			loadPlayer: function(players, x, y, className) {
-				var player = null;
-				for (var i = 0; i < players.length; i++) {
-					if (players[i].x === x && players[i].y === y) {
-						player = React.createElement("div", {className: className});
-						break;
-					}
-				}
+		componentWillMount: function() {
+			Controller.on("load-state",			 this.setInitialState	  );
+			Controller.on("player-selected", 	 this.setShowSelections   );
+			Controller.on("posibility-selected", this.setShowSelections   );
+			Controller.on("action-selected", 	 this.setShowPosibilities );
+			Controller.on("action-unselected", 	 this.setInitialState	  );
+			Controller.on("player-unselected",	 this.setInitialState	  );
+			Controller.on("card-selected",	 	 this.setCardPosibilities );
+			Controller.on("turn-end",	 		 this.setInitialState	  );
+		},
 
-				return player;
-			},
-			isPosibilityCell: function(x, y) {
-				for (var i = 0, len = this.state.posibleActions.length; i < len; i++) {
-					var cell = this.state.posibleActions[i];
-					if (cell.x === x && cell.y === y) {
-						return true;
-					}
+		createCellMatrix: function() {
+			var cells = [];
+			var numberOfColumns = parseInt(this.props.columns);
+			var numberOfRows = parseInt(this.props.rows);
+
+			for (var x = 0; x < numberOfColumns; x++) {
+				cells[x] = [];
+				for (var y = 0; y < numberOfRows; y++) {
+					cells[x].push({posX: x, posY: y});
 				}
 			}
 
-		});
+			return cells;
+		},
 
-		var pitchElement = React.createElement(pitchComponent);
-		this.reactComponent = React.render(pitchElement, this.pitchElement);
-	};
+		addProperties: function(cellMatrix, propertyName, positions) {
+			if (positions && positions[0]) {
+				positions.forEach(function(position) {
+					cellMatrix[position.x][position.y][propertyName] = true;
+				});
+			}
+		},
 
-		//TODO REFACTOR have only a single call that updates full state
-	function loadState(userAreaController) {
-		this.reactComponent.setState({
-			"dimensions": userAreaController.getDimensions(),
-			"userPlayers": userAreaController.getUserPlayerPositions(),
-			"rivalPlayers": userAreaController.getRivalPlayerPositions(),
-			"ballPosition": userAreaController.getBallPosition(),
-			"selectedPlayerPosition": null,
-			"posibleActions": [],
-			"selectedActionPosition": null,
-			"selectActionState": false
-		});	
-	};
+		createCellArray: function(cellMatrix) {
+			var numberOfColumns = parseInt(this.props.columns);
+			var numberOfRows = parseInt(this.props.rows);
+			var cellStyle = {height: 100/numberOfRows + "%", width: 100/numberOfColumns + "%"};
+			var cells = [];
+			var cell = null;
+			
+			for (var y = 0; y < numberOfRows; y++) {
+				for (var x = 0; x < numberOfColumns; x++) {
+					cell = cellMatrix[x][y];
+					cells.push(
+						<Cell 
+							posX={cell.posX} 
+							posY={cell.posY} 
+							userPlayer={!!cell.userPlayer} 
+							rivalPlayer={!!cell.rivalPlayer} 
+							ball={!!cell.ball} 
+							actionPosibility={!!cell.actionPosibility} 
+							actionSelection={!!cell.actionSelection} 
+							cellStyle={cellStyle}
+							isSelected={!!cell.isSelected}
+							isEmptyCellClickabel={!this.state.isSelecting}/>
+					);
+				}
+			}
 
-	function selectPlayer(userAreaController) {
-		this.reactComponent.setState({
-			"selectedPlayerPosition": userAreaController.getSelectedPlayerPosition(),
-			"selectedActionPosition": userAreaController.getSelectedActionPosition()
-		});
-	};
+			return cells;
+		},
 
-	function unselectPlayer(userAreaController) {
-		this.reactComponent.setState({
-			"selectedPlayerPosition": null
-		});
-	};
+		render: function() {
+			var cellMatrix = this.createCellMatrix();
+			this.addProperties(cellMatrix, "userPlayer"			, this.state.userPlayers);
+			this.addProperties(cellMatrix, "rivalPlayer"		, this.state.rivalPlayers);
+			this.addProperties(cellMatrix, "ball"				, [this.state.ballPosition]);
+			this.addProperties(cellMatrix, "actionPosibility"	, this.state.actionPosibilities);
+			this.addProperties(cellMatrix, "actionSelection"	, this.state.actionSelections);
+			this.addProperties(cellMatrix, "isSelected"			, [this.state.selectedCell]);
 
-	function onActionSelected(userAreaController) {
-		this.reactComponent.setState({
-			"posibleActions": userAreaController.getActionPosibilities()
-		});
-	};
+			var cells = this.createCellArray(cellMatrix);
 
-	function onActionStateChanged(userAreaController) {
-		this.reactComponent.setState({
-			"selectActionState": userAreaController.getSelectActionState(),
-			"selectedActionPosition": userAreaController.getSelectedActionPosition()
-		});
-	};
+			return (
+				<div className="pitch">
+					{cells}
+				</div>
+			);
+		}
+	});
 
-	return PitchComponent; 
+	var Cell = React.createClass({
+		onCellClicked: function() {
+			if (this.props.actionPosibility) {
+				Controller.posibilityClicked(this.props.posX, this.props.posY);
+			} else if (this.props.userPlayer || this.props.rivalPlayer) {
+				Controller.playerClicked(this.props.posX, this.props.posY);
+			} else if (this.props.isEmptyCellClickabel){
+				Controller.emptyCellClicked();
+			}
+		},
+
+		generateChilds: function(isUserPlayer, isRivalPlayer, isBall) {
+			var childs = [];
+			isUserPlayer && childs.push(<div className="mine fa fa-child"></div>);
+			isRivalPlayer && childs.push(<div className="rival fa fa-child"></div>);
+			isBall && childs.push(<div className="ball"></div>);
+
+			return childs;
+		},
+
+		render: function() {
+			var childs = this.generateChilds(this.props.userPlayer, this.props.rivalPlayer, this.props.ball);
+			var className = Utils.reactClassAppender({
+				"action-selected": this.props.actionSelection,
+				"action-posibility": this.props.actionPosibility,
+				"player": this.props.userPlayer || this.props.rivalPlayer,
+				"selected": this.props.isSelected
+			}, "cell skeleton");
+
+			return (
+				<div className={className} style={this.props.cellStyle} onClick={this.onCellClicked}>
+					{childs}
+				</div>
+			);
+		}
+	});
+
+	return <PitchComponent columns="11" rows="5"/>;
 });

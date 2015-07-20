@@ -1,0 +1,29 @@
+/* TODO REFACTOR, per component state*/
+
+#game-area {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	min-width: 1024px;
+	min-height: 768px;
+	padding: 5px;
+
+	overflow: hidden;
+}
+
+#panel-container {
+	position: relative;
+  	width: 100%;
+  	height: 100%;
+}
+
+#user-area {
+	float: left;
+	width: 70%;
+	height: 100%;
+	padding: 5px;
+
+	overflow: hidden;
+}

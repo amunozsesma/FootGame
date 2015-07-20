@@ -1,0 +1,149 @@
+#card-area {
+	float: left;
+	width: 30%;
+	height: 100%;
+	padding: 5px;
+	border: 1px solid #9C9C9C;
+}
+
+.deck-section {
+	height: 100px;
+	border-bottom: 1px solid #9C9C9C;
+	position: relative;
+}
+
+.deck-section .deck-card {
+	height: 55px;
+	width: 45px;
+	border: 1px solid #9C9C9C;
+	position: absolute;
+	margin-top: 15px;
+	margin-left: 15px;
+	background-image: url(/images/deck-card-texture.jpg);
+	padding: 10px;
+}
+
+.revealed-cards-section {
+	height: 400px;
+	border-bottom: 1px solid #9C9C9C;
+	position: relative;
+}
+
+.card {
+	height: 95px;
+	width: 120px;
+	border: 1px solid #9C9C9C;
+	margin-left: 15px;
+	margin-top: 15px;
+	float: left;
+	background-color: white;
+	padding: 5px;
+	overflow: hidden;
+	position: relative;
+
+	-webkit-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.75);
+	box-shadow: 1px 1px 1px 0px rgba(0,0,0,0.75);
+}
+
+.card .title {
+	text-align: center;
+}
+
+.card .description {
+	padding: 12px 5px 0 5px;
+	font-size: 12px;
+}
+
+.card:hover {
+	cursor: pointer;
+}
+
+.card.disabled {
+	color: #D6D6D6;
+}
+
+.card.disabled:hover {
+	cursor: default;
+}
+
+.card-enter {
+	opacity: 0;
+	transition: opacity 0.5s;
+}
+
+.card-enter.card-enter-active {
+	opacity: 0.7;
+}
+
+.card-leave {
+	opacity: 0.7;
+	transition: opacity 0.5s;
+}
+
+.card-leave.card-leave-active {
+	opacity: 0;
+}
+
+.actioned-cards-section {
+	padding: 0 15px 15px 15px;
+}
+
+.actioned-cards-section .card {
+	height: 45px;
+	margin-left: 0px;
+	width: 100%;
+	padding: 5px;
+	overflow: visible;	
+}
+
+.actioned-cards-section .card span {
+	float: left;
+}
+
+.actioned-cards-section .card .actions-left {
+	position: absolute;
+	text-align: center;
+	font-size: 13px;
+	width: 20px;
+	height: 20px;
+	border: 1px solid black;
+	padding: 0px;
+	border-radius: 50%;
+	color: white;
+	background-color: #0066FF;
+	font-weight: bolder;
+	margin: 7px 0 0 80%;
+}
+
+.actioned-cards-section .card.disabled .actions-left {
+	color: white;
+	background-color: #D6D6D6;
+}
+
+.actioned-cards-section .card .close{
+	float: right;
+	margin: -15px -15px 0 0;
+	font-size: 20px !important;
+	color: black;
+}
+
+.actioned-cards-section .card .close:hover{
+	color: grey;
+	cursor: pointer;
+}
+
+
+.card.zoomed {
+	position: absolute;
+	height: 190px;
+	width: 180px;
+	top: 50%;
+	left: 50%;
+	margin: -95px 0 0 -90px;
+	cursor: default;
+
+	-webkit-box-shadow: 1px 1px 300px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 1px 1px 300px 0px rgba(0,0,0,0.75);
+	box-shadow: 1px 1px 300px 0px rgba(0,0,0,0.75);
+}

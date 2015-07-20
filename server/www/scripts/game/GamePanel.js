@@ -1,15 +1,16 @@
 define([
-	"game/components/PitchComponent", 
-	"game/components/ActionsComponent", 
-	"game/components/InfoComponent", 
-	"game/UserAreaController", 
+	"react",
+	"jsx!game/components/PitchComponent", 
+	"jsx!game/components/ActionsComponent", 
+	"jsx!game/components/CardInfoComponent",
+	"jsx!game/components/InfoComponent", 
+	"jsx!game/components/CardsComponent", 
 	"game/GameManager"], 
-function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, GameManager) {
+function(React, PitchComponent, ActionsComponent, CardInfoComponent, InfoComponent, CardsComponent, GameManager) {
 	"use strict";
 
 	function GamePanel() {
-		this.userAreaController = new UserAreaController();
-		this.gameManager = new GameManager(this.userAreaController);
+		this.gameManager = new GameManager();
 
 		this.keyPressHandler = function(event) {
 			if (event.keyCode === 13) {
@@ -19,20 +20,23 @@ function(PitchComponent, ActionsComponent, InfoComponent, UserAreaController, Ga
 	};
 
 	GamePanel.prototype.getElement = function() {
-		var infoContainer    = React.createElement("div", {id: "info-container"});
-		var pitchContainer   = React.createElement("div", {id: "pitch-container"});
-		var actionsContainer = React.createElement("div", {id: "actions-container"});
-		var userArea         = React.createElement("div", {id: "user-area"}, [infoContainer, pitchContainer, actionsContainer]);
-		var cardArea         = React.createElement("div", {id: "card-area", className: "skeleton red"}, "CARDS");
+		var infoContainer     = React.createElement("div", {id: "info-container"});
+		var pitchContainer    = React.createElement("div", {id: "pitch-container"});
+		var actionsContainer  = React.createElement("div", {id: "actions-container"});
+		var cardInfoContainer = React.createElement("div", {id: "cardinfo-container"});
+		var userArea          = React.createElement("div", {id: "user-area"}, [infoContainer, pitchContainer, cardInfoContainer, actionsContainer]);
+		var cardArea          = React.createElement("div", {id: "card-area"});
 
 		return [userArea, cardArea]; 
 	};
 
 	GamePanel.prototype.onShow = function() {
-		this.pitchComponent     = new PitchComponent(document.getElementById("pitch-container"), this.userAreaController);
-		this.infoComponent      = new InfoComponent(document.getElementById("info-container"), this.userAreaController);
-		this.actionshComponent  = new ActionsComponent(document.getElementById("actions-container"), this.userAreaController);
-		
+		React.render(PitchComponent, document.getElementById("pitch-container"));
+		React.render(InfoComponent, document.getElementById("info-container"));
+		React.render(ActionsComponent, document.getElementById("actions-container"));
+		React.render(CardInfoComponent, document.getElementById("cardinfo-container"));
+		React.render(CardsComponent, document.getElementById("card-area"));
+
 		this.gameManager.start();
 		document.body.addEventListener("keypress", this.keyPressHandler);
 	};
